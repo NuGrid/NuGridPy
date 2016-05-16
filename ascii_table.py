@@ -37,6 +37,10 @@ Assumptions for Trajectory Files:
     'time', the second with 'T' and the third with rho.
 
 """
+from __future__ import print_function
+from builtins import input
+from builtins import str
+from builtins import range
 from numpy import *
 from data_plot import *
 import matplotlib.pylab as pyl
@@ -170,13 +174,13 @@ class ascii_table(DataPlot):
         if read:
 
             self.hattrs,self.data=self._readFile(sldir,filename,sep)
-            self.dcols=self.data.keys()
+            self.dcols=list(self.data.keys())
         else:
             a=self.write(filename,headers,dcols,data,headerlines,sldir,sep)
             if a ==None:
                 return None
             self.hattrs,self.data=self._readFile(sldir,filename,sep)
-        self.dcols=self.data.keys()
+        self.dcols=list(self.data.keys())
 
     def get(self, attri):
         ''' 
@@ -198,8 +202,8 @@ class ascii_table(DataPlot):
         elif attri in self.hattrs:
             isHead=True
         else:
-            print "That attribute does not exist in this File"
-            print 'Returning None'
+            print("That attribute does not exist in this File")
+            print('Returning None')
 
         if isCol:
             return self.getColData(attri)
@@ -281,7 +285,7 @@ class ascii_table(DataPlot):
                 i+=1
         while i<len(fileLines):
             tmp=fileLines[i].split()
-            for j in xrange(len(tmp)):
+            for j in range(len(tmp)):
                 tmp[j]=tmp[j].strip()
             data.append(tmp)
             i+=1
@@ -334,8 +338,8 @@ def writeTraj(filename='trajectory.input', data=[], ageunit=0, tunit=0,
 
     '''
     if data==[]:
-        print 'Please input correct data'
-        print 'returning None'
+        print('Please input correct data')
+        print('returning None')
         return None
     headers=[]
     if ageunit ==1:
@@ -411,24 +415,24 @@ def write(filename, headers, dcols, data, headerlines=[],
                  # in each column
 
     if os.path.exists(filename):
-        print 'Warning this method will overwrite '+ filename
-        print 'Would you like to continue? (y)es or (n)no?'
-        s = raw_input('--> ')
+        print('Warning this method will overwrite '+ filename)
+        print('Would you like to continue? (y)es or (n)no?')
+        s = input('--> ')
         if s=='Y' or s=='y' or s=='Yes' or s=='yes':
-            print 'Yes selected'
-            print 'Continuing as normal'
+            print('Yes selected')
+            print('Continuing as normal')
         else:
-            print 'No Selected'
-            print 'Returning None'
+            print('No Selected')
+            print('Returning None')
             return None
 
     if len(data)!=len(dcols):
-        print 'The number of data columns does not equal the number of Data attributes'
-        print 'returning none'
+        print('The number of data columns does not equal the number of Data attributes')
+        print('returning none')
         return None
     if trajectory:
         sep=' '
-    for i in xrange(len(headers)):
+    for i in range(len(headers)):
         if not trajectory:
             tmp.append(header_char+' '+headers[i]+'\n')
         else:
@@ -436,9 +440,9 @@ def write(filename, headers, dcols, data, headerlines=[],
     headers=tmp
     tmp=''
 
-    for i in xrange(len(data)): #Line length stuff
+    for i in range(len(data)): #Line length stuff
         length=len(dcols[i])
-        for j in xrange(len(data[i])):
+        for j in range(len(data[i])):
             if len(str(data[i][j]))>length:
                 length=len(str(data[i][j]))
         lengthList.append(length)
@@ -447,12 +451,12 @@ def write(filename, headers, dcols, data, headerlines=[],
     tmp1=''
     if trajectory:
         tmp='#'
-    for i in xrange(len(dcols)):
+    for i in range(len(dcols)):
         tmp1=dcols[i]
         if not trajectory:
             if len(dcols[i]) < lengthList[i]:
                 j=lengthList[i]-len(dcols[i])
-                for k in xrange(j):
+                for k in range(j):
                     tmp1+=' '
             tmp+=sep+tmp1
         else:
@@ -462,12 +466,12 @@ def write(filename, headers, dcols, data, headerlines=[],
     tmp=''
 
 
-    for i in xrange(len(data[0])):
-        for j in xrange(len(data)):
+    for i in range(len(data[0])):
+        for j in range(len(data)):
             tmp1=str(data[j][i])
             if len(str(data[j][i])) < lengthList[j]:
                 l=lengthList[j]-len(str(data[j][i]))
-                for k in xrange(l):
+                for k in range(l):
                     tmp1+=' '
             tmp+=sep+tmp1
         lines.append(tmp+'\n')
@@ -475,16 +479,16 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     f=open(filename,'w')
     if not trajectory:
-        for i in xrange(len(headers)):
+        for i in range(len(headers)):
             f.write(headers[i])
         f.write(dcols)
     else:
         f.write(dcols)
-        for i in xrange(len(headerlines)):
+        for i in range(len(headerlines)):
             f.write('# '+headerlines[i]+'\n')
-        for i in xrange(len(headers)):
+        for i in range(len(headers)):
             f.write(headers[i])
-    for i in xrange(len(lines)):
+    for i in range(len(lines)):
         f.write(lines[i])
 
     f.close()
@@ -569,20 +573,20 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 			     # in each column
 			     
 		if os.path.exists(filename):
-			print 'This method will add table to existing file '+ filename
+			print('This method will add table to existing file '+ filename)
 		
 		if len(data)!=len(dcols):
-			print 'The number of data columns does not equal the number of Data attributes'
-			print 'returning none'
+			print('The number of data columns does not equal the number of Data attributes')
+			print('returning none')
 			return None
-		for i in xrange(len(headers)):
+		for i in range(len(headers)):
 			tmp.append(header_char+' '+headers[i]+'\n')
 		headers=tmp
 		tmp=''
 		
-		for i in xrange(len(data)): #Line length stuff
+		for i in range(len(data)): #Line length stuff
 			length=len(dcols[i])+1
-			for j in xrange(len(data[i])):
+			for j in range(len(data[i])):
 				tmp2=data[i][j]
 				if isinstance(data[i][j],float):
 					tmp2='{:.3E}'.format(data[i][j])+' '
@@ -593,25 +597,25 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 		
 		tmp=''
 		tmp1=''
-		for i in xrange(len(dcols)):
+		for i in range(len(dcols)):
 			tmp1=dcols[i]
 			if len(dcols[i]) < lengthList[i]:
 				j=lengthList[i]-len(dcols[i])
-				for k in xrange(j):
+				for k in range(j):
 					tmp1+=' '
 			tmp+=sep+tmp1
 		tmp+='\n'
 		dcols=tmp
 		tmp=''
-		for i in xrange(len(data[0])):
-			for j in xrange(len(data)):
+		for i in range(len(data[0])):
+			for j in range(len(data)):
 				if type(data[j][i]) == str:
 					#match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
                                         #items = match.groups()
                                         tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
                                 	if len(str(data[j][i])) < lengthList[j]:
                                         	l=lengthList[j]-len(tmp1)
-                                        	for k in xrange(l):
+                                        	for k in range(l):
                                                 	tmp1+=' '
 					extra=''	
 				#else:
@@ -627,10 +631,10 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 			tmp=''
 			
 		f=open(filename,'a')
-		for i in xrange(len(headers)):
+		for i in range(len(headers)):
 			f.write(headers[i])
 		f.write(dcols)
-		for i in xrange(len(lines)):
+		for i in range(len(lines)):
 			f.write(lines[i])
 		
 		f.close()
@@ -714,20 +718,20 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 			     # in each column
 			     
 		if os.path.exists(filename):
-			print 'This method will add table to existing file '+ filename
+			print('This method will add table to existing file '+ filename)
 		
 		if len(data)!=len(dcols):
-			print 'The number of data columns does not equal the number of Data attributes'
-			print 'returning none'
+			print('The number of data columns does not equal the number of Data attributes')
+			print('returning none')
 			return None
-		for i in xrange(len(headers)):
+		for i in range(len(headers)):
 			tmp.append(header_char+' '+headers[i]+'\n')
 		headers=tmp
 		tmp=''
 		
-		for i in xrange(len(data)): #Line length stuff
+		for i in range(len(data)): #Line length stuff
 			length=len(dcols[i])+1
-			for j in xrange(len(data[i])):
+			for j in range(len(data[i])):
 				tmp2=data[i][j]
 				if isinstance(data[i][j],float):
 					tmp2='{:.3E}'.format(data[i][j])+' '
@@ -738,25 +742,25 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 		
 		tmp=''
 		tmp1=''
-		for i in xrange(len(dcols)):
+		for i in range(len(dcols)):
 			tmp1=dcols[i]
 			if len(dcols[i]) < lengthList[i]:
 				j=lengthList[i]-len(dcols[i])
-				for k in xrange(j):
+				for k in range(j):
 					tmp1+=' '
 			tmp+=sep+tmp1
 		tmp+='\n'
 		dcols=tmp
 		tmp=''
-		for i in xrange(len(data[0])):
-			for j in xrange(len(data)):
+		for i in range(len(data[0])):
+			for j in range(len(data)):
 				if type(data[j][i]) == str:
 					#match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
                                         #items = match.groups()
                                         tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
                                 	if len(str(data[j][i])) < lengthList[j]:
                                         	l=lengthList[j]-len(tmp1)
-                                        	for k in xrange(l):
+                                        	for k in range(l):
                                                 	tmp1+=' '
 					extra=''	
 				#else:
@@ -772,10 +776,10 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
 			tmp=''
 			
 		f=open(filename,'a')
-		for i in xrange(len(headers)):
+		for i in range(len(headers)):
 			f.write(headers[i])
 		f.write(dcols)
-		for i in xrange(len(lines)):
+		for i in range(len(lines)):
 			f.write(lines[i])
 		
 		f.close()

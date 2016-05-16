@@ -118,6 +118,12 @@ v0.1, 23JUN2010: Falk Herwig
     a1.cols and a1.header_attr gives the column names and header attributes.
    
 '''
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import ascii_table
 import numpy as np
 import utils as u
@@ -290,7 +296,7 @@ class mesa_profile(DataPlot):
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
             try:
-                print 'nugrid_path = '+nugrid_path
+                print('nugrid_path = '+nugrid_path)
             except:
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using mesa.set_nugrid_path('path')")
             
@@ -301,14 +307,14 @@ class mesa_profile(DataPlot):
             setname=setsnames[idx]
             realZ=setsZs[idx]
             
-            print 'closest set is '+setname+' (Z = '+str(realZ)+')'
+            print('closest set is '+setname+' (Z = '+str(realZ)+')')
             
             # try first data, then data-team:
             mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
                 mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
-                print 'mod_dir = ', mod_dir
+                print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
             
             # which mass? [find nearest]
@@ -324,7 +330,7 @@ class mesa_profile(DataPlot):
             modname=list[idx2]
             realmass=setmasses[idx2]
             
-            print 'closest mass is '+str(realmass)
+            print('closest mass is '+str(realmass))
             
             mod_dir+=modname
             if 'LOGS' not in os.listdir(mod_dir):
@@ -347,43 +353,43 @@ class mesa_profile(DataPlot):
             nearest       = min(abs(self.model[nearmods[0]]-num),\
                                     abs(self.model[nearmods[1]]-num))
             num = self.model[sometable[nearest]]
-            print 'Found and load nearest profile for cycle '+str(num)
+            print('Found and load nearest profile for cycle '+str(num))
             num_type = 'model'
         if num_type is 'model':
             try:
                 log_num=self.log_ind[num]
             except KeyError:
-                print 'There is no profile file for this model'
-                print "You may retry with num_type='nearest_model'"
+                print('There is no profile file for this model')
+                print("You may retry with num_type='nearest_model'")
                 return
         elif num_type is 'profiles_i':
             log_num=self._log_file_ind(num)
             if log_num == -1:
-                print "Could not find a profile file with that number"
+                print("Could not find a profile file with that number")
                 return
         elif num_type is 'profile_num':
             log_num = num
         elif num_type is 'explicit':
             pass
         else:
-            print 'unknown num_type'
+            print('unknown num_type')
             return
 
         if num_type is 'explicit':
             filename = sldir+'/'+give_filename
             if not os.path.exists(filename):
-                print 'error: file '+give_filename+' not found in '+sldir
+                print('error: file '+give_filename+' not found in '+sldir)
         else:
             filename=self.sldir+'/'+profile_prefix+str(log_num)+data_suffix
             if not os.path.exists(filename):
                 profile_prefix='log'
                 filename=self.sldir+'/'+profile_prefix+str(log_num)+data_suffix
                 if not os.path.exists(filename):
-                    print 'error: no profile.data file found in '+sldir
-                    print 'error: no log.data file found in '+sldir
+                    print('error: no profile.data file found in '+sldir)
+                    print('error: no log.data file found in '+sldir)
 
 
-        print 'reading '+filename+' ...'
+        print('reading '+filename+' ...')
         header_attr = _read_mesafile(filename,only='header_attr')
         num_zones=int(header_attr['num_zones'])
         header_attr,cols,data = _read_mesafile(filename,data_rows=num_zones,only='all')
@@ -394,7 +400,7 @@ class mesa_profile(DataPlot):
 
 
     def __del__(self):
-        print 'Closing profile tool ...'
+        print('Closing profile tool ...')
 
     def _profiles_index(self):
         ''' 
@@ -417,7 +423,7 @@ class mesa_profile(DataPlot):
         f = open(self.sldir+'/'+prof_ind_name,'r')
         line = f.readline()
         numlines=int(line.split()[0])
-        print str(numlines)+' in profiles.index file ...'
+        print(str(numlines)+' in profiles.index file ...')
 
         model=[]
         log_file_num=[]
@@ -449,20 +455,20 @@ class mesa_profile(DataPlot):
 
         self._profiles_index()
         if inum <= 0:
-            print "Smallest argument is 1"
+            print("Smallest argument is 1")
             return
 
         inum_max = len(self.log_ind)
         inum -= 1
 
         if inum > inum_max:
-            print 'There are only '+str(inum_max)+' profile file available.'
+            print('There are only '+str(inum_max)+' profile file available.')
             log_data_number = -1
             return log_data_number
         else:
             log_data_number=self.log_ind[self.model[inum]]
-            print 'The '+str(inum+1)+'. profile.data file is '+ \
-                  str(log_data_number)
+            print('The '+str(inum+1)+'. profile.data file is '+ \
+                  str(log_data_number))
             return log_data_number
 
     def get(self,str_name):
@@ -496,7 +502,7 @@ class mesa_profile(DataPlot):
         try:
             from ProgenitorHotb_new import ProgenitorHotb_new
         except ImportError:
-            print 'Module ProgenitorHotb_new not found.'
+            print('Module ProgenitorHotb_new not found.')
             return
         import astronomy as ast
         nz=len(self.get('mass'))
@@ -560,7 +566,7 @@ class mesa_profile(DataPlot):
                 l.append(element+str(i))
             return l
 
-        abun_avail = self.cols.keys()
+        abun_avail = list(self.cols.keys())
 
         def elemental_abund(ilist,abun_avail):
             X = np.zeros(len(self.get('mass')))
@@ -687,14 +693,14 @@ class mesa_profile(DataPlot):
         rad = rad[::-1][:idx]
         ye = ye[::-1][:idx]
         
-        print 'there will be about ',rad[-1] / dr, 'mass cells...'
+        print('there will be about ',old_div(rad[-1], dr), 'mass cells...')
 
         # add r = 0 point to all arrays
         rad = np.insert(rad,0,0)
         ye  = np.insert(ye,0,ye[0])
         rho = np.insert(rho,0,rho[0])
 
-        print rad
+        print(rad)
 
         # interpolate
         fye  = interpolate.interp1d(rad,ye)
@@ -740,7 +746,7 @@ class mesa_profile(DataPlot):
             xaxis = mass
             xlab = 'Mass / M$_\odot$'
         else:
-            xaxis = radius / 1.e8 # Mm
+            xaxis = old_div(radius, 1.e8) # Mm
             xlab = 'radius / Mm'
         
         pl.plot(xaxis, np.log10(eps_nuc),
@@ -809,7 +815,7 @@ class history_data(DataPlot):
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
             try:
-                print 'nugrid_path = '+nugrid_path
+                print('nugrid_path = '+nugrid_path)
             except:
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using mesa.set_nugrid_path('path')")
             
@@ -820,14 +826,14 @@ class history_data(DataPlot):
             setname=setsnames[idx]
             realZ=setsZs[idx]
             
-            print 'closest set is '+setname+' (Z = '+str(realZ)+')'
+            print('closest set is '+setname+' (Z = '+str(realZ)+')')
             
             # try first data, then data-team:
             mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
                 mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
-                print 'mod_dir = ', mod_dir
+                print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
             
             # which mass? [find nearest]
@@ -843,7 +849,7 @@ class history_data(DataPlot):
             modname=list[idx2]
             realmass=setmasses[idx2]
             
-            print 'closest mass is '+str(realmass)
+            print('closest mass is '+str(realmass))
             
             mod_dir+=modname
             if 'LOGS' not in os.listdir(mod_dir):
@@ -854,8 +860,8 @@ class history_data(DataPlot):
         
         if not os.path.exists(self.sldir+'/'+self.slname):
             if not os.path.exists(self.sldir+'/'+'star.log'):
-                print 'error: no history.data file found in '+sldir
-                print 'error: no star.log file found in '+sldir
+                print('error: no history.data file found in '+sldir)
+                print('error: no star.log file found in '+sldir)
             else:
                 self.slname='star.log'
                 self._read_starlog()
@@ -863,7 +869,7 @@ class history_data(DataPlot):
             self._read_starlog()
 
     def __del__(self):
-        print 'Closing', self.slname,' tool ...'
+        print('Closing', self.slname,' tool ...')
 
 # let's start with functions that aquire data
     def _read_starlog(self):
@@ -874,14 +880,14 @@ class history_data(DataPlot):
         slaname = slname+'sa'
 
         if not os.path.exists(sldir+'/'+slaname):
-            print 'No '+self.slname+'sa file found, create new one from '+self.slname
+            print('No '+self.slname+'sa file found, create new one from '+self.slname)
             _cleanstarlog(sldir+'/'+slname)
         else:
             if self.clean_starlog:
-                print 'Requested new '+self.slname+'sa; create new from '+self.slname
+                print('Requested new '+self.slname+'sa; create new from '+self.slname)
                 _cleanstarlog(sldir+'/'+slname)
             else:
-                print 'Using old '+self.slname+'sa file ...'
+                print('Using old '+self.slname+'sa file ...')
 
         cmd=os.popen('wc '+sldir+'/'+slaname)
         cmd_out=cmd.readline()
@@ -928,7 +934,7 @@ class history_data(DataPlot):
         def C_O(model):
             surface_c12=model.get('surface_c12')
             surface_o16=model.get('surface_o16')
-            CORatio=(surface_c12*4.)/(surface_o16*3.)
+            CORatio=old_div((surface_c12*4.),(surface_o16*3.))
             return CORatio
 
         if ixaxis=='time':
@@ -1275,7 +1281,7 @@ class history_data(DataPlot):
 
         gage= self.get('star_age')
         lage=np.zeros(len(gage))
-        agemin = max(abs(gage[-1]-gage[-2])/5.,1.e-10)
+        agemin = max(old_div(abs(gage[-1]-gage[-2]),5.),1.e-10)
         for i in np.arange(len(gage)):
             if gage[-1]-gage[i]>agemin:
                 lage[i]=np.log10(gage[-1]-gage[i]+agemin)
@@ -1364,8 +1370,8 @@ class history_data(DataPlot):
             skip=0
  
         age= self.get('star_age')
-        x1 = age / 1.e6
-        x2 = age / 1.e6
+        x1 = old_div(age, 1.e6)
+        x2 = old_div(age, 1.e6)
         y1 = self.get('mix_qtop_1')*self.get('star_mass')
         y2 = self.get('mix_qtop_2')*self.get('star_mass')
         mt1 = self.get('mix_type_1')
@@ -1451,8 +1457,8 @@ class history_data(DataPlot):
         elif xax == 'model':
             xaxisarray = self.get('model_number')
         else:
-            print 'kippenhahn_error: invalid string for x-axis selction.'+\
-                  ' needs to be "time" or "model"'
+            print('kippenhahn_error: invalid string for x-axis selction.'+\
+                  ' needs to be "time" or "model"')
 
         t0_mod=xaxisarray[t0_model]
 
@@ -1475,7 +1481,7 @@ class history_data(DataPlot):
         surface_c12       = self.get('surface_c12')
         surface_o16       = self.get('surface_o16')
 
-        COratio=(surface_c12*4.)/(surface_o16*3.)
+        COratio=old_div((surface_c12*4.),(surface_o16*3.))
 
         pyl.plot(xaxisarray[t0_model:]-t0_mod,COratio[t0_model:],'-k',label='CO ratio')
         pyl.ylabel('C/O ratio')
@@ -1501,9 +1507,9 @@ class history_data(DataPlot):
         if tp_agb > 0.:
             h1_min = min(h1_boundary_mass[t0_model:])
             h1_max = max(h1_boundary_mass[t0_model:])
-            h1_min = h1_min*(1.-tp_agb/100.)
-            h1_max = h1_max*(1.+tp_agb/100.)
-            print 'setting ylim to zoom in on H-burning:',h1_min,h1_max
+            h1_min = h1_min*(1.-old_div(tp_agb,100.))
+            h1_max = h1_max*(1.+old_div(tp_agb,100.))
+            print('setting ylim to zoom in on H-burning:',h1_min,h1_max)
             pyl.ylim(h1_min,h1_max)
 
     def kippenhahn(self, num_frame, xax, t0_model=0,
@@ -1559,7 +1565,7 @@ class history_data(DataPlot):
                 t0_mod=xaxisarray[t0_model]
             else:
                 t0_mod = 0.
-            print 'zero time is '+str(t0_mod)
+            print('zero time is '+str(t0_mod))
         elif xax == 'model':
             xaxisarray = self.get('model_number')
             #t0_mod=xaxisarray[t0_model]
@@ -1569,8 +1575,8 @@ class history_data(DataPlot):
             xaxisarray = np.log10(np.max(xaxi)+t_eps-xaxi)
             t0_mod = 0.
         else:
-            print 'kippenhahn_error: invalid string for x-axis selction.'+\
-                  ' needs to be "time" or "model"'
+            print('kippenhahn_error: invalid string for x-axis selction.'+\
+                  ' needs to be "time" or "model"')
 
 
         plot_bounds=True
@@ -1623,9 +1629,9 @@ class history_data(DataPlot):
         if tp_agb > 0.:
             h1_min = min(h1_boundary_mass[t0_model:])
             h1_max = max(h1_boundary_mass[t0_model:])
-            h1_min = h1_min*(1.-tp_agb/100.)
-            h1_max = h1_max*(1.+tp_agb/100.)
-            print 'setting ylim to zoom in on H-burning:',h1_min,h1_max
+            h1_min = h1_min*(1.-old_div(tp_agb,100.))
+            h1_max = h1_max*(1.+old_div(tp_agb,100.))
+            print('setting ylim to zoom in on H-burning:',h1_min,h1_max)
             pyl.ylim(h1_min,h1_max)
 
     def t_surfabu(self, num_frame, xax, t0_model=0,
@@ -1666,8 +1672,8 @@ class history_data(DataPlot):
             xaxisarray = self.get('star_age')
             xaxisarray=np.log10(max(xaxisarray[t0_model:])+t_eps-xaxisarray[t0_model:])
         else:
-            print 't-surfabu error: invalid string for x-axis selction.'+ \
-                  ' needs to be "time" or "model"'
+            print('t-surfabu error: invalid string for x-axis selction.'+ \
+                  ' needs to be "time" or "model"')
 
         star_mass         = self.get('star_mass')
         surface_c12       = self.get('surface_c12')
@@ -1678,7 +1684,7 @@ class history_data(DataPlot):
         target_n14 = -3.5
 
 
-        COratio=(surface_c12*4.)/(surface_o16*3.)
+        COratio=old_div((surface_c12*4.),(surface_o16*3.))
         t0_mod=xaxisarray[t0_model]
         log10_c12=np.log10(surface_c12[t0_model:])
 
@@ -1736,7 +1742,7 @@ class history_data(DataPlot):
         elif xax == 'model':
             xaxisarray = self.get('model_number')
         else:
-            print 'kippenhahn_error: invalid string for x-axis selction. needs to be "time" or "model"'
+            print('kippenhahn_error: invalid string for x-axis selction. needs to be "time" or "model"')
 
 
         logLH   = self.get('log_LH')
@@ -1774,7 +1780,7 @@ class history_data(DataPlot):
         elif xax == 'model':
             xaxisarray = self.get('model_number')
         else:
-            print 'kippenhahn_error: invalid string for x-axis selction. needs to be "time" or "model"'
+            print('kippenhahn_error: invalid string for x-axis selction. needs to be "time" or "model"')
 
 
         logL    = self.get('log_L')
@@ -1872,25 +1878,25 @@ class history_data(DataPlot):
         # log of time left until core collapse
             gage= self.get('star_age')
             lage=np.zeros(len(gage))
-            agemin = max(abs(gage[-1]-gage[-2])/5.,1.e-10)
+            agemin = max(old_div(abs(gage[-1]-gage[-2]),5.),1.e-10)
             for i in np.arange(len(gage)):
                 if gage[-1]-gage[i]>agemin:
                     lage[i]=np.log10(gage[-1]-gage[i]+agemin)
                 else :
                     lage[i]=np.log10(agemin)
             xxx = lage[modstart:modstop]
-            print 'plot versus time left'
+            print('plot versus time left')
             ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$',fontsize=fsize)
         elif ixaxis =='model_number':
             xxx= self.get('model_number')[modstart:modstop]
-            print 'plot versus model number'
+            print('plot versus model number')
             ax.set_xlabel('Model number',fontsize=fsize)
         elif ixaxis =='age':
-            xxx= self.get('star_age')[modstart:modstop]/1.e6
-            print 'plot versus age'
+            xxx= old_div(self.get('star_age')[modstart:modstop],1.e6)
+            print('plot versus age')
             ax.set_xlabel('Age [Myr]',fontsize=fsize)
         else:
-            print 'ixaxis must be one of: log_time_left, age or model_number'
+            print('ixaxis must be one of: log_time_left, age or model_number')
             sys.exit()
 
         if xlims == [0.,0.]:
@@ -1901,10 +1907,10 @@ class history_data(DataPlot):
             ylims[1] = mup
 
 
-        print 'plotting patches'
+        print('plotting patches')
         ax.plot(xxx[::dx],self.get('star_mass')[modstart:modstop][::dx],'k-')
 
-        print 'plotting abund boundaries'
+        print('plotting abund boundaries')
         ax.plot(xxx,self.get('h1_boundary_mass')[modstart:modstop],label='H boundary')
         ax.plot(xxx,self.get('he4_boundary_mass')[modstart:modstop],label='He boundary')
 #       ax.plot(xxx,self.get('c12_boundary_mass')[modstart:modstop],label='C boundary')
@@ -1946,7 +1952,7 @@ class history_data(DataPlot):
                             #ax.axvline(xxx[i*dx],ymin=(llimit-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimit-ylims[0])/(ylims[1]-ylims[0]),color='r',alpha=btypealpha)
                             pass
 
-            print ' \n'
+            print(' \n')
 
         old_percent = 0
                 
@@ -1959,14 +1965,14 @@ class history_data(DataPlot):
                     sys.stdout.write("\r creating color map1 " + "...%d%%" % percent)
                     old_percent = percent
 
-                llimitl1=self.get('epsnuc_M_1')[modstart:modstop][i*dx]/Msol
-                ulimitl1=self.get('epsnuc_M_4')[modstart:modstop][i*dx]/Msol
-                llimitl2=self.get('epsnuc_M_5')[modstart:modstop][i*dx]/Msol
-                ulimitl2=self.get('epsnuc_M_8')[modstart:modstop][i*dx]/Msol
-                llimith1=self.get('epsnuc_M_2')[modstart:modstop][i*dx]/Msol
-                ulimith1=self.get('epsnuc_M_3')[modstart:modstop][i*dx]/Msol
-                llimith2=self.get('epsnuc_M_6')[modstart:modstop][i*dx]/Msol
-                ulimith2=self.get('epsnuc_M_7')[modstart:modstop][i*dx]/Msol
+                llimitl1=old_div(self.get('epsnuc_M_1')[modstart:modstop][i*dx],Msol)
+                ulimitl1=old_div(self.get('epsnuc_M_4')[modstart:modstop][i*dx],Msol)
+                llimitl2=old_div(self.get('epsnuc_M_5')[modstart:modstop][i*dx],Msol)
+                ulimitl2=old_div(self.get('epsnuc_M_8')[modstart:modstop][i*dx],Msol)
+                llimith1=old_div(self.get('epsnuc_M_2')[modstart:modstop][i*dx],Msol)
+                ulimith1=old_div(self.get('epsnuc_M_3')[modstart:modstop][i*dx],Msol)
+                llimith2=old_div(self.get('epsnuc_M_6')[modstart:modstop][i*dx],Msol)
+                ulimith2=old_div(self.get('epsnuc_M_7')[modstart:modstop][i*dx],Msol)
                 # lower thresh first, then upper thresh:
                 #if llimitl1!=ulimitl1:
                     #ax.axvline(xxx[i*dx],ymin=(llimitl1-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimitl1-ylims[0])/(ylims[1]-ylims[0]),color='b',alpha=1.)
@@ -1977,7 +1983,7 @@ class history_data(DataPlot):
                 #if llimith2!=ulimith2:
                     #ax.axvline(xxx[i*dx],ymin=(llimith2-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimith2-ylims[0])/(ylims[1]-ylims[0]),color='b',alpha=4.)
 
-            print ' \n'
+            print(' \n')
                 
         mixstyle = 'full'
         try:
@@ -2005,9 +2011,9 @@ class history_data(DataPlot):
                     mtype=self.get('mix_type_'+str(j))[modstart:modstop][i*dx]
                     if llimit!=ulimit:
                         if mtype == 1:
-                            ax.axvline(xxx[i*dx],ymin=(llimit-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimit-ylims[0])/(ylims[1]-ylims[0]),color='k',alpha=3., linewidth=.5)
+                            ax.axvline(xxx[i*dx],ymin=old_div((llimit-ylims[0]),(ylims[1]-ylims[0])),ymax=old_div((ulimit-ylims[0]),(ylims[1]-ylims[0])),color='k',alpha=3., linewidth=.5)
 
-            print ' \n'
+            print(' \n')
                 
         old_percent = 0
 
@@ -2023,17 +2029,17 @@ class history_data(DataPlot):
                 ulimit=self.get('conv_mx1_top')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 llimit=self.get('conv_mx1_bot')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 if llimit!=ulimit:
-                    ax.axvline(xxx[i*dx],ymin=(llimit-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimit-ylims[0])/(ylims[1]-ylims[0]),color='k',alpha=5.,linewidth=.5)
+                    ax.axvline(xxx[i*dx],ymin=old_div((llimit-ylims[0]),(ylims[1]-ylims[0])),ymax=old_div((ulimit-ylims[0]),(ylims[1]-ylims[0])),color='k',alpha=5.,linewidth=.5)
                 ulimit=self.get('conv_mx2_top')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 llimit=self.get('conv_mx2_bot')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 if llimit!=ulimit:
-                    ax.axvline(xxx[i*dx],ymin=(llimit-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimit-ylims[0])/(ylims[1]-ylims[0]),color='k',alpha=3.,linewidth=.5)
+                    ax.axvline(xxx[i*dx],ymin=old_div((llimit-ylims[0]),(ylims[1]-ylims[0])),ymax=old_div((ulimit-ylims[0]),(ylims[1]-ylims[0])),color='k',alpha=3.,linewidth=.5)
 
-            print ' \n'
+            print(' \n')
 
-        print 'engenstyle was ', engenstyle
-        print 'mixstyle was ', mixstyle
-        print '\n finished preparing color map'
+        print('engenstyle was ', engenstyle)
+        print('mixstyle was ', mixstyle)
+        print('\n finished preparing color map')
 
         #fig.savefig(outfile)
         pl.show()
@@ -2186,11 +2192,11 @@ class history_data(DataPlot):
         # y-axis resolution
         ny=yres
         #dy=mup/float(ny)
-        dy = (mup-mDOWN)/float(ny)
+        dy = old_div((mup-mDOWN),float(ny))
 
         # x-axis resolution
         maxpoints=xres
-        dx=int(max(1,nmodels/maxpoints))
+        dx=int(max(1,old_div(nmodels,maxpoints)))
 
         #y = np.arange(0., mup, dy)
         y = np.arange(mDOWN, mup, dy)
@@ -2226,7 +2232,7 @@ class history_data(DataPlot):
                         B1[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 10.0**(btype_array[j,i])
                     elif btype_array[j,i] < 0. and abs(btype_array[j,i]) < 99.:
                         B2[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 10.0**(abs(btype_array[j,i]))
-            print ' \n'
+            print(' \n')
 
         if engenstyle == 'twozone' and (engenPlus == True or engenMinus == True):
             V=np.zeros([len(y),len(x)],float)
@@ -2238,14 +2244,14 @@ class history_data(DataPlot):
                     sys.stdout.flush()
                     sys.stdout.write("\r creating color map1 " + "...%d%%" % percent)
                     old_percent = percent
-                llimitl1=self.get('epsnuc_M_1')[modstart:modstop][i*dx]/Msol
-                ulimitl1=self.get('epsnuc_M_4')[modstart:modstop][i*dx]/Msol
-                llimitl2=self.get('epsnuc_M_5')[modstart:modstop][i*dx]/Msol
-                ulimitl2=self.get('epsnuc_M_8')[modstart:modstop][i*dx]/Msol
-                llimith1=self.get('epsnuc_M_2')[modstart:modstop][i*dx]/Msol
-                ulimith1=self.get('epsnuc_M_3')[modstart:modstop][i*dx]/Msol
-                llimith2=self.get('epsnuc_M_6')[modstart:modstop][i*dx]/Msol
-                ulimith2=self.get('epsnuc_M_7')[modstart:modstop][i*dx]/Msol
+                llimitl1=old_div(self.get('epsnuc_M_1')[modstart:modstop][i*dx],Msol)
+                ulimitl1=old_div(self.get('epsnuc_M_4')[modstart:modstop][i*dx],Msol)
+                llimitl2=old_div(self.get('epsnuc_M_5')[modstart:modstop][i*dx],Msol)
+                ulimitl2=old_div(self.get('epsnuc_M_8')[modstart:modstop][i*dx],Msol)
+                llimith1=old_div(self.get('epsnuc_M_2')[modstart:modstop][i*dx],Msol)
+                ulimith1=old_div(self.get('epsnuc_M_3')[modstart:modstop][i*dx],Msol)
+                llimith2=old_div(self.get('epsnuc_M_6')[modstart:modstop][i*dx],Msol)
+                ulimith2=old_div(self.get('epsnuc_M_7')[modstart:modstop][i*dx],Msol)
                 # lower thresh first, then upper thresh:
                 if llimitl1!=ulimitl1:
                     for k in range(ny):
@@ -2263,7 +2269,7 @@ class history_data(DataPlot):
                     for k in range(ny):
                         if llimith2<=y[k] and ulimith2>y[k]:
                             V[k,i]=30.
-            print ' \n'
+            print(' \n')
 
         mixstyle = 'full'
         try:
@@ -2292,7 +2298,7 @@ class history_data(DataPlot):
                     if CBM:
                         if mtype_array[j,i] == 2.:
                             Zcbm[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 1.
-            print ' \n'
+            print(' \n')
 
         if mixstyle == 'twozone':
             Z=np.zeros([len(y),len(x)],float)
@@ -2318,7 +2324,7 @@ class history_data(DataPlot):
                     for k in range(ny):
                         if llimit<=y[k] and ulimit>y[k]:
                             Z[k,i]=1.
-            print ' \n'
+            print(' \n')
 
         if rad_lines == True:
             masses = np.arange(0.1,1.5,0.1)
@@ -2331,9 +2337,9 @@ class history_data(DataPlot):
                     idx=np.abs(p.get('mass')-masses[j]).argmin()
                     rads[j].append(p.get('radius')[idx])
 
-        print 'engenstyle was ', engenstyle
-        print 'mixstyle was ', mixstyle
-        print '\n finished preparing color map'
+        print('engenstyle was ', engenstyle)
+        print('mixstyle was ', mixstyle)
+        print('\n finished preparing color map')
 
         ########################################################################
         #----------------------------------plot--------------------------------#
@@ -2361,20 +2367,20 @@ class history_data(DataPlot):
         # log of time left until core collapse
             gage= self.get('star_age')
             lage=np.zeros(len(gage))
-            agemin = max(abs(gage[-1]-gage[-2])/5.,1.e-10)
+            agemin = max(old_div(abs(gage[-1]-gage[-2]),5.),1.e-10)
             for i in np.arange(len(gage)):
                 if gage[-1]-gage[i]>agemin:
                     lage[i]=np.log10(gage[-1]-gage[i]+agemin)
                 else :
                     lage[i]=np.log10(agemin)
             xxx = lage[modstart:modstop]
-            print 'plot versus time left'
+            print('plot versus time left')
             ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$') #,fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
         elif ixaxis =='model_number':
             xxx= self.get('model_number')[modstart:modstop]
-            print 'plot versus model number'
+            print('plot versus model number')
             ax.set_xlabel('Model number') # ,fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [self.get('model_number')[modstart],self.get('model_number')[modstop]]
@@ -2382,10 +2388,10 @@ class history_data(DataPlot):
             if t0_model != 0:
                 t0_mod=np.abs(mod-t0_model).argmin()
                 xxx= self.get('star_age')[modstart:modstop] - self.get('star_age')[t0_mod]
-                print 'plot versus age'
+                print('plot versus age')
                 ax.set_xlabel('Age [yr] - '+str(self.get('star_age')[modstart])) #,fontsize=fsize)
             else:
-                xxx= self.get('star_age')[modstart:modstop]/1.e6
+                xxx= old_div(self.get('star_age')[modstart:modstop],1.e6)
                 ax.set_xlabel('Age [Myr]') #,fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
@@ -2439,7 +2445,7 @@ class history_data(DataPlot):
             ylims[0] = y[0]
             ylims[1] = y[-1]
 
-        print 'plotting contours'
+        print('plotting contours')
         CMIX    = ax.contourf(xxx[::dx],y,Z, cmap=cmapMIX,alpha=0.6,levels=[0.5,1.5])
         #CMIX    = ax.pcolor(xxx[::dx],y,Z, cmap=cmapMIX,alpha=0.6,vmin=0.5,vmax=1.5)
         if rasterise==True:
@@ -2489,13 +2495,13 @@ class history_data(DataPlot):
         if engenstyle == 'twozone' and (engenPlus == True or engenMinus == True):
             ax.contourf(xxx[::dx],y,V, cmap=cmapB1, alpha=0.5)
 
-        print 'plotting patches'
+        print('plotting patches')
         mtot=self.get('star_mass')[modstart:modstop][::dx]
         mtot1=(mtot-ylims1[0])*float(yscale)
         ax.plot(xxx[::dx],mtot1,'k-')
 
         if boundaries == True:
-            print 'plotting abund boundaries'
+            print('plotting abund boundaries')
             try:
                 bound=self.get('h1_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
@@ -2704,11 +2710,11 @@ class history_data(DataPlot):
         # y-axis resolution
         ny=yres
         #dy=mup/float(ny)
-        dy = (mup-mDOWN)/float(ny)
+        dy = old_div((mup-mDOWN),float(ny))
 
         # x-axis resolution
         maxpoints=xres
-        dx=int(max(1,nmodels/maxpoints))
+        dx=int(max(1,old_div(nmodels,maxpoints)))
 
         #y = np.arange(0., mup, dy)
         y = np.arange(mDOWN, mup, dy)
@@ -2744,7 +2750,7 @@ class history_data(DataPlot):
                         B1[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 10.0**(btype_array[j,i])
                     elif btype_array[j,i] < 0. and abs(btype_array[j,i]) < 99.:
                         B2[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 10.0**(abs(btype_array[j,i]))
-            print ' \n'
+            print(' \n')
 
         if engenstyle == 'twozone' and (engenPlus == True or engenMinus == True):
             V=np.zeros([len(y),len(x)],float)
@@ -2756,14 +2762,14 @@ class history_data(DataPlot):
                     sys.stdout.flush()
                     sys.stdout.write("\r creating color map1 " + "...%d%%" % percent)
                     old_percent = percent
-                llimitl1=self.get('epsnuc_M_1')[modstart:modstop][i*dx]/Msol
-                ulimitl1=self.get('epsnuc_M_4')[modstart:modstop][i*dx]/Msol
-                llimitl2=self.get('epsnuc_M_5')[modstart:modstop][i*dx]/Msol
-                ulimitl2=self.get('epsnuc_M_8')[modstart:modstop][i*dx]/Msol
-                llimith1=self.get('epsnuc_M_2')[modstart:modstop][i*dx]/Msol
-                ulimith1=self.get('epsnuc_M_3')[modstart:modstop][i*dx]/Msol
-                llimith2=self.get('epsnuc_M_6')[modstart:modstop][i*dx]/Msol
-                ulimith2=self.get('epsnuc_M_7')[modstart:modstop][i*dx]/Msol
+                llimitl1=old_div(self.get('epsnuc_M_1')[modstart:modstop][i*dx],Msol)
+                ulimitl1=old_div(self.get('epsnuc_M_4')[modstart:modstop][i*dx],Msol)
+                llimitl2=old_div(self.get('epsnuc_M_5')[modstart:modstop][i*dx],Msol)
+                ulimitl2=old_div(self.get('epsnuc_M_8')[modstart:modstop][i*dx],Msol)
+                llimith1=old_div(self.get('epsnuc_M_2')[modstart:modstop][i*dx],Msol)
+                ulimith1=old_div(self.get('epsnuc_M_3')[modstart:modstop][i*dx],Msol)
+                llimith2=old_div(self.get('epsnuc_M_6')[modstart:modstop][i*dx],Msol)
+                ulimith2=old_div(self.get('epsnuc_M_7')[modstart:modstop][i*dx],Msol)
                 # lower thresh first, then upper thresh:
                 if llimitl1!=ulimitl1:
                     for k in range(ny):
@@ -2781,7 +2787,7 @@ class history_data(DataPlot):
                     for k in range(ny):
                         if llimith2<=y[k] and ulimith2>y[k]:
                             V[k,i]=30.
-            print ' \n'
+            print(' \n')
 
         mixstyle = 'full'
         try:
@@ -2805,7 +2811,7 @@ class history_data(DataPlot):
                 for j in range(mix_zones):
                     if mtype_array[j,i] == 1.:
                         Z[(np.abs(y-llimit_array[j][i])).argmin():(np.abs(y-ulimit_array[j][i])).argmin()+1,i] = 1.
-            print ' \n'
+            print(' \n')
 
         if mixstyle == 'twozone':
             Z=np.zeros([len(y),len(x)],float)
@@ -2831,7 +2837,7 @@ class history_data(DataPlot):
                     for k in range(ny):
                         if llimit<=y[k] and ulimit>y[k]:
                             Z[k,i]=1.
-            print ' \n'
+            print(' \n')
 
         if rad_lines == True:
             masses = np.arange(0.1,1.5,0.1)
@@ -2844,9 +2850,9 @@ class history_data(DataPlot):
                     idx=np.abs(p.get('mass')-masses[j]).argmin()
                     rads[j].append(p.get('radius')[idx])
 
-        print 'engenstyle was ', engenstyle
-        print 'mixstyle was ', mixstyle
-        print '\n finished preparing color map'
+        print('engenstyle was ', engenstyle)
+        print('mixstyle was ', mixstyle)
+        print('\n finished preparing color map')
 
         ########################################################################
         #----------------------------------plot--------------------------------#
@@ -2882,20 +2888,20 @@ class history_data(DataPlot):
         # log of time left until core collapse
             gage= self.get('star_age')
             lage=np.zeros(len(gage))
-            agemin = max(abs(gage[-1]-gage[-2])/5.,1.e-10)
+            agemin = max(old_div(abs(gage[-1]-gage[-2]),5.),1.e-10)
             for i in np.arange(len(gage)):
                 if gage[-1]-gage[i]>agemin:
                     lage[i]=np.log10(gage[-1]-gage[i]+agemin)
                 else :
                     lage[i]=np.log10(agemin)
             xxx = lage[modstart:modstop]
-            print 'plot versus time left'
+            print('plot versus time left')
             ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
         elif ixaxis =='model_number':
             xxx= self.get('model_number')[modstart:modstop]
-            print 'plot versus model number'
+            print('plot versus model number')
             ax.set_xlabel('Model number')#,fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [self.get('model_number')[modstart],self.get('model_number')[modstop]]
@@ -2903,10 +2909,10 @@ class history_data(DataPlot):
             if t0_model != 0:
                 t0_mod=np.abs(mod-t0_model).argmin()
                 xxx= self.get('star_age')[modstart:modstop] - self.get('star_age')[t0_mod]
-                print 'plot versus age'
+                print('plot versus age')
                 ax.set_xlabel('Age [yr] - '+str(self.get('star_age')[modstart]))#,fontsize=fsize)
             else:
-                xxx= self.get('star_age')[modstart:modstop]/1.e6
+                xxx= old_div(self.get('star_age')[modstart:modstop],1.e6)
                 ax.set_xlabel('Age [Myr]')#,fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
@@ -2958,7 +2964,7 @@ class history_data(DataPlot):
             ylims[0] = y[0]
             ylims[1] = y[-1]
 
-        print 'plotting contours'
+        print('plotting contours')
         CMIX    = ax.contourf(xxx[::dx],y,Z, cmap=cmapMIX,alpha=0.6,levels=[0.5,1.5])
         if rasterise==True:
             insert_rasterized_contour_plot(CMIX)
@@ -2998,13 +3004,13 @@ class history_data(DataPlot):
         if engenstyle == 'twozone' and (engenPlus == True or engenMinus == True):
             ax.contourf(xxx[::dx],y,V, cmap=cmapB1, alpha=0.5)
 
-        print 'plotting patches'
+        print('plotting patches')
         mtot=self.get('star_mass')[modstart:modstop][::dx]
         mtot1=(mtot-ylims1[0])*float(yscale)
         ax.plot(xxx[::dx],mtot1,'k-')
 
         if boundaries == True:
-            print 'plotting abund boundaries'
+            print('plotting abund boundaries')
             try:
                 bound=self.get('h1_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
@@ -3046,7 +3052,7 @@ class history_data(DataPlot):
         if CO_ratio == True:
             surface_c12       = self.get('surface_c12')
        	    surface_o16       = self.get('surface_o16')
-            COratio=(surface_c12*4.)/(surface_o16*3.)
+            COratio=old_div((surface_c12*4.),(surface_o16*3.))
             ax2=pyl.twinx()
        	    ax2.plot(xxx,COratio[modstart:modstop]-ylims[0],'-k',label='C/O ratio')
 	    ax2.axis([xlims[0],xlims[1],0,max(COratio)*1.1])
@@ -3144,14 +3150,14 @@ class history_data(DataPlot):
                     		activate=True
                     		lum_array.append(he_lumi[i])
                     		models.append(i)
-				print TP_bot[i],TP_top[i]
+				print(TP_bot[i],TP_top[i])
                 if (activate == True) and (he_lumi[i]<h_lumi[i]):
 			#if fake tp
 			if max(pdcz_size)<1e-5:
 				active=False
 				lum_array=[]
 				models=[]
-				print 'fake tp'
+				print('fake tp')
 			else:	
                         	break
         t0_model = models[np.argmax(lum_array)]
@@ -3236,8 +3242,8 @@ class history_data(DataPlot):
                 maxDUPs.append(idx1+bound.argmin()) # model number of deepest extend of 3DUP
                 maxDUP=bound0-min(bound) # total mass dredged up in DUP
                 db=bound - bound[0]
-                db_maxDUP = db / maxDUP
-                DUP=np.where(db_maxDUP <= -float(percent)/100.)[0][0]
+                db_maxDUP = old_div(db, maxDUP)
+                DUP=np.where(db_maxDUP <= old_div(-float(percent),100.))[0][0]
                 DUPs.append(DUP+idx1)
 #                # Alternative definition, where envelope reaches mass coordinate
 #                # where top of PDCZ had resided during the TP:
@@ -3258,7 +3264,7 @@ class history_data(DataPlot):
         for i in range(1,len(maxima)):
             dmenv = h1_bndry[maxima[i]] - h1_bndry[maxDUPs[i-1]]
             dmdredge = h1_bndry[maxima[i]] - h1_bndry[maxDUPs[i]]
-            lambd.append(dmdredge/dmenv)
+            lambd.append(old_div(dmdredge,dmenv))
 
         TPmods = maxima + t0_idx
         DUPmods = DUPs + t0_idx
@@ -3281,11 +3287,11 @@ class history_data(DataPlot):
 	
 	peak_lum_model,h1_mass_min_DUP_model=self.find_TP_attributes( 3, t0_model=self.find_first_TP(), color='r', marker_type='o')
 
-	print 'first tp'
-	print self.find_first_TP()
-	print 'peak lum mmmodel'
-	print  peak_lum_model
-	print h1_mass_min_DUP_model
+	print('first tp')
+	print(self.find_first_TP())
+	print('peak lum mmmodel')
+	print(peak_lum_model)
+	print(h1_mass_min_DUP_model)
 
 	TPmods=peak_lum_model
 
@@ -3337,7 +3343,7 @@ class history_data(DataPlot):
 			if ((mx2t[i]-mx2b[i])<(0.5*refsize)) and (flagdecline==False):
 				flagdecline=True
 				refmasscoord=mx2t[i]
-				print 'flagdecline to true'
+				print('flagdecline to true')
 				continue
 			if flagdecline==True:
 				if (mx2t[i]-mx2b[i])<(0.1*refsize):
@@ -3345,12 +3351,12 @@ class history_data(DataPlot):
 					if refmasscoord<mx2t[i]:
 						endTP=models[idx+i-1]
 						TPend.append(int(float(endTP)))
-						print 'HDUp, TP end',endTP
+						print('HDUp, TP end',endTP)
 						break
 					if (mx2t[i]-mx2b[i])<1e-5:
 						endTP=models[idx+i-1]
 						TPend.append(int(float(endTP)))
-						print 'normal TPend',endTP
+						print('normal TPend',endTP)
 						break
 			'''
 			if max(mx2t[0:(i-1)])>mx2t[i]:
@@ -3368,15 +3374,15 @@ class history_data(DataPlot):
 			    TPend.append(int(float(endTP)))
 			    break
 			'''
-		print 'found TP boundaries',TPstart[-1],TPend[-1]
+		print('found TP boundaries',TPstart[-1],TPend[-1])
 	#find max and minimum mass coord of TP at max Lum
 		mtot=self.get('star_mass')
 		masstop_tot=np.array(masstop)*np.array(mtot)
 		idx_tpext=list(masstop_tot).index(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
-		print 'TP',k+1,TPmods[k]
-		print TPstart[k],TPend[k]
-		print 'INDEX',idx_tpext,models[idx_tpext]
-		print max(masstop_tot[TPstart[k]:(TPend[k]-10)])
+		print('TP',k+1,TPmods[k])
+		print(TPstart[k],TPend[k])
+		print('INDEX',idx_tpext,models[idx_tpext])
+		print(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
 		mtot=self.get('star_mass')[idx_tpext]
 		max_m_TP.append(masstop[idx_tpext]*mtot)
 		min_m_TP.append(massbot[idx_tpext]*mtot)
@@ -3398,26 +3404,26 @@ class history_data(DataPlot):
 
 
 		if h1_bndry[idx]>=max_m_TP[-1]:
-			print 'Pulse',k+1,'model',TPmods[k],'skip'
-			print h1_bndry[idx],max_m_TP[-1]
+			print('Pulse',k+1,'model',TPmods[k],'skip')
+			print(h1_bndry[idx],max_m_TP[-1])
 			DUPmods[k] = -1
 			DUPm_min_h.append( -1)  
 			continue
 
 		DUPm_min_h.append(h1_bdy[idx])
 	for k in range(len(TPmods)):
-		print '#############'
-		print 'TP ',k+1
-		print 'Start: ',TPstart[k]
-		print 'Peak' , TPmods[k],TP_max_env[k]
-		print '(conv) PDCZ size: ',min_m_TP[k],' till ',max_m_TP[k]
-		print 'End',TPend[k]
+		print('#############')
+		print('TP ',k+1)
+		print('Start: ',TPstart[k])
+		print('Peak' , TPmods[k],TP_max_env[k])
+		print('(conv) PDCZ size: ',min_m_TP[k],' till ',max_m_TP[k])
+		print('End',TPend[k])
 		if k <=(len(DUPmods)-1):
-			print len(DUPmods),k
-			print 'DUP max',DUPmods[k]
-			print DUPm_min_h[k]
+			print(len(DUPmods),k)
+			print('DUP max',DUPmods[k])
+			print(DUPm_min_h[k])
 		else:
-			print 'no DUP'
+			print('no DUP')
 
 		return TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
 
@@ -3556,9 +3562,9 @@ class history_data(DataPlot):
 				TP_interpulse=True	  	
        
 	    if ( ((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
-                        print 'test for last DUP'
+                        print('test for last DUP')
                         if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-                                print 'last DUP after last TP'
+                                print('last DUP after last TP')
                                 lastDUP=True
        	                	break
 				
@@ -3566,9 +3572,9 @@ class history_data(DataPlot):
             if ((h_lum[i]>he_lum[i]) and (TP_interpulse==True)) or ( ((len(he_lum)-1)==i) and (TP_interpulse==True)):
 		#make sure that pulse is fully computed
                	if (len(he_lum)-1)<(i+2000):
-			print 'test for last DUP'
+			print('test for last DUP')
 			if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-				print 'last DUP after last TP'
+				print('last DUP after last TP')
 				lastDUP=True	
 			break
 		#print 'model',model[i] 
@@ -3578,9 +3584,9 @@ class history_data(DataPlot):
 		if len(lum_1)<10:
 			continue
 		if len(peak_lum_model)>2:
-			if ( 10**((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1]))/2.)  )  >max_value1:
-				print 'fake tp',model_1[lum_1.index(np.array(lum_1).max())]	
-				print leg
+			if ( 10**(old_div((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1])),2.))  )  >max_value1:
+				print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])	
+				print(leg)
 				continue
                 max_value=np.array(lum_1).max()
                 max_index = lum_1.index(max_value)
@@ -3621,8 +3627,8 @@ class history_data(DataPlot):
 		idx1=list(model).index(peak_lum_model[-1])	
 		idx2=-1
 		h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
-	print peak_lum_model
-	print h1_mass_min_DUP_model
+	print(peak_lum_model)
+	print(h1_mass_min_DUP_model)
         #print peak_lum_model
         #print h1_mass_min_DUP_model
         #print h1_mass_tp
@@ -3662,7 +3668,7 @@ class history_data(DataPlot):
             The default is False.
             
         '''
-        number_DUP=(len(modeln)/2 -1) #START WITH SECOND
+        number_DUP=(old_div(len(modeln),2) -1) #START WITH SECOND
 	try:
            h1_bnd_m=self.get('h1_boundary_mass')
 	except:
@@ -3689,7 +3695,7 @@ class history_data(DataPlot):
             else:
                 DUP_xaxis[j]=star_mass[modeln[i]]
             #DUP_xaxis[j]=modeln[i]
-            DUP_parameter[j]=(TP-m_dredge)/(TP-last_m_dredge)
+            DUP_parameter[j]=old_div((TP-m_dredge),(TP-last_m_dredge))
             last_m_dredge=m_dredge
             j+=1
 
@@ -3766,7 +3772,7 @@ def _read_mesafile(filename,data_rows=0,only='all'):
                     v[v.index(item)]='0'
         data.append(vv)
 
-    print ' \n'
+    print(' \n')
     f.close()
     a=np.array(data)
     data = []

@@ -111,6 +111,15 @@ plot saved, the user can input their cycle, in a list like [0].  And
 that will save their plot.
 
 '''
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import filter
+from builtins import next
+from builtins import input
+from builtins import str
+from builtins import range
+from past.utils import old_div
 
 import h5T
 import numpy as np
@@ -210,7 +219,7 @@ class se(DataPlot, Utils):
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
             try:
-                print 'nugrid_path = '+nugrid_path
+                print('nugrid_path = '+nugrid_path)
             except:
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using nugridse.set_nugrid_path('path')")
 
@@ -221,14 +230,14 @@ class se(DataPlot, Utils):
             setname=setsnames[idx]
             realZ=setsZs[idx]
 
-            print 'closest set is '+setname+' (Z = '+str(realZ)+')'
+            print('closest set is '+setname+' (Z = '+str(realZ)+')')
 
             # try first data, then data-team:
             sedir = nugrid_path+'/data/set1/'+setname+'/'+type+'/'
             if not os.path.exists(sedir):
                 sedir = nugrid_path+'/data-team/Set1_extension/'+setname+'/'+type+'/'
             if not os.path.exists(sedir):
-                print 'sedir = ', sedir
+                print('sedir = ', sedir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using nugridse.set_nugrid_path('path')'.")
 
             # which mass? [find nearest]
@@ -244,7 +253,7 @@ class se(DataPlot, Utils):
             modname=list[idx2]
             realmass=setmasses[idx2]
             
-            print 'closest mass is '+str(realmass)
+            print('closest mass is '+str(realmass))
                     
             sedir+=modname
             if 'ppd' in type:
@@ -260,13 +269,13 @@ class se(DataPlot, Utils):
                         raise IOError("Could not find any data.")
     
         if verbose:
-            print 'sedir = ', sedir
+            print('sedir = ', sedir)
 
         slist = os.listdir(sedir)
         self.pattern=pattern
         expr = re.compile(pattern)
 
-        sefiles=filter(expr.search,slist)
+        sefiles=list(filter(expr.search,slist))
 
         self.se = []         # main data dictionary
         self.sedir=sedir
@@ -278,7 +287,7 @@ class se(DataPlot, Utils):
         self.se=h5T.Files(sedir,sefiles,rewrite=rewrite)
 
     def __del__(self):
-        print 'Closing plot_tools'
+        print('Closing plot_tools')
 
     def get(self, cycle_list, dataitem=None, isotope=None, sparse=1):
         ''' 
@@ -509,7 +518,7 @@ class se(DataPlot, Utils):
         with 'delta_outfile.txt'.
         
         '''
-        print 'This is a preliminary version - contact Reto for more information!'
+        print('This is a preliminary version - contact Reto for more information!')
         # make filename
         filename = 'delta_outfile.txt'
         # which iso_massmf?
@@ -579,7 +588,7 @@ class se(DataPlot, Utils):
                 for j in range(len(isolist[i])):
                     if j != isoabuindex[i]:
                         deltalist.append([elelist[i][0], isolist[i][j], isolist[i][isoabuindex[i]]])
-                        solsysratio.append(isoabulist[i][j] / isoabulist[i][isoabuindex[i]])
+                        solsysratio.append(old_div(isoabulist[i][j], isoabulist[i][isoabuindex[i]]))
         solsysratio = array(solsysratio)
         # Make an array to write all data into. first column, cycle number, second column, co ratio, then all delta values
         write_out = zeros((len(tp_pos), len(deltalist) + 2))
@@ -673,7 +682,7 @@ class se(DataPlot, Utils):
         '''
         # read in c and o isotopes for all cycles, regarding deltacycle
         last_cycle = int(self.se.cycles[len(self.se.cycles)-1])
-        cyc_tp = range(1,last_cycle + dcycle, dcycle)
+        cyc_tp = list(range(1,last_cycle + dcycle, dcycle))
         all_data = array(self.get(cyc_tp,['C-12','C-13','O-16','O-17','O-18']))
         c_nf = np.zeros(len(all_data))
         o_nf = np.zeros(len(all_data))
@@ -682,7 +691,7 @@ class se(DataPlot, Utils):
             o_nf[i] = all_data[i][2] + all_data[i][3] + all_data[i][4]
 
         # search for thermal pulses
-        co_ratio = (c_nf / o_nf) * 15.9994 / 12.0107
+        co_ratio = (old_div(c_nf, o_nf)) * 15.9994 / 12.0107
         tp_guess     = 200   # this should be an upper limit!
         tp_guess_max = 200   # to through an error
         # guess variables, i is the actual break criterion, n a max counter
@@ -693,23 +702,23 @@ class se(DataPlot, Utils):
             tp_ind = list()
             i = 0
             while i < len(co_ratio)-2:
-                gcompar= 1. / (dcycle*tp_guess*100.)
-                slope1 = (co_ratio[i+1]-co_ratio[i])/(dcycle)
-                slope2 = (co_ratio[i+2]-co_ratio[i+1])/dcycle
+                gcompar= old_div(1., (dcycle*tp_guess*100.))
+                slope1 = old_div((co_ratio[i+1]-co_ratio[i]),(dcycle))
+                slope2 = old_div((co_ratio[i+2]-co_ratio[i+1]),dcycle)
                 if slope1 > gcompar and slope2 < gcompar and co_ratio[i+1] > co_ratio[i]:
                     tp_ind.append(i+1)
                     i += 3   # jump three cycles to avoid defining a single cycle twice!
                 else:
                     i += 1
 
-            if abs(len(tp_ind) - tp_guess) < tp_guess/2:   # gotta be within factor two of guess
+            if abs(len(tp_ind) - tp_guess) < old_div(tp_guess,2):   # gotta be within factor two of guess
                 gi = 1
             else:
                 gn += 1
                 tp_guess /= 2
         # check w/ maximum of thermal pulses allowed
         if len(tp_ind) > tp_guess_max:
-            print 'Problem detected with number of pulses'
+            print('Problem detected with number of pulses')
         # create thermal pulse vector
         tp_startf = zeros(len(tp_ind))   # found start
         for i in range(len(tp_startf)):
@@ -784,7 +793,7 @@ class se(DataPlot, Utils):
             if all_sum[i] == 0.:
                 colzero += 1
 
-        print str(colzero) + ' columns are empty. Skipping them.'
+        print(str(colzero) + ' columns are empty. Skipping them.')
 
         # now filter data
         all_data_fil = np.zeros((len(all_data),len(all_data[0])-colzero))
@@ -800,7 +809,7 @@ class se(DataPlot, Utils):
         # write to excel file
         excelfile = Workbook(outfname + '.xlsx')
         wsh = excelfile.add_worksheet(sheetname)
-        print 'If you run from a restart file, this might take a little bit. Be patient!'
+        print('If you run from a restart file, this might take a little bit. Be patient!')
         for i in range(len(all_data_fil)):
             for j in range(len(all_data_fil[i])):
                 if i == 0:
@@ -907,12 +916,12 @@ class se(DataPlot, Utils):
         radius_at_mass_coo=[]
         density_at_mass_coo=[]
         temperature_at_mass_coo=[]
-        masses=self.se.get(range(ini,end+1,delta),'mass')
-        temps=self.se.get(range(ini,end+1,delta),'temperature')
-        rhos=self.se.get(range(ini,end+1,delta),'rho')
-        radii=self.se.get(range(ini,end+1,delta),'radius')
-        ages=self.se.get(range(ini,end+1,delta),'age')
-        cycs=range(ini,end+1,delta)
+        masses=self.se.get(list(range(ini,end+1,delta)),'mass')
+        temps=self.se.get(list(range(ini,end+1,delta)),'temperature')
+        rhos=self.se.get(list(range(ini,end+1,delta)),'rho')
+        radii=self.se.get(list(range(ini,end+1,delta)),'radius')
+        ages=self.se.get(list(range(ini,end+1,delta)),'age')
+        cycs=list(range(ini,end+1,delta))
         age_all=[]
         for i in range(len(ages)):
             age=ages[i]
@@ -980,7 +989,7 @@ class se(DataPlot, Utils):
         temperature=self.se.get(ini,'temperature')
         rho=self.se.get(ini,'rho')
         abund_string = self.se.dcols[5]
-        print abund_string
+        print(abund_string)
         if online:
             from IPython.display import FileLink, FileLinks
         tm=type(mass_coo)
@@ -1004,7 +1013,7 @@ class se(DataPlot, Utils):
             abundsum=np.zeros(len(self.se.isotopes))
             for i in range(len(abundsum)):
                 abundsum[i]=sum([vec[i] for vec in dmabunds])
-            abunds=abundsum / totmass
+            abunds=old_div(abundsum, totmass)
 #        for i in range(len(mass)):
 #            if mass_coo == mass[i]:
 #                mass_coo_new = mass[i]
@@ -1155,7 +1164,7 @@ class se(DataPlot, Utils):
             massco = self.se.get(cyclelist[i],'mass')
             plotlims = getlims(d_coeff,massco)
             for k in range(0,len(plotlims),2):
-                ax.axvline(xx[i],ymin=plotlims[k]/m_ini,ymax=plotlims[k+1]/m_ini,color='b',linewidth=0.5)
+                ax.axvline(xx[i],ymin=old_div(plotlims[k],m_ini),ymax=old_div(plotlims[k+1],m_ini),color='b',linewidth=0.5)
 
 
         ax.plot(xx, totalmass, color='black', linewidth=1)
@@ -1224,8 +1233,8 @@ class se(DataPlot, Utils):
         tmp_cycles=self.se.cycles
         original_cyclelist = [int(tmp_cycles[i]) for i in range(len(tmp_cycles))]
         nmodels=len(self.se.cycles[modstart:modstop])
-        print 'nmodels           = ', nmodels
-        sparse = int(max(1,nmodels/xres))
+        print('nmodels           = ', nmodels)
+        sparse = int(max(1,old_div(nmodels,xres)))
         cyclelist = original_cyclelist[modstart:modstop:sparse]
 
         age_unit=self.get('age_unit')
@@ -1247,7 +1256,7 @@ class se(DataPlot, Utils):
             ylims[1] = m_max
 
 
-        dy = (m_max-m_min)/float(yres)
+        dy = old_div((m_max-m_min),float(yres))
         y = np.arange(m_min, m_max, dy)
 
         Z = np.zeros([len(y),len(cyclelist)],float)
@@ -1265,28 +1274,28 @@ class se(DataPlot, Utils):
 
         if write_preproc==True:
             if os.path.exists(self.sedir+'/conv_data_preproc.txt'):
-                print 'Preprocessor already exists (conv_data_preproc.txt).'
-                print 'Please remove this file if you want to create a new preprocessor file'
+                print('Preprocessor already exists (conv_data_preproc.txt).')
+                print('Please remove this file if you want to create a new preprocessor file')
                 sys.exit()
-            print 'write_preproc=True'
-            print 'getting complete dataset'
-            print 'getting mass coordinates'
+            print('write_preproc=True')
+            print('getting complete dataset')
+            print('getting mass coordinates')
             allcycs=[int(self.se.cycles[i]) for i in range(len(self.se.cycles))]
             mass=self.se.get(allcycs,'mass')
-            print 'getting conv'
+            print('getting conv')
             if datatype=='dcoeff':
                 conv=se.f.se.get(allcycs,'dcoeff')
             else:
                 conv=self.se.get(allcycs,'convection_indicator')
-            print 'getting cycles'
+            print('getting cycles')
             models=self.se.cycles
-            print 'getting ages'
+            print('getting ages')
             if codev=='KEP':
                 deltat=self.se.get(allcycs,'deltat')
                 ages=np.cumsum(deltat)
             else:
                 ages=self.se.ages
-            print 'writing preprocessor file'
+            print('writing preprocessor file')
             f=open(self.sedir+'/conv_data_preproc.txt','w')
             #f=open('./conv_data_preproc.txt','w')
             f.write('FORMAT OF THIS FILE:\n')
@@ -1306,7 +1315,7 @@ class se(DataPlot, Utils):
                 f.write(list_to_string(conv[i]))
 
             f.close()
-            print 'preprocessor file written'
+            print('preprocessor file written')
             sys.exit()
 
         def realarray(array):
@@ -1325,15 +1334,15 @@ class se(DataPlot, Utils):
             floatarray=np.array([float(el) for el in array])
             return floatarray
 
-        print 'getting data...'
+        print('getting data...')
 
         if os.path.exists(self.sedir+'/conv_data_preproc.txt'):
-            print '... from preprocessor file ...'
+            print('... from preprocessor file ...')
             lines=open(self.sedir+'/conv_data_preproc.txt','r').readlines()
             #lines=open('./conv_data_preproc.txt','r').readlines()
             lines=lines[6:]
             mod=np.array([float(line.split()[0]) for line in lines[::4]])
-            age=np.array([float(line.split()[0]) for line in lines[1::4]])/oneyear
+            age=old_div(np.array([float(line.split()[0]) for line in lines[1::4]]),oneyear)
             # masses and mix types will be read just as an array of strings (each string is a profile)
             # to be extracted later
             masses=lines[2::4]
@@ -1345,25 +1354,25 @@ class se(DataPlot, Utils):
             tmp=[realarray(mixvec.split()) for mixvec in conv]
             conv=tmp
 
-            print len(age),len(mod),len(masses),len(conv)
+            print(len(age),len(mod),len(masses),len(conv))
 
         else:
-            print '... from HDF5 data ...'
+            print('... from HDF5 data ...')
             masses=self.se.get(cyclelist,'mass')
             mod=cyclelist
             if self.deltat == None:
-                print 'getting deltat since not initialised'
+                print('getting deltat since not initialised')
                 self.deltat = self.se.get(self.se.cycles,'deltat')
-            age=np.cumsum(self.deltat) / (3600.*24.*365.)
+            age=old_div(np.cumsum(self.deltat), (3600.*24.*365.))
             
             if datatype=='convection':
                 conv=self.se.get(cyclelist,'convection_indicator')
             else:
                 conv=self.se.get(cyclelist,'dcoeff')
 
-        print 'calculating convection matrix... '
+        print('calculating convection matrix... ')
 
-        print len(masses)
+        print(len(masses))
         conv_i_vec_matrix=np.zeros([len(y),len(masses)],float)
 
         for i in range(len(masses)):
@@ -1388,7 +1397,7 @@ class se(DataPlot, Utils):
                 conv_i_vec_matrix[j,i] = mixnew[j]
 
 
-        print 'getting stellar mass...'
+        print('getting stellar mass...')
         mtot = np.array([np.max(m) for m in masses])
 
         #########################################################################
@@ -1421,28 +1430,28 @@ class se(DataPlot, Utils):
         # log of time left until core collapse
             gage= np.array(age_array)
             lage=np.zeros(len(gage))
-            agemin = max(abs(gage[-1]-gage[-2])/5.,1.e-10)
+            agemin = max(old_div(abs(gage[-1]-gage[-2]),5.),1.e-10)
             for i in np.arange(len(gage)):
                 if gage[-1]-gage[i]>agemin:
                     lage[i]=np.log10(gage[-1]-gage[i]+agemin)
                 else :
                     lage[i]=np.log10(agemin)
             xxx = np.array([lage[int(i)] for i in cyclelist]) # np.array([lage[i] for i in cyclelist])
-            print len(xxx)
-            print 'plot versus time left'
+            print(len(xxx))
+            print('plot versus time left')
             ax.set_xlabel('$\mathrm{log}_{10}(t^*/\mathrm{yr})$',fontsize=fsize)
             if xlims == [0.,0.]:
                 xlims = [xxx[0],xxx[-1]]
         elif ixaxis =='model_number':
             cyclelist=mod[modstart:modstop:sparse] # np.array([int(cycle) for cycle in cyclelist])
             xxx= cyclelist
-            print 'plot versus model number'
+            print('plot versus model number')
             ax.set_xlabel('Model number',fontsize=fsize)
             if xlims == [0.,0.]:
                 xlims = [cyclelist[0],cyclelist[-1]]
         elif ixaxis =='age':
-            xxx = np.array([age_array[int(i)] for i in cyclelist])/1.e6
-            print 'plot versus age'
+            xxx = old_div(np.array([age_array[int(i)] for i in cyclelist]),1.e6)
+            print('plot versus age')
             ax.set_xlabel('Age [Myr]',fontsize=fsize)
             if xlims == [0.,0.]:
                 xlims = [xxx[0],xxx[-1]]
@@ -1475,13 +1484,13 @@ class se(DataPlot, Utils):
             return cc
 
 
-        print 'plotting contours'
+        print('plotting contours')
         ax.autoscale(False)
-        low_level = dcoeff_thresh - dcoeff_thresh/10
-        high_level= dcoeff_thresh + dcoeff_thresh/10
+        low_level = dcoeff_thresh - old_div(dcoeff_thresh,10)
+        high_level= dcoeff_thresh + old_div(dcoeff_thresh,10)
         if datatype=='dcoeff':
-            low_level = dcoeff_thresh - dcoeff_thresh/10
-            high_level= dcoeff_thresh + dcoeff_thresh/10
+            low_level = dcoeff_thresh - old_div(dcoeff_thresh,10)
+            high_level= dcoeff_thresh + old_div(dcoeff_thresh,10)
             CMIX=ax.contourf(xxx,y,conv_i_vec_matrix, cmap=cmapMIX, alpha=1.0,levels=[low_level,1.e99])
         else:
             CMIX=ax.contourf(xxx,y,conv_i_vec_matrix, cmap=cmapMIX, alpha=1.0,levels=[0.5,1.5])
@@ -1533,8 +1542,8 @@ class se(DataPlot, Utils):
             elif outfile[-4:] == '.pdf':
                 fig.savefig(outfile,format='pdf')
             else:
-                print 'file format not specified as .eps or .png, saving as eps:'
-                print outfile+'.eps'
+                print('file format not specified as .eps or .png, saving as eps:')
+                print(outfile+'.eps')
                 fig.savefig(outfile+'.eps',format='eps')
 
         pl.show()
@@ -1639,11 +1648,11 @@ class se(DataPlot, Utils):
         original_cyclelist = self.se.cycles
         if cycle_end==0.:
             cycle_end = original_cyclelist[-1]
-        cycle_end = int(cycle_end)/sparse_intrinsic - 1
+        cycle_end = old_div(int(cycle_end),sparse_intrinsic) - 1
         if cycle_start==0:
             pass
         else:
-            cycle_start = int(cycle_start)/sparse_intrinsic - 1
+            cycle_start = old_div(int(cycle_start),sparse_intrinsic) - 1
         cyclelist = original_cyclelist[cycle_start:cycle_end:sparse]
         # fix for KEPLER restart counting at O burning:
         original_ages= self.se.ages
@@ -1654,7 +1663,7 @@ class se(DataPlot, Utils):
                 if (original_ages[i]-original_ages[i-1]) < 0.:
                     age_at_restart_idx = i-1
                     age_at_restart = original_ages[i-1]
-                    print 'age restart found at cycle = '+str(age_at_restart_idx)+', age = '+str(age_at_restart)
+                    print('age restart found at cycle = '+str(age_at_restart_idx)+', age = '+str(age_at_restart))
                     KEPLER = True
                     break
 
@@ -1687,10 +1696,10 @@ class se(DataPlot, Utils):
             elif age == 'seconds':
                 if KEPLER == True:
                     for i in range(len(cyclelist)):
-                        xxtmp[i] = original_ages[cycle_start:cycle_end:sparse][i]/31558149.984
+                        xxtmp[i] = old_div(original_ages[cycle_start:cycle_end:sparse][i],31558149.984)
                 else:
                     for i in range(len(cyclelist)):
-                        xxtmp[i] = self.se.ages[cycle_start:cycle_end:sparse][i]/31558149.984
+                        xxtmp[i] = old_div(self.se.ages[cycle_start:cycle_end:sparse][i],31558149.984)
         if xax == 'cycles':
             xx = cyclelist
             xxtmp = cyclelist
@@ -1701,7 +1710,7 @@ class se(DataPlot, Utils):
         # Modified from the GENEC gdic (R. Hirschi)
         if xax == 'log_time_left':
             xx=np.zeros(len(xxtmp))
-            agemin = max(abs(xxtmp[-1]-xxtmp[-2])/5.,1.e-10)
+            agemin = max(old_div(abs(xxtmp[-1]-xxtmp[-2]),5.),1.e-10)
             for i in np.arange(len(xxtmp)):
                 if xxtmp[-1]-xxtmp[i]>agemin:
                     xx[i]=np.log10(xxtmp[-1]-xxtmp[i]+agemin)
@@ -1716,12 +1725,12 @@ class se(DataPlot, Utils):
             m_ini = float(self.se.get('mini'))
         except:
             mini=m.se.get(0,'total_mass')
-            mini=mini/constants.mass_sun
-            print 'getting Mini from 1st cycle'
+            mini=old_div(mini,constants.mass_sun)
+            print('getting Mini from 1st cycle')
 
         if yulim==0.:
             yulim = m_ini
-        dy = m_ini/float(y_res)
+        dy = old_div(m_ini,float(y_res))
         vlinetol = 1.0E-8
         # Set up (y-axis) vector and a 3-D (hist) array to store all of the
         # contours.
@@ -1796,7 +1805,7 @@ class se(DataPlot, Utils):
                     # elements that are to be plotted, one by one.
                     if ypsthere == True:
                         if ypscoeff[j] == -1:
-                            ypscoeff[j] = int(raw_input("What integer is your element "+str(plot[j])+" in the 'yps' array? "))
+                            ypscoeff[j] = int(input("What integer is your element "+str(plot[j])+" in the 'yps' array? "))
                         else:
                             pass
                         variables = self.se.get(cyclelist[i],'yps')[:,ypscoeff[j]]
@@ -1878,11 +1887,11 @@ class se(DataPlot, Utils):
                     if dummy_engen[f] == 0.:
                         engen_signs.append(1.)
                     else:
-                        engen_signs.append(dummy_engen[f]/abs(dummy_engen[f]))
+                        engen_signs.append(old_div(dummy_engen[f],abs(dummy_engen[f])))
                     if abs(engen_signs[f]) != 1.:
-                        print 'engen sign not +/- 1!!'
-                        print 'engen_signs['+str(f)+'] = ',engen_signs[f]
-                        print 'dummy_engen[f] = ', dummy_engen[f]
+                        print('engen sign not +/- 1!!')
+                        print('engen_signs['+str(f)+'] = ',engen_signs[f])
+                        print('dummy_engen[f] = ', dummy_engen[f])
                         sys.exit()
                     dummy_engen[f] = abs(dummy_engen[f])
                 log_epsnuc = np.log10(dummy_engen)
@@ -1904,18 +1913,18 @@ class se(DataPlot, Utils):
                         energy_here = 0.
                     else:
                         lims = find_nearest(massco,y[j])
-                        frac = (y[j]-massco[lims[0]])/(massco[lims[1]]-massco[lims[0]])
+                        frac = old_div((y[j]-massco[lims[0]]),(massco[lims[1]]-massco[lims[0]]))
                         energy_here = frac*(log_epsnuc[lims[1]]-log_epsnuc[lims[0]]) + log_epsnuc[lims[0]]
                     if energy_here > max_energy_gen:
                         max_energy_gen = energy_here
                     if energy_here < min_energy_gen:
                         min_energy_gen = energy_here
                     if abs(max_energy_gen) > 100.:
-                        print y[j]
-                        print engen_signs[f], log_epsnuc[f], frac, lims[0], lims[1], massco[lims[0]], massco[lims[1]]
-                        print (massco[lims[1]]-massco[lims[0]]), (y[j]-massco[lims[0]])
-                        print max_energy_gen
-                        print 'exit due to energy generation > 100'
+                        print(y[j])
+                        print(engen_signs[f], log_epsnuc[f], frac, lims[0], lims[1], massco[lims[0]], massco[lims[1]])
+                        print((massco[lims[1]]-massco[lims[0]]), (y[j]-massco[lims[0]]))
+                        print(max_energy_gen)
+                        print('exit due to energy generation > 100')
                         sys.exit()
 #                    print energy_here
 #                    print max_energy_gen
@@ -1944,7 +1953,7 @@ class se(DataPlot, Utils):
         for i in range(len(plot)):
             cmap.append(mpl.colors.ListedColormap(['w',colours[i]]))
 
-        print 'plotting contours'
+        print('plotting contours')
 
         if xllim==0. and xulim==0.:
             ax.axis([float(xx[0]),float(xx[-1]),yllim,yulim])
@@ -1962,7 +1971,7 @@ class se(DataPlot, Utils):
             #ceiling = int(max_energy_gen+1)
             #floor = int(min_energy_gen+1)
             #cburn = ax.contourf(xx,y,Z[:,:,1],cmap=engen_cmap,locator=mpl.ticker.LogLocator(),alpha=engenalpha) # SJONES comment
-            cburn = ax.contourf(xx,y,Z[:,:,1],cmap=engen_cmap,alpha=engenalpha,levels=range(5,32,5))
+            cburn = ax.contourf(xx,y,Z[:,:,1],cmap=engen_cmap,alpha=engenalpha,levels=list(range(5,32,5)))
             cbarburn = pl.colorbar(cburn)
 #            if min_energy_gen != 0:
 #                closs = ax.contourf(xx,y,Z[:,:,2],cmap=enloss_cmap,locator=mpl.ticker.LogLocator(),alpha=engenalpha)
@@ -1976,7 +1985,7 @@ class se(DataPlot, Utils):
         pl.text(0.9,0.9,annotation,horizontalalignment='right',transform = ax.transAxes,fontsize=fsize)
         pl.ylabel('$\mathrm{Mass}\;[M_\odot]$',fontsize=fsize-1)
         pl.savefig(outfile)
-        print outfile+' is done.'
+        print(outfile+' is done.')
         pl.show()
 
 
@@ -2007,7 +2016,7 @@ class se(DataPlot, Utils):
         species='C-12'
 
         filename = 'ABUPP%07d0000.DAT' % mod
-        print filename
+        print(filename)
         mass,c12=np.loadtxt(filename,skiprows=4,usecols=[1,18],unpack=True)
         c12_se=self.se.get(mod,'iso_massf','C-12')
         mass_se=self.se.get(mod,'mass')
@@ -2051,7 +2060,7 @@ class se(DataPlot, Utils):
 
         masses = self.se.get(cycle,'mass')
         if mass_range == None:
-            print 'Using default mass range'
+            print('Using default mass range')
             mass_range = [min(masses),max(masses)]
         # what this was for??? Marco
         #masses.sort()
@@ -2059,9 +2068,9 @@ class se(DataPlot, Utils):
 
 
 
-        print 'Using The following conditions:'
-        print '\tmass_range:', mass_range[0], mass_range[1]
-        print '\tcycle:', cycle
+        print('Using The following conditions:')
+        print('\tmass_range:', mass_range[0], mass_range[1])
+        print('\tcycle:', cycle)
 
         isotope_names = self.se.isotopes
         u.convert_specie_naming_from_h5_to_ppn(isotope_names)
@@ -2662,7 +2671,7 @@ class se(DataPlot, Utils):
         #cycles_list = self.se.cycles
         cyc = self.se.cycles
         sparsity_factor = int(1)
-        cycles_list = range(int(cyc[0]),int(cyc[len(cyc)-1]),((int(cyc[1])-int(cyc[0])))*sparsity_factor)
+        cycles_list = list(range(int(cyc[0]),int(cyc[len(cyc)-1]),((int(cyc[1])-int(cyc[0])))*sparsity_factor))
         age_list    = self.se.get(keyw["age"])
         # I want to read only the isotopes I need to identify the burning stages.
         all_isos=self.se.isotopes
@@ -2730,7 +2739,7 @@ class se(DataPlot, Utils):
                 return [burn_cycles, burn_ages, burn_abun, burn_type,
                 burn_lifetime]
 
-                print 'passa 3'
+                print('passa 3')
 
             # H-burning
             if hburn_logic:
@@ -3002,7 +3011,7 @@ class se(DataPlot, Utils):
                     burn_type.append('O')
 
 
-        print 'passa 4'
+        print('passa 4')
 
         pair = False
         age1 = -1
@@ -3259,8 +3268,8 @@ class se(DataPlot, Utils):
                     ni56index = i
 
         if h1index == -1 or he4index == -1 or c12index == -1 or o16index == -1:
-            print "A key isotope(s) is not found in network!  Please check for the \
-            presence of H1, He4, C12 and O16."
+            print("A key isotope(s) is not found in network!  Please check for the \
+            presence of H1, He4, C12 and O16.")
             os.sys.exit()
 
         # Si_core = Si28+S32+Ar36+Ca40+Ti44
@@ -3268,8 +3277,8 @@ class se(DataPlot, Utils):
         if core_opt == 0:
             if si28index == -1 or s32index == -1 or a36index == -1 or ca40index == -1 \
             or ti44index == -1 or cr48index == -1 or fe52index == -1 or ni56index == -1:
-                print "Key isotopes for measuring the core mass with core_opt = 0 \
-                are missing.  Setting core_opt = 1."
+                print("Key isotopes for measuring the core mass with core_opt = 0 \
+                are missing.  Setting core_opt = 1.")
                 core_opt = 1
 
         # Si_core = Sum of all isotopes with 14 <= Z <= 22
@@ -3556,7 +3565,7 @@ class se(DataPlot, Utils):
         for i in range(niso):
             if k1>=1:
                 if isoX[k1-1,i]!=0.0:
-                    m=(isoX[k1,i]-isoX[k1-1,i])/(xm[k1]-xm[k1-1])
+                    m=old_div((isoX[k1,i]-isoX[k1-1,i]),(xm[k1]-xm[k1-1]))
                     ybound[i] = isoX[k1-1,i] +m*(mrem-xm[k1-1])
                 else:
                     ybound[i]=1.e-99
@@ -3647,7 +3656,7 @@ class se(DataPlot, Utils):
         if ("cycle" in keyw) == False:
             keyw["cycle"] = "cycle"
 
-        print "Windyields() initialised.  Reading files..."
+        print("Windyields() initialised.  Reading files...")
 
         ypsinit = []
         niso = 0
@@ -3668,13 +3677,13 @@ class se(DataPlot, Utils):
         yapp = ypssurf.extend
 
         # Retrieve the data from the files
-        for i in xrange(ini,end+1,delta):
+        for i in range(ini,end+1,delta):
             step = int(i)
             capp([int(cycleret[i-ini])])
             tapp([retrieve(step,keyw["tmass"])])
             yapp([retrieve(step,keyw["abund"])])
 
-        print "Reading complete.  Calculating yields and ejected masses..."
+        print("Reading complete.  Calculating yields and ejected masses...")
 
         nsteps = len(cycles)-1
         niso = len(ypssurf[0])
@@ -3702,8 +3711,8 @@ class se(DataPlot, Utils):
             X_i = np.zeros([niso], float)
             E_i = np.zeros([niso], float)
             ypsinit = ypssurf[0]
-            for m in xrange(niso):
-                for n in xrange(nsteps):
+            for m in range(niso):
+                for n in range(nsteps):
                     X_i[m] = X_i[m] + ((totalmass[n] - totalmass[n+1]) * \
                     (0.5 * (ypssurf[n][m] + ypssurf[n+1][m]) - ypsinit[m]))
                     E_i[m] = E_i[m] + ((totalmass[n] - totalmass[n+1]) * \
@@ -3711,7 +3720,7 @@ class se(DataPlot, Utils):
 
         else:
             for m in range(niso):
-                for n in xrange(nsteps):
+                for n in range(nsteps):
                     X_i[m] = X_i[m] + ((totalmass[n] - totalmass[n+1]) * \
                     (0.5 * (ypssurf[n][m] + ypssurf[n+1][m]) - ypsinit[m]))
                     E_i[m] = E_i[m] + ((totalmass[n] - totalmass[n+1]) * \
@@ -3747,7 +3756,7 @@ class se(DataPlot, Utils):
         import utils as u
 
         if not stable and i_decay == 2:
-            print 'ERROR: choose i_decay = 1'
+            print('ERROR: choose i_decay = 1')
             return
 
         #data=mp.se(directory,name_h5_file)
@@ -3760,8 +3769,8 @@ class se(DataPlot, Utils):
         # here I am calculating average mass fraction for all isotopes in given mass range, and then
         # if needed calculating average over decayed.
         # warning: mass_range is bigger than used_masses range, by definition. Should I use it?
-        print 'average over used_masses range, not over original mass_range'
-        print used_masses[0],used_masses[len(used_masses)-1],'instead of',mass_range[0],mass_range[1]
+        print('average over used_masses range, not over original mass_range')
+        print(used_masses[0],used_masses[len(used_masses)-1],'instead of',mass_range[0],mass_range[1])
 
         global average_mass_frac
         average_mass_frac = []
@@ -3776,13 +3785,13 @@ class se(DataPlot, Utils):
                 average_mass_frac.append(temp)
             #print average_mass_frac
         elif  len(used_masses) == 1:
-            print 'case with 1 mass zone only, not implemented yet'
+            print('case with 1 mass zone only, not implemented yet')
 
 
 
         somma = 0.
         somma = sum(average_mass_frac)
-        print 'departure from 1 of sum of average_mass_frac=',abs(1. - somma)
+        print('departure from 1 of sum of average_mass_frac=',abs(1. - somma))
 
         # not let's do it over decayed also, if i_decay = 2
         if i_decay == 2:
@@ -3800,7 +3809,7 @@ class se(DataPlot, Utils):
 
             somma = 0.
             somma = sum(average_mass_frac_decay)
-            print 'departure from 1 of sum of average_mass_frac_decay=',abs(1. - somma)
+            print('departure from 1 of sum of average_mass_frac_decay=',abs(1. - somma))
 
         # now I have the average abundances. We can do the plot.
 
@@ -3854,8 +3863,8 @@ class se(DataPlot, Utils):
             jj=0
             for j in range(len(self.stable_isotope_identifier)):
                 if self.stable_isotope_identifier[j] == 1:
-                    pf_dum.append(float(self.mass_frac[i][self.index_for_all_species[self.stable_isotope_list
-[jj].capitalize()]]/u.solar_abundance[self.stable_isotope_list[jj].lower()]))
+                    pf_dum.append(float(old_div(self.mass_frac[i][self.index_for_all_species[self.stable_isotope_list
+[jj].capitalize()]],u.solar_abundance[self.stable_isotope_list[jj].lower()])))
                     jj=jj+1
                 #elif self.stable_isotope_identifier[j] == 0:
                 #       pf_dum.append(float(0.))
@@ -3867,8 +3876,8 @@ class se(DataPlot, Utils):
             jj=0
             for j in range(len(self.stable_isotope_identifier)):
                 if self.stable_isotope_identifier[j] == 1:
-                    pf_dum_d.append(float(self.decayed_stable_isotopes_per_cycle[i][self.index_for_stable_species[self.stable_isotope_list
-[jj].upper()]]/u.solar_abundance[self.stable_isotope_list[jj].lower()]))
+                    pf_dum_d.append(float(old_div(self.decayed_stable_isotopes_per_cycle[i][self.index_for_stable_species[self.stable_isotope_list
+[jj].upper()]],u.solar_abundance[self.stable_isotope_list[jj].lower()])))
                     jj=jj+1
             self.isotopic_production_factors_decayed.append(pf_dum_d)
 
@@ -3995,15 +4004,15 @@ def _obsolete_plot_iso_abund_marco(directory, name_h5_file, mass_range,
         if i_decay == 2:
             for j in range(len(stable)):
                     #print cl[stable[j].capitalize()],stable[j].capitalize(),amass_int[cl[stable[j].capitalize()]]
-                pl.plot(amass_int[u.cl[stable[j].capitalize()]],u.mass_fractions_array_decayed[u.back_ind[stable[j]]]/u.solar_abundance[stable[j].lower()],'Dk')
+                pl.plot(amass_int[u.cl[stable[j].capitalize()]],old_div(u.mass_fractions_array_decayed[u.back_ind[stable[j]]],u.solar_abundance[stable[j].lower()]),'Dk')
 
         for i in range(len(stable)):
             for j in range(len(stable)):
                 if stable[i][:2] == stable[j][:2]:
                     if stable[i] == stable[j-1]:
                         adum  =[amass_int[u.cl[stable[i].capitalize()]],amass_int[u.cl[stable[j].capitalize()]]]
-                        mfdum =[float(average_mass_frac[u.cl[stable[i].capitalize()]])/float(u.solar_abundance[stable[i].lower()]),float(average_mass_frac[u.cl[stable[j].capitalize()]])/float(u.solar_abundance[stable[j].lower()])]
-                        mfddum=[float(u.average_mass_frac_decay[u.back_ind[stable[i]]])/float(u.solar_abundance[stable[i].lower()]),float(u.average_mass_frac_decay[u.back_ind[stable[j]]])/float(u.solar_abundance[stable[j].lower()])]
+                        mfdum =[old_div(float(average_mass_frac[u.cl[stable[i].capitalize()]]),float(u.solar_abundance[stable[i].lower()])),old_div(float(average_mass_frac[u.cl[stable[j].capitalize()]]),float(u.solar_abundance[stable[j].lower()]))]
+                        mfddum=[old_div(float(u.average_mass_frac_decay[u.back_ind[stable[i]]]),float(u.solar_abundance[stable[i].lower()])),old_div(float(u.average_mass_frac_decay[u.back_ind[stable[j]]]),float(u.solar_abundance[stable[j].lower()]))]
                         #pl.plot(adum,mfdum,'k-')
                         # I had to add this try/except...why? I guess is someone related to H2, that I spotted that was wrong in stable_raw...
                         # should deal without this. Have to be solved when I have time Marco (June 7 2011)

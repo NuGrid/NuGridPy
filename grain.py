@@ -28,6 +28,13 @@ reading in the database, open it in excel, save the file, and try
 again. if this does not work, good luck...
 
 '''
+from __future__ import division
+from __future__ import print_function
+from builtins import input
+from builtins import zip
+from builtins import str
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 import matplotlib as mpl
@@ -80,7 +87,7 @@ class gdb(DataPlot,Utils):
 
     def __init__(self, fname=None, gdbdir=None, gdbload=True,
                  iniabufile='frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn'):
-        print 'Reading in... this takes a little bit'
+        print('Reading in... this takes a little bit')
 
         if iniabufile[0] != '/':
             iniabufile = get_svnpath() + iniabufile
@@ -88,12 +95,12 @@ class gdb(DataPlot,Utils):
         # grab data
         header_desc, header_data, desc, data = preprocessor(fname,gdbdir,gdbload)
         # make dictionary
-        descdict = dict(zip(header_desc,range(len(header_desc))))
-        datadict = dict(zip(header_data,range(len(header_data))))
+        descdict = dict(list(zip(header_desc,list(range(len(header_desc))))))
+        datadict = dict(list(zip(header_data,list(range(len(header_data))))))
 
         # style definer
         header_style, style = style_creator(desc,descdict)
-        styledict = dict(zip(header_style,range(len(header_style))))
+        styledict = dict(list(zip(header_style,list(range(len(header_style))))))
 
         # make private instances w/ all the data
         self._header_desc = header_desc
@@ -118,7 +125,7 @@ class gdb(DataPlot,Utils):
         self.inut = iniabu(iniabufile)
 
     def __del__(self):
-        print 'Presolar grain database available at: http://presolar.wustl.edu/PGD/Presolar_Grain_Database.html'
+        print('Presolar grain database available at: http://presolar.wustl.edu/PGD/Presolar_Grain_Database.html')
 
     def reset_filter(self):
         ''' 
@@ -158,7 +165,7 @@ class gdb(DataPlot,Utils):
         phase_info = []
 
         # how many grains in database
-        print 'There are ' + str(len(self.data)) + ' grains in your database.\n'
+        print('There are ' + str(len(self.data)) + ' grains in your database.\n')
 
         # graintypes
         if graintype:
@@ -171,9 +178,9 @@ class gdb(DataPlot,Utils):
                         break
                 if wrtchk:
                     gtype_info.append(gtype_tmp)
-            print 'Available graintypes are:'
-            print '-------------------------'
-            print gtype_info
+            print('Available graintypes are:')
+            print('-------------------------')
+            print(gtype_info)
 
         # groups
         if group:
@@ -186,9 +193,9 @@ class gdb(DataPlot,Utils):
                         break
                 if wrtchk:
                     group_info.append(group_tmp)
-            print '\nAvailable groups of grains (for silicates and oxides) are:'
-            print '----------------------------------------------------------'
-            print group_info
+            print('\nAvailable groups of grains (for silicates and oxides) are:')
+            print('----------------------------------------------------------')
+            print(group_info)
 
         # Phases
         if phase:
@@ -201,9 +208,9 @@ class gdb(DataPlot,Utils):
                         break
                 if wrtchk:
                     phase_info.append(phase_tmp)
-            print '\nAvailable Phases of grains are:'
-            print '----------------------------------------------------------'
-            print phase_info
+            print('\nAvailable Phases of grains are:')
+            print('----------------------------------------------------------')
+            print(phase_info)
 
 
         # references
@@ -217,9 +224,9 @@ class gdb(DataPlot,Utils):
                         break
                 if wrtchk:
                     ref_info.append(ref_tmp)
-            print '\nReferences for grains:'
-            print '----------------------'
-            print ref_info
+            print('\nReferences for grains:')
+            print('----------------------')
+            print(ref_info)
 
 
 
@@ -381,7 +388,7 @@ class gdb(DataPlot,Utils):
             self.data = data_tmp
             self.style= style_tmp
         else:
-            print 'No filter selected or no data found!'
+            print('No filter selected or no data found!')
 
 
 
@@ -405,16 +412,16 @@ class gdb(DataPlot,Utils):
             my_index += 1
 
         for prt_line in my_grains:
-            print prt_line
+            print(prt_line)
 
         # now write the selector for the index of the grains to select which one should be
         # available and which ones should be dumped
         usr_input = ''
-        usr_input = raw_input('Select the grains by index that you want to use. Please separate the indeces by a comma, e.g., 1 or 0,2,3,4\n')
+        usr_input = input('Select the grains by index that you want to use. Please separate the indeces by a comma, e.g., 1 or 0,2,3,4\n')
 
         # process user index
         if usr_input == '':
-            print 'No data selected to filter.'
+            print('No data selected to filter.')
             return None
         elif len(usr_input) == 1:
             usr_index = [usr_input]
@@ -463,7 +470,7 @@ class gdb(DataPlot,Utils):
         # check availability
         dat_index, delta_b, ratio_b = self.check_availability(isos)
         if dat_index == -1:
-            print 'Isotopes selected are not available. Check i.datadict (where i is your instance) for availability of isotopes.'
+            print('Isotopes selected are not available. Check i.datadict (where i is your instance) for availability of isotopes.')
             return None
 
         # select if larger or smaller and define limit
@@ -472,13 +479,13 @@ class gdb(DataPlot,Utils):
         elif limit[0:1] == '<':
             comperator = 'st'
         else:
-            print 'Comperator not specified. Limit must be given as \'>5.\' for example.'
+            print('Comperator not specified. Limit must be given as \'>5.\' for example.')
             return None
 
         try:
             limit = float(limit[1:len(limit)])
         except ValueError:
-            print 'Limit must be given as \'>5.\' for example.'
+            print('Limit must be given as \'>5.\' for example.')
             return None
 
         # now calculate the actual limit to compare with, depending on if it delta or not or whatsoever
@@ -488,7 +495,7 @@ class gdb(DataPlot,Utils):
                     tmp = self.delta_to_ratio(isos,limit,oneover=True)
                     comp_lim = self.ratio_to_delta(isos,tmp)   # check
                 else:
-                    comp_lim = 1./limit   # check
+                    comp_lim = old_div(1.,limit)   # check
 
             else:   # all fine
                 comp_lim = limit
@@ -528,7 +535,7 @@ class gdb(DataPlot,Utils):
             self.desc = desc_tmp
             self.data = data_tmp
         else:
-            print 'No filter selected!'
+            print('No filter selected!')
 
 
 
@@ -556,7 +563,7 @@ class gdb(DataPlot,Utils):
         # check availability
         dat_index, delta_b, ratio_b = self.check_availability(isos)
         if dat_index == -1:
-            print 'Isotopes selected are not available. Check i.datadict (where i is your instance) for availability of isotopes.'
+            print('Isotopes selected are not available. Check i.datadict (where i is your instance) for availability of isotopes.')
             return None
 
         # select if larger or smaller and define limit
@@ -565,13 +572,13 @@ class gdb(DataPlot,Utils):
         elif limit[0:1] == '<':
             comperator = 'st'
         else:
-            print 'Comperator not specified. Limit must be given as \'>5.\' for example.'
+            print('Comperator not specified. Limit must be given as \'>5.\' for example.')
             return None
 
         try:
             limit = float(limit[1:len(limit)])
         except ValueError:
-            print 'Limit must be given as \'>5.\' for example.'
+            print('Limit must be given as \'>5.\' for example.')
             return None
 
         # now calculate the actual limit to compare with, depending on if it delta or not or whatsoever
@@ -581,7 +588,7 @@ class gdb(DataPlot,Utils):
                     tmp = self.delta_to_ratio(isos,limit,oneover=True)
                     comp_lim = self.ratio_to_delta(isos,tmp)   # check
                 else:
-                    comp_lim = 1./limit   # check
+                    comp_lim = old_div(1.,limit)   # check
 
             else:   # all fine
                 comp_lim = limit
@@ -621,7 +628,7 @@ class gdb(DataPlot,Utils):
             self.desc = desc_tmp
             self.data = data_tmp
         else:
-            print 'No filter selected!'
+            print('No filter selected!')
 
 
     def style_chg_label(self,type,symb=None,edc=None,fac=None,smbsz=None,edw=None,lab=None):
@@ -786,11 +793,11 @@ class gdb(DataPlot,Utils):
         index_x, delta_b_x, ratio_b_x = self.check_availability(isox)
         index_y, delta_b_y, ratio_b_y = self.check_availability(isoy)
         if index_x == -1 or index_y == -1:
-            print 'Following input data are not available in the database. Revise your input.'
+            print('Following input data are not available in the database. Revise your input.')
             if index_x == -1:
-                print 'x axis data not available'
+                print('x axis data not available')
             if index_y == -1:
-                print 'y axis data not available'
+                print('y axis data not available')
             return None
 
         # create x and y data as 1d vectors, also error bars
@@ -811,7 +818,7 @@ class gdb(DataPlot,Utils):
                 index_nan.append(it)
 
         # make range of all incides
-        index_filtered = range(len(xdata_vec))
+        index_filtered = list(range(len(xdata_vec)))
         for it in range(len(index_nan)):
             index_filtered.remove(index_nan[it])
 
@@ -910,7 +917,7 @@ class gdb(DataPlot,Utils):
 
         for i in range(len(index)):
             if index[i] == -1:
-                print 'Input not available for: ' + isos[i] + '. Revise!'
+                print('Input not available for: ' + isos[i] + '. Revise!')
                 return None
 
         # create x and y data as 1d vectors, also error bars
@@ -929,7 +936,7 @@ class gdb(DataPlot,Utils):
                     index_nan.append(it)
 
         # make range of all incides
-        index_filtered = range(len(data_vec))
+        index_filtered = list(range(len(data_vec)))
         for it in range(len(index_nan)):
             index_filtered.remove(index_nan[it])
 
@@ -1077,15 +1084,15 @@ class gdb(DataPlot,Utils):
         elif type(isos_ss) == list:
             ss_ratio = self.inut.isoratio_init(isos_ss)
         else:
-            print 'Check input of isos_ss into ratio_to_delta routine'
+            print('Check input of isos_ss into ratio_to_delta routine')
             return None
 
         # check if one over is necessary or not
         if oneover:
-            ratio = 1/ratio
+            ratio = old_div(1,ratio)
 
         # calculate delta value
-        delta = (ratio / ss_ratio - 1.) * 1000.
+        delta = (old_div(ratio, ss_ratio) - 1.) * 1000.
 
         return delta
 
@@ -1116,15 +1123,15 @@ class gdb(DataPlot,Utils):
         elif type(isos_ss) == list:
             ss_ratio = self.inut.isoratio_init(isos_ss)
         else:
-            print 'Check input of isos_ss into ratio_to_delta routine'
+            print('Check input of isos_ss into ratio_to_delta routine')
             return None
 
         # transform to ratio
-        ratio = (delta / 1000. + 1) * ss_ratio
+        ratio = (old_div(delta, 1000.) + 1) * ss_ratio
 
         # one over necessary or not?
         if oneover:
-            ratio = 1/ratio
+            ratio = old_div(1,ratio)
 
         return ratio
 
@@ -1175,7 +1182,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
     if fname != None:
         wb_pri = xlrd.open_workbook(gdbdir + fname)
         sh_pri = wb_pri.sheet_by_index(0)
-        print 'Private file ' + fname + ' initialized.'
+        print('Private file ' + fname + ' initialized.')
 
 
     # Initialize grain database
@@ -1319,7 +1326,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
 
     # Raise error if nothing is specified
     if gdbload == False and fname == None:
-        print 'Nothing to load is specified!'
+        print('Nothing to load is specified!')
         return [],[],[],[]
 
 
@@ -1352,7 +1359,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
     jadder = 0
     if gdbload:
         # SiC
-        sic_hdict = dict(zip(sh_sic.row_values(0),np.arange(len(sh_sic.row_values(0)))))
+        sic_hdict = dict(list(zip(sh_sic.row_values(0),np.arange(len(sh_sic.row_values(0))))))
         # description data
         for i in range(len(header_desc)):
             try:
@@ -1386,7 +1393,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
         jadder += sic_len - 1
 
         # Graphites
-        gra_hdict = dict(zip(sh_gra.row_values(0),np.arange(len(sh_gra.row_values(0)))))
+        gra_hdict = dict(list(zip(sh_gra.row_values(0),np.arange(len(sh_gra.row_values(0))))))
         # description data
         for i in range(len(header_desc)):
             try:
@@ -1420,7 +1427,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
         jadder += gra_len - 1
 
         # Oxides
-        oxi_hdict = dict(zip(sh_oxi.row_values(0),np.arange(len(sh_oxi.row_values(0)))))
+        oxi_hdict = dict(list(zip(sh_oxi.row_values(0),np.arange(len(sh_oxi.row_values(0))))))
         # description data
         for i in range(len(header_desc)):
             try:
@@ -1454,7 +1461,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
         jadder += oxi_len - 1
 
         # Misc
-        mis_hdict = dict(zip(sh_mis.row_values(0),np.arange(len(sh_mis.row_values(0)))))
+        mis_hdict = dict(list(zip(sh_mis.row_values(0),np.arange(len(sh_mis.row_values(0))))))
         # description data
         for i in range(len(header_desc)):
             try:
@@ -1492,7 +1499,7 @@ def preprocessor(fname,gdbdir,gdbload, wb_sic=None):
 
     # Private file
     if fname != None:
-        pri_hdict = dict(zip(sh_pri.row_values(0),np.arange(len(sh_pri.row_values(0)))))
+        pri_hdict = dict(list(zip(sh_pri.row_values(0),np.arange(len(sh_pri.row_values(0))))))
         # description data
         for i in range(len(header_desc)):
             try:

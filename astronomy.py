@@ -1,4 +1,7 @@
 '''Constants and methods for astronomy & astrophysics'''
+from __future__ import division
+from __future__ import print_function
+from past.utils import old_div
 
 # Astronomy utilities module
 
@@ -70,7 +73,7 @@ def visc_mol_sol(T,rho,X):
     see astronomy.visc_rad_kap_sc
 
     '''
-    visc_mol = 1.84e-17*(1.+7.*X)*(T**2.5/rho)
+    visc_mol = 1.84e-17*(1.+7.*X)*(old_div(T**2.5,rho))
     return visc_mol
 
 
@@ -112,7 +115,7 @@ def visc_rad_kap_sc(T,rho,X):
 
     '''
     kappa = 0.2*(1.+X)
-    nu_rad = 6.88e-26*(T**4/(kappa*rho**2))
+    nu_rad = 6.88e-26*(old_div(T**4,(kappa*rho**2)))
     return nu_rad
 
 def Gamma1_gasrad(beta):
@@ -127,7 +130,7 @@ def Gamma1_gasrad(beta):
         Gas pressure fraction Pgas/(Pgas+Prad)
 
     '''
-    Gamma3minus1 = (2./3.)*(4.-3.*beta)/(8.-7.*beta) 
+    Gamma3minus1 = (old_div(2.,3.))*(4.-3.*beta)/(8.-7.*beta) 
     Gamma1 = beta + (4.-3.*beta) * Gamma3minus1
     return Gamma1
 
@@ -145,8 +148,8 @@ def Pgas(rho,T,mu):
         Temperature [K]
 
     '''
-    R = boltzmann_constant / atomic_mass_unit
-    return (R/mu) * rho * T
+    R = old_div(boltzmann_constant, atomic_mass_unit)
+    return (old_div(R,mu)) * rho * T
 
 def Prad(T,mu):
     ''' 
@@ -160,7 +163,7 @@ def Prad(T,mu):
         Temperature [K].
 
     '''
-    return (radiation_constant/3.) * T**4
+    return (old_div(radiation_constant,3.)) * T**4
 
 def mimf_ferrario(mi):
     ''' Curvature MiMf from Ferrario etal. 2005MNRAS.361.1131.'''
@@ -247,7 +250,7 @@ def int_imf_dm(m1,m2,m,imf,bywhat='bymass',integral='normal'):
     elif integral is 'cum':
         int_func = sc.integrate.cumtrapz
     else:
-        print "Error in int_imf_dm: don't know how to integrate"
+        print("Error in int_imf_dm: don't know how to integrate")
         return 0
        
     if bywhat is 'bymass':
@@ -255,7 +258,7 @@ def int_imf_dm(m1,m2,m,imf,bywhat='bymass',integral='normal'):
     elif bywhat is 'bynumber':
         return int_func(imf[ind_m],m[ind_m])
     else:
-        print "Error in int_imf_dm: don't know by what to integrate"
+        print("Error in int_imf_dm: don't know by what to integrate")
         return 0
 
 def am_orb(m1,m2,a,e):
@@ -279,7 +282,7 @@ def am_orb(m1,m2,a,e):
     m1_g = m1 * msun_g
     m2_g = m2 * msun_g
 
-    J_orb=np.sqrt(grav_const*a_cm*((m1_g**2*m2_g**2)/(m1_g+m2_g)))*(1-e**2)
+    J_orb=np.sqrt(grav_const*a_cm*(old_div((m1_g**2*m2_g**2),(m1_g+m2_g))))*(1-e**2)
     return J_orb
 
 def mass_loss_loon05(L,Teff):
@@ -304,7 +307,7 @@ def mass_loss_loon05(L,Teff):
     
     '''
     
-    Mdot = -5.65 + np.log10(L/10.**4) -6.3*np.log10(Teff/3500.)
+    Mdot = -5.65 + np.log10(old_div(L,10.**4)) -6.3*np.log10(old_div(Teff,3500.))
     return Mdot
 
 def energ_orb(m1,m2,r):
@@ -345,9 +348,9 @@ def period(A,M1,M2):
     """
 
     A *= rsun_cm
-    print A
+    print(A)
     velocity = np.sqrt(grav_const*msun_g*(M1+M2)/A)
-    print velocity/1.e5
+    print(old_div(velocity,1.e5))
     
     p = 2.*np.pi * A / velocity
 
@@ -407,7 +410,7 @@ def macs(nasv,T):
     k  = boltzmann_constant
     vtherm=(2.*k*T/mass_H_atom)**0.5
 
-    s      = nasv/(vtherm*Na)
+    s      = old_div(nasv,(vtherm*Na))
     macs   = s*1.e27
     return macs
 
@@ -428,10 +431,10 @@ def mu_e(X):
     '''
 
     try:
-        mu_e = 2./(1.+X)
+        mu_e = old_div(2.,(1.+X))
     except TypeError:
         X=np.array([X])
-        mu_e = 2./(1.+X)
+        mu_e = old_div(2.,(1.+X))
 
     return mu_e
 
@@ -460,12 +463,12 @@ def mu(X,Z,A):
     	X = np.array(X)
     	
     try:
-        mu = 1./sum(X*(1.+Z)/A)
+        mu = old_div(1.,sum(X*(1.+Z)/A))
     except TypeError:
         X=np.array([X])
         A=np.array([A])
         Z=np.array([Z])
-        mu = 1./sum(X*(1.+Z)/A)
+        mu = old_div(1.,sum(X*(1.+Z)/A))
 
     return mu
 
@@ -484,7 +487,7 @@ def Trho_idrad(rho,mu):
 
     '''
 
-    T = 3.2E7 * (rho/mu)**(1./3.)
+    T = 3.2E7 * (old_div(rho,mu))**(old_div(1.,3.))
     return T
     
 def Trho_iddeg(rho,mu,mu_e):
@@ -504,6 +507,6 @@ def Trho_iddeg(rho,mu,mu_e):
         
     '''
 
-    T = 1.207E5 * rho**(2./3.) * mu / mu_e**(5./3.)
+    T = 1.207E5 * rho**(old_div(2.,3.)) * mu / mu_e**(old_div(5.,3.))
     return T
     

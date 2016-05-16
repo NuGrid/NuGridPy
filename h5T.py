@@ -32,6 +32,11 @@ interface by allowing for intuitive, but sparse commands.  Refer to the
 users manual and docstring below for more information.
 
 """
+from __future__ import print_function
+from builtins import map
+from builtins import str
+from builtins import range
+from past.builtins import basestring
 
 import os
 import numpy as np
@@ -45,8 +50,8 @@ import bisect
 try:
     from ascii_table import *
 except ImportError:
-    print 'No module ascii_table'
-    print 'Please checkout ascii_table.py svn://forum.astro.keele.ac.uk/utils/pylib and add to python path'
+    print('No module ascii_table')
+    print('Please checkout ascii_table.py svn://forum.astro.keele.ac.uk/utils/pylib and add to python path')
 try:
     import h5py as mrT
 except ImportError :
@@ -276,7 +281,7 @@ class Files(threading.Thread):
             if not pattern.startswith('*'):
                 pattern='*'+pattern
             self.files=glob.glob(self.filename + os.sep +pattern)
-            for i in xrange(len(self.files)):
+            for i in range(len(self.files)):
                 self.files[i]=self.files[i].split(os.sep)[-1]
 
             for fil in self.files:
@@ -297,10 +302,10 @@ class Files(threading.Thread):
                 # there in the first place (SJONES)
 
         if self.h5files == []:
-            print 'There are no h5Files in: ', self.filename, 'please try a better folder.'
+            print('There are no h5Files in: ', self.filename, 'please try a better folder.')
         else:
-            print 'Searching files, please wait.......'
-            for i in xrange(len(self.h5files)):
+            print('Searching files, please wait.......')
+            for i in range(len(self.h5files)):
                 self.h5sStarted.append(False)
             # SJONES: here, i also now pass whether preprocExisted:
             #self.h5s.append(h5File(self.h5files[0],True, True))
@@ -330,15 +335,15 @@ class Files(threading.Thread):
         try:
             self.A = self.h5s[0].A[0]
         except IndexError:
-            print "Sorry, there is no A vector. This can cause problems for reading abundances. Continue..."
+            print("Sorry, there is no A vector. This can cause problems for reading abundances. Continue...")
         try:
             self.Z = self.h5s[0].Z[0]
         except IndexError:
-            print "Sorry, there is no Z vector. This can cause problems for reading abundances. Continue... "
+            print("Sorry, there is no Z vector. This can cause problems for reading abundances. Continue... ")
         try:
             self.isomeric_states = self.h5s[0].isomeric_state[0]
         except IndexError:
-            print "Sorry, there is no isomeric state vector. Continue..."
+            print("Sorry, there is no isomeric state vector. Continue...")
 
         new = self.h5s[0].new    #    This boolean handles the changes to the cycle nomenclature format
 
@@ -351,14 +356,14 @@ class Files(threading.Thread):
             preprocTable=ascii_table(self.preprocName,self.filename)
             if int(preprocTable.hattrs[0])<len(self.h5files):
                 self.preprocExists=False
-                print 'A File was added, rewriteing preprocessor file'
+                print('A File was added, rewriteing preprocessor file')
 
             if self.preprocExists:
-                for i in xrange(len(self.h5files)):
+                for i in range(len(self.h5files)):
                     if os.path.basename(self.h5files[i])+'-cyc' not in preprocTable.dcols and self.preprocExists:
-                        print 'A File was renamed, rewriteing preprocessor file'
+                        print('A File was renamed, rewriteing preprocessor file')
                         if self.verbose:
-                            print preprocTable.dcols[i], os.path.basename(self.h5files[i])+'-cyc'
+                            print(preprocTable.dcols[i], os.path.basename(self.h5files[i])+'-cyc')
                         self.preprocExists=False
 
         if not self.preprocExists and os.path.exists(b):
@@ -366,14 +371,14 @@ class Files(threading.Thread):
 
 # create list of isotopes stored in this h5 file
         try:
-            for x in xrange(len(self.Tables[0])):
+            for x in range(len(self.Tables[0])):
                 if self.isomeric_states[x] ==1:
                     self.isotopes.append(self.isos[int(self.Tables[1][x])]+'-' +str(int(self.Tables[0][x])))
                 else:
                     self.isotopes.append(self.isos[int(self.Tables[1][x])]+'-' +str(int(self.Tables[0][x]))+\
                     self.isomerDelimiter+str(self.isomeric_states[x]-1))
         except IndexError:
-            print 'This file does not contain any tables.  Isotopic data must be contained elsewhere.'
+            print('This file does not contain any tables.  Isotopic data must be contained elsewhere.')
         t1 = time.time()
 
 # create list of elements stored in this h5 file
@@ -386,7 +391,7 @@ class Files(threading.Thread):
         thread_list = []
         if self.verbose:
             print(self.h5s[0].filename)
-        for x in xrange(len(self.h5files)-1):
+        for x in range(len(self.h5files)-1):
             # SJONES: here, i also now pass whether preprocExisted:
             #thread_list.append(self.h5s.append(h5File(self.h5files[x+1],False, new)))
             thread_list.append(self.h5s.append(h5File(self.h5files[x+1],False, new, self.preprocExisted)))
@@ -405,7 +410,7 @@ class Files(threading.Thread):
         #    thread.join()
 
         if not self.preprocExists:
-            for x in xrange(len(self.h5files)-1):
+            for x in range(len(self.h5files)-1):
                 self.cycles.extend(self.h5s[x+1].cycle)
                 self.ages.extend(self.h5s[x+1].age)
             header=[str(len(self.h5files)),'This is a preprocessor file for the directory: '+str(self.filename),\
@@ -416,7 +421,7 @@ class Files(threading.Thread):
             try:
                 self.cycles = sorted(self.cycles, cmp=self.numeric_compare)
             except TypeError:
-                print "There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again"
+                print("There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again")
 
             try:
                 self.ages = sorted(self.ages, cmp=self.numeric_compare)
@@ -424,12 +429,12 @@ class Files(threading.Thread):
                 None
 
 
-            print 'Writing preprocessor files'
+            print('Writing preprocessor files')
             data=[]
             dcols=[]
             length=0
-            for i in xrange(len(self.h5s)):
-                print self.h5s[i].filename.rpartition('/')[2]
+            for i in range(len(self.h5s)):
+                print(self.h5s[i].filename.rpartition('/')[2])
                 dcols.append(os.path.basename(self.h5s[i].filename)+'-cyc')
                 dcols.append(os.path.basename(self.h5s[i].filename)+'-age')
                 data.append(self.h5s[i].cycle)
@@ -439,8 +444,8 @@ class Files(threading.Thread):
                 if len(self.h5s[i].age)>length:
                     length=len(self.h5s[i].age)
 
-            for i in xrange(len(data)):
-                for j in xrange(length-len(data[i])):
+            for i in range(len(data)):
+                for j in range(length-len(data[i])):
                     data[i].append(3.14159265)
 
             write(self.preprocName,header,dcols,data,sldir=self.filename)
@@ -473,47 +478,47 @@ class Files(threading.Thread):
 #                self.h5s[i+1].age=dat
 #                for j in xrange(len(dat)):
 #                    self.ages.append(dat[j])
-            print 'Reading preprocessor files'
+            print('Reading preprocessor files')
             preprocTable=ascii_table(self.preprocName,self.filename)
-            for i in xrange(len(self.h5s)):
+            for i in range(len(self.h5s)):
                 dat=preprocTable.get(os.path.basename(self.h5s[i].filename)+'-cyc')
                 dat1=[]
-                for j in xrange(len(dat)):
+                for j in range(len(dat)):
                     if dat[j]!=3.14159265:
                         dat1.append(dat[j])
                 
                 dat=dat1
-                for j in xrange(len(dat)):
+                for j in range(len(dat)):
                     dat[j]=str(int(dat[j]))
-                    for k in xrange(10-len(dat[j])):
+                    for k in range(10-len(dat[j])):
                         dat[j]='0'+dat[j]
                 
-                for j in xrange(len(dat)):
+                for j in range(len(dat)):
                     self.cycles.append(dat[j])
                 self.h5s[i].cycle=dat
                 dat=preprocTable.get(os.path.basename(self.h5s[i].filename)+'-age')
                 dat1=[]
-                for j in xrange(len(dat)):
+                for j in range(len(dat)):
                     if dat[j]!=3.14159265:
                         dat1.append(dat[j])
                 dat=dat1
                 self.h5s[i].age=dat
-                for j in xrange(len(dat)):
+                for j in range(len(dat)):
                     self.ages.append(dat[j])
 ### end of new section ###
             try:
                 self.cycles = sorted(self.cycles, cmp=self.numeric_compare)
             except TypeError:
-                print "There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again"
+                print("There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again")
 
             try:
                 self.ages = sorted(self.ages, cmp=self.numeric_compare)
             except TypeError:
                 None
-        print 'File search complete.'
+        print('File search complete.')
         t2 = time.time()
         if self.verbose:
-            print "Total duration is " + str(t2-t1) + " seconds."
+            print("Total duration is " + str(t2-t1) + " seconds.")
         return
 
     def numeric_compare(self, x, y):
@@ -709,7 +714,7 @@ class Files(threading.Thread):
 
         #    Just in case the user inputs integers
         try:
-            for x in xrange(len(cycle_list)):
+            for x in range(len(cycle_list)):
                 cycle_list[x] = str(cycle_list[x])
         except TypeError:
             cycle_list = [str(cycle_list)]
@@ -732,7 +737,7 @@ class Files(threading.Thread):
             except AttributeError: ##if it is a list of cycles make sure its formatted correctly
                 if cycle_list[0].isdigit():
 
-                    for x in xrange(len(cycle_list)):
+                    for x in range(len(cycle_list)):
                         if len(str(cycle_list[x])) != len(str(self.cycles[0])):
                             #print "b"
                             diff = len(str(self.cycles[0]))-len(str(cycle_list[x]))
@@ -750,7 +755,7 @@ class Files(threading.Thread):
         dat = []
         cycle_list.sort()
 
-        cyclelist=np.array(map(int,cycle_list))
+        cyclelist=np.array(list(map(int,cycle_list)))
 
         # cycles_requested is a list of indices from cyclelist
         # The index of the larges and smallest indices should be stored
@@ -768,9 +773,9 @@ class Files(threading.Thread):
                 file_min.append(int(h5.cycle[0]))
                 file_max.append(int(h5.cycle[-1]))
         except IndexError:
-            print 'File '+h5.filename+' contains no data, please remove or rename it'
-            print 'Once the file has been removed or renamed, the preprocessor file must be re-written. Do this by either removing the file h5Preproc.txt from the data directory or by invoking the se instance with rewrite=True'
-            print 'At present, h5T cannot check for empty files since the overhead using the mounted VOSpace would be too great.'
+            print('File '+h5.filename+' contains no data, please remove or rename it')
+            print('Once the file has been removed or renamed, the preprocessor file must be re-written. Do this by either removing the file h5Preproc.txt from the data directory or by invoking the se instance with rewrite=True')
+            print('At present, h5T cannot check for empty files since the overhead using the mounted VOSpace would be too great.')
             raise IOError('Cycle-less file encountered')
         file_min.sort()
         file_max.sort()
@@ -926,7 +931,7 @@ class Files(threading.Thread):
             # calculate the proper insertion point for the data colected from
             # the file h5 in self.h5s
             insert_pnt = 0
-            for i in xrange(len(cycles_requested)):
+            for i in range(len(cycles_requested)):
                 if i % 2 == 1:
                     if cycles_requested[i] < index_min:
                         insert_pnt += cycles_requested[i] - cycles_requested[i-1]
@@ -1148,7 +1153,7 @@ class h5File(threading.Thread):
         
         if is_error:
             if not quiet:
-                print "The requested cycles: " + str(missing_cycles) + " are not available in this data set. They have been replaced with the nearest available data."
+                print("The requested cycles: " + str(missing_cycles) + " are not available in this data set. They have been replaced with the nearest available data.")
 
         self.h5.close()
         return data
@@ -1157,7 +1162,7 @@ class h5File(threading.Thread):
     #    The typical search algirthm when a h5file class is initialized
     def search_shallow(self):
         self.h5 = mrT.File(self.filename,'r')
-        temp = self.h5.keys()
+        temp = list(self.h5.keys())
         self.cycle=[str(k).replace('cycle','').replace('-','') for k in temp if 'cyc' in k]
         try:
             self.age=[float(self.h5[str(asd)].attrs.get("age",None)) for asd in temp if 'cyc' in asd]
@@ -1191,7 +1196,7 @@ class h5File(threading.Thread):
 
     def search_deep(self):
         self.h5 = mrT.File(self.filename,'r')
-        temp = self.h5.keys()
+        temp = list(self.h5.keys())
 
         #    Handles the change in cycle nomenclature
         self.new = True
@@ -1292,7 +1297,7 @@ class h5File(threading.Thread):
         attrs = self.h5.attrs
         for at in attrs:
             self.hattr.append(at)
-        self.cattr = self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys()
+        self.cattr = list(self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys())
 
         table = []
         grp = self.h5[self.cycle_header+str(self.cycle[0])]
@@ -1307,7 +1312,7 @@ class h5File(threading.Thread):
 
     def search_deep_sam(self):
         self.h5 = mrT.File(self.filename,'r')
-        temp = self.h5.keys()
+        temp = list(self.h5.keys())
 
         # SJONES attempt to speed this up and not search through the file:
 
@@ -1375,7 +1380,7 @@ class h5File(threading.Thread):
         attrs = self.h5.attrs
         for at in attrs:
             self.hattr.append(at)
-        self.cattr = self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys()
+        self.cattr = list(self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys())
         
         table = []
         grp = self.h5[self.cycle_header+str(self.cycle[0])]

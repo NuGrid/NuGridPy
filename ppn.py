@@ -45,6 +45,10 @@ No cycle numbers are skipped, ie if cycle 0 and 3 are present, 1 and 2
 must be here as well.
 
 """
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import range
 
 from numpy import *
 from data_plot import *
@@ -133,8 +137,8 @@ class xtime(DataPlot):
         self.sldir= sldir
 
         if not os.path.exists(sldir):  # If the path does not exist
-            print 'error: Directory, '+sldir+ ' not found'
-            print 'Now returning None'
+            print('error: Directory, '+sldir+ ' not found')
+            print('Now returning None')
             return None
         else:
             self.data, self.col_num, self.cols, self.col_tot, self.ilines =\
@@ -166,12 +170,12 @@ class xtime(DataPlot):
             col_num={}
         col_tot = len(cols)
 
-        print 'number of species: ', str(ispec)
-        print 'number of cols: ', str(col_tot)
+        print('number of species: ', str(ispec))
+        print('number of cols: ', str(col_tot))
 
 
         col_num={}
-        for a,b in zip(cols,range(col_tot)):
+        for a,b in zip(cols,list(range(col_tot))):
             col_num[a]=b
 
         # read remainder of the file
@@ -182,7 +186,7 @@ class xtime(DataPlot):
             vv=array(v,dtype='float')
             data.append(vv)
         ilines=i
-        print "There are "+str(ilines)+" time steps found."
+        print("There are "+str(ilines)+" time steps found.")
         return data,col_num,cols,col_tot,ilines
 
     def get(self, col_str):
@@ -377,13 +381,13 @@ class abu_vector(DataPlot, Utils):
         self.files=[]
         self.isotopes=[]
         if not os.path.exists(sldir):  # If the path does not exist
-            print 'error: Directory, '+sldir+ ' not found'
-            print 'Now returning None'
+            print('error: Directory, '+sldir+ ' not found')
+            print('Now returning None')
             return None
         f=os.listdir(sldir) # reads the directory
 
         def iniabmode(): #Where we go if dealing with iniab files in a USEEPP directory
-            print "---> In iniab mode"
+            print("---> In iniab mode")
             for file in f:
             # Removes any files that are not ppn files
                 if filenames in file and 'ppn' in file and '~' not in file \
@@ -395,8 +399,8 @@ class abu_vector(DataPlot, Utils):
 
             if len(self.files)==0:
                 # If there are no Files in the Directory
-                print 'Error: no '+filenames+ ' named files exist in Directory'
-                print 'Now returning None'
+                print('Error: no '+filenames+ ' named files exist in Directory')
+                print('Now returning None')
                 return None
             fname=self.files[len(self.files)-1]
             self.dcols,self.index=self._readPPN(fname,sldir)
@@ -408,10 +412,10 @@ class abu_vector(DataPlot, Utils):
                 i += 1
             self.indexp_cyc2filels = indexp_cyc2filels
 
-            for i in xrange(len(self.files)):
+            for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
-            print str(len(self.files))+' cycle numbers found in '+sldir
-            print 'Ranging from 0 to '+str(len(self.files)-1)
+            print(str(len(self.files))+' cycle numbers found in '+sldir)
+            print('Ranging from 0 to '+str(len(self.files)-1))
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
         def iso_massfmode():
@@ -426,8 +430,8 @@ class abu_vector(DataPlot, Utils):
 
             if len(self.files)==0:
                 # If there are no Files in the Directory
-                print 'Error: no '+filenames+ ' named files exist in Directory'
-                print 'Now returning None'
+                print('Error: no '+filenames+ ' named files exist in Directory')
+                print('Now returning None')
                 return None
             fname=self.files[len(self.files)-1]
             self.cattrs,self.dcols,self.index=self._readFile(fname,sldir)
@@ -439,10 +443,10 @@ class abu_vector(DataPlot, Utils):
                 i += 1
             self.indexp_cyc2filels = indexp_cyc2filels
 
-            for i in xrange(len(self.files)):
+            for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
-            print str(len(self.files))+' cycle numbers found in '+sldir
-            print 'Ranging from 0 to '+str(len(self.files)-1)
+            print(str(len(self.files))+' cycle numbers found in '+sldir)
+            print('Ranging from 0 to '+str(len(self.files)-1))
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
 
@@ -452,15 +456,15 @@ class abu_vector(DataPlot, Utils):
         deal with 'iso_massfmode'
         '''
         if ('USEEPP' in sldir or 'USEEPP' in self.startdir) and (USEEPP == 'on' or USEEPP == 'auto'):
-            print '--> Going to iniab mode'
+            print('--> Going to iniab mode')
             filenames='iniab'
             iniabmode()
         elif ('USEEPP' in sldir or 'USEEPP' in self.startdir) and USEEPP == 'off':
-            print "--> Skipping iniab mode (USEEPP == 'off')"
+            print("--> Skipping iniab mode (USEEPP == 'off')")
             iso_massfmode()
         elif ('USEEPP' not in sldir or 'USEEPP' not in self.startdir) and USEEPP == 'on':
-            print "--> Error: Not in, or referencing, a USEEPP directory. Cannot enter iniab mode"
-            print "--> Skipping iniab mode"
+            print("--> Error: Not in, or referencing, a USEEPP directory. Cannot enter iniab mode")
+            print("--> Skipping iniab mode")
             iso_massfmode()
         else:
             iso_massfmode()
@@ -525,8 +529,8 @@ class abu_vector(DataPlot, Utils):
             elif lines[i].startswith('H'):
                 continue
             else:
-                print 'This cycle attribute does not exist'
-                print 'Returning None'
+                print('This cycle attribute does not exist')
+                print('Returning None')
                 return None
 
 
@@ -746,7 +750,7 @@ class abu_vector(DataPlot, Utils):
 
         '''
         if isinstance(attri,int):
-            print "Calling get method in cycle mode, adding a_iso_to_plot, z.. el.. isotope.. isotope... to instance"
+            print("Calling get method in cycle mode, adding a_iso_to_plot, z.. el.. isotope.. isotope... to instance")
             self._getcycle(attri,decayed)
         elif isinstance(attri,str):
             data=self._getattr(attri,fname,numtype)
@@ -772,9 +776,9 @@ class abu_vector(DataPlot, Utils):
             try:
                 self.decay_idp
             except AttributeError:
-                print "WARNING: decayed in _getcycle ignores isomers " \
-                    "and will decay alpha-unstable p-rich nuclei as if they were beta+ stable."
-                print "Initialising decay index pointers ...."
+                print("WARNING: decayed in _getcycle ignores isomers " \
+                    "and will decay alpha-unstable p-rich nuclei as if they were beta+ stable.")
+                print("Initialising decay index pointers ....")
                 self.decay_indexpointer() # provides self.decay_idp and
             ind_tmp=self.idp_to_stables_in_isostoplot
 
@@ -783,15 +787,15 @@ class abu_vector(DataPlot, Utils):
             a_iso_decay=array(a_iso_to_plot)[ind_tmp]
             el_iso_decay=array(el_iso_to_plot)[ind_tmp]
             abunds_decay=zeros(len(ind_tmp), dtype='float64')
-            for i in xrange(len(isotope_to_plot)):
+            for i in range(len(isotope_to_plot)):
                 idp=where(isotope_decay==isotope_to_plot[self.decay_idp[i]])[0] # points from
                 # i on isotope_to_plot scale to decay target_on_decayed array scale
                 abunds_decay[idp] += abunds[i]
 
             if self.debug:
-                print "Decayed array:"
-                for i in xrange(len(ind_tmp)):
-                    print isotope_decay[i], z_iso_decay[i], a_iso_decay[i], el_iso_decay[i], abunds_decay[i]
+                print("Decayed array:")
+                for i in range(len(ind_tmp)):
+                    print(isotope_decay[i], z_iso_decay[i], a_iso_decay[i], el_iso_decay[i], abunds_decay[i])
 
             self.a_iso_to_plot=a_iso_decay
             self.isotope_to_plot=isotope_decay
@@ -813,7 +817,7 @@ class abu_vector(DataPlot, Utils):
             numtype='file'
             isList=True
         if isList:
-            for i in xrange(len(fname)):
+            for i in range(len(fname)):
                 if attri in self.cattrs:
                     data.append(self.getCycleData(attri,fname[i],numtype))
                 elif attri in self.dcols:
@@ -821,8 +825,8 @@ class abu_vector(DataPlot, Utils):
                 elif attri in self.get('ISOTP',fname,numtype):
                     data.append(self.getElement(attri,fname[i],numtype))
                 else:
-                    print 'Attribute '+attri+ ' does not exist'
-                    print 'Returning none'
+                    print('Attribute '+attri+ ' does not exist')
+                    print('Returning none')
                     return None
 
         else:
@@ -833,8 +837,8 @@ class abu_vector(DataPlot, Utils):
             elif attri in self.get('ISOTP',fname,numtype):
                 return self.getElement(attri,fname,numtype)
             else:
-                print 'Attribute '+attri+ ' does not exist'
-                print 'Returning none'
+                print('Attribute '+attri+ ' does not exist')
+                print('Returning none')
                 return None
 
         return data
@@ -940,18 +944,18 @@ class abu_vector(DataPlot, Utils):
             try:
                 fname = int(fname)
             except ValueError:
-                print 'Improper choice:'+ str(fname)
-                print 'Reselecting as 0'
+                print('Improper choice:'+ str(fname))
+                print('Reselecting as 0')
                 fname = 0
-                print 'Using '+self.files[fname]
+                print('Using '+self.files[fname])
         try:
             return self.files[self.indexp_cyc2filels[fname]]
         except IndexError:
             mods = array(self.get('mod'), dtype=int)
             if fname not in mods:
-                print 'You seem to try to plot a cycle that is not present: '+str(fname)
+                print('You seem to try to plot a cycle that is not present: '+str(fname))
                 fname = mods[-1]
-                print 'I will assume you want to plot the last cycle in the run: '+str(fname)
-                print '[I am not 100% sure this escape is debugged. You better do this again with'
-                print 'the correct input.]'
+                print('I will assume you want to plot the last cycle in the run: '+str(fname))
+                print('[I am not 100% sure this escape is debugged. You better do this again with')
+                print('the correct input.]')
                 return self.files[fname]

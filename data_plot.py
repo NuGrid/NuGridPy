@@ -24,6 +24,15 @@ C. To properly use DataTable's methods properly one will need these
    to be atri which is the name of the data one is looking for.
 
 """
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import input
+from builtins import range
+from past.builtins import basestring
+from builtins import object
+from past.utils import old_div
 from numpy import *
 from math import *
 import matplotlib.pylab as pyl
@@ -69,7 +78,7 @@ def _padding_model_number(number, max_num):
     return (cmax - clen)*'0' + cnum
 
 
-class DataPlot():
+class DataPlot(object):
 
     def _classTest(self):
         ''' 
@@ -266,9 +275,9 @@ class DataPlot():
             legendList=True
 
         if legendList and len(cyclist) !=len(legend): #if it is a list, make sure there is an entry for each cycle
-            print 'Please input a proper legend, with correct length, aborting plot'
+            print('Please input a proper legend, with correct length, aborting plot')
             return None
-        for i in xrange(len(cyclist)):
+        for i in range(len(cyclist)):
             if legendList:
                 self.plot(atrix,atriy,cyclist[i],'ndump',legend[i],labelx,labely,base=base,sparse=sparse, \
                                   logx=logx,logy=logy,show=False,limits=limits)
@@ -415,7 +424,7 @@ class DataPlot():
                 listX=self.get(fname, atrix,sparse=sparse)
 
             t2= time.time()
-            print t2 -t1
+            print(t2 -t1)
         elif plotType=='PPN' :
             if fname==None and atrix not in self.cattrs and atriy not in self.cattrs:
                 fname=len(self.files)-1
@@ -434,8 +443,8 @@ class DataPlot():
         if isinstance(listX[0], basestring) or isinstance(listY[0], basestring):
             for i in range(len(listX)):
                 if '*****' == listX[i] or '*****' == listY[i]:
-                    print 'There seems to be a string of * in the lists'
-                    print 'Cutting out elements in both the lists that have an index equal to or greater than the index of the location of the string of *'
+                    print('There seems to be a string of * in the lists')
+                    print('Cutting out elements in both the lists that have an index equal to or greater than the index of the location of the string of *')
                     break
                 tmpX.append(float(listX[i]))
                 tmpY.append(float(listY[i]))
@@ -465,7 +474,7 @@ class DataPlot():
         elif indexx<len(listX): # If an index is specified, use that index
             tmpX=listX[indexx]
         else:
-            print 'Sorry that indexx does not exist, returning None'
+            print('Sorry that indexx does not exist, returning None')
             return None
 
         #Determining if listY is a list or a list of lists
@@ -491,7 +500,7 @@ class DataPlot():
             #print 'sixth'
             tmpY=listY[indexy]
         else:
-            print 'Sorry that indexy does not exist, returning None'
+            print('Sorry that indexy does not exist, returning None')
             return None
         ''' 
         elif indexy==None and len(listY)==1:
@@ -506,15 +515,15 @@ class DataPlot():
         #searches for a list that is of an equal length
         if len(tmpY)!=len(tmpX):
             found=False
-            print "It seems like the lists are not of equal length"
-            print "Now attempting to find a compatible list for ListX"
+            print("It seems like the lists are not of equal length")
+            print("Now attempting to find a compatible list for ListX")
             for i in range(len(listY)):
                 if not singleY and len(tmpX)==len(listY[i]):
                     tmpY=listY[i]
                     found=True
 
             if not found:
-                print "Now attempting to find a compatible list for ListY"
+                print("Now attempting to find a compatible list for ListY")
                 for i in range(len(listX)):
 
                     if not singleX and len(tmpY)==len(listX[i]):
@@ -522,13 +531,13 @@ class DataPlot():
                         found=True
 
             if found:
-                print "Suitable list found"
+                print("Suitable list found")
             else:
 
-                print "There is no suitalble list, returning None"
+                print("There is no suitalble list, returning None")
                 return None
         if len(tmpY)!=len(tmpX) and single == True:
-            print 'It seems that the selected lists are of different\nsize, now returning none'
+            print('It seems that the selected lists are of different\nsize, now returning none')
             return None
         # Sparse stuff
         if plotType!='se':
@@ -549,8 +558,8 @@ class DataPlot():
         tmpY=[]
         for i in range(len(tmX)):
             if '*' in tmX[i] or '*' in tmY[i]:
-                print 'There seems to be a string of * in the lists'
-                print 'Cutting out elements in both the lists that have an index equal to or greater than the index of the location of the string of *'
+                print('There seems to be a string of * in the lists')
+                print('Cutting out elements in both the lists that have an index equal to or greater than the index of the location of the string of *')
                 break
             tmpX.append(float(tmX[i]))
             tmpY.append(float(tmY[i]))
@@ -709,8 +718,8 @@ class DataPlot():
             yrat_solsys = 0.
 
         # number ratio for solar system ratio
-        xrat_solsys *= (float(xiso[1].split('-')[1]) / float(xiso[0].split('-')[1]))
-        yrat_solsys *= (float(yiso[1].split('-')[1]) / float(yiso[0].split('-')[1]))
+        xrat_solsys *= (old_div(float(xiso[1].split('-')[1]), float(xiso[0].split('-')[1])))
+        yrat_solsys *= (old_div(float(yiso[1].split('-')[1]), float(yiso[0].split('-')[1])))
 
 
         # initialize xdataerr and ydataerr as None
@@ -722,12 +731,12 @@ class DataPlot():
         ### DO PLOTS FROM NUGRIDSE CLASS ###
         if self._classTest() == 'se':
             if spec==None:
-                spec = str(input('Please specify \'surf\' for surface models (AGB stars) or \'exp\' for explosive'
-                             'models and zone finding, etc., and press enter: '))
+                spec = str(eval(input('Please specify \'surf\' for surface models (AGB stars) or \'exp\' for explosive'
+                             'models and zone finding, etc., and press enter: ')))
 
             ### SURFACE MODELS - PLOT AGB STAR STUFF ###
             if spec == 'surf':
-                print 'Plotting AGB star stuff'
+                print('Plotting AGB star stuff')
 
                 # read in thermal pulse position and co ratio
                 tp_pos, co_return = self._tp_finder(dcycle)
@@ -746,19 +755,19 @@ class DataPlot():
                 xrat = np.zeros(len(iso_alldata))
                 yrat = np.zeros(len(iso_alldata))
                 for i in range(len(iso_alldata)):
-                    xrat[i] = iso_alldata[i][0] / iso_alldata[i][1]
-                    yrat[i] = iso_alldata[i][2] / iso_alldata[i][3]
+                    xrat[i] = old_div(iso_alldata[i][0], iso_alldata[i][1])
+                    yrat[i] = old_div(iso_alldata[i][2], iso_alldata[i][3])
 
                 # make number ratios
                 for i in range(len(xrat)):
-                    xrat[i] *= float(xiso[1].split('-')[1]) / float(xiso[0].split('-')[1])
-                    yrat[i] *= float(yiso[1].split('-')[1]) / float(yiso[0].split('-')[1])
+                    xrat[i] *= old_div(float(xiso[1].split('-')[1]), float(xiso[0].split('-')[1]))
+                    yrat[i] *= old_div(float(yiso[1].split('-')[1]), float(yiso[0].split('-')[1]))
 
                 # if delta values are requested, need to calculate those now
                 if deltax:
-                    xrat = (xrat/xrat_solsys -1.) * 1000.
+                    xrat = (old_div(xrat,xrat_solsys) -1.) * 1000.
                 if deltay:
-                    yrat = (yrat/yrat_solsys -1.) * 1000.
+                    yrat = (old_div(yrat,yrat_solsys) -1.) * 1000.
 
                 # now we might have o and c rich zones. prepare stuff for plotting
                 xdata_o = []
@@ -797,7 +806,7 @@ class DataPlot():
 
             ### EXPLOSIVE MODELS ###
             elif spec == 'exp':
-                print 'explosive models'
+                print('explosive models')
                 # compatibility
                 co_toggle = co_toggle.lower()
                 isotope_list = [xiso[0],xiso[1],yiso[0],yiso[1]]
@@ -810,7 +819,7 @@ class DataPlot():
                 if cust_toggle == None:
                     c_elem = mco_data[1]+mco_data[2]
                     o_elem = mco_data[3]+mco_data[4]+mco_data[5]
-                    co_ratio = c_elem / o_elem * (16. / 12.)
+                    co_ratio = c_elem / o_elem * (old_div(16., 12.))
                     co_comp_val = 1.
                 else:
                     co_data1 = self.get(cyc_no,cust_toggle[0])
@@ -834,7 +843,7 @@ class DataPlot():
                     for i in range(len(co_data2)):
                         massn2 += sum(co_data2[i]) * float(cust_toggle[1][i].split('-')[1])
                     massn2 /= sum(o_elem)
-                    co_ratio = c_elem / o_elem * (massn2 / massn1)   # this has nothing to do with a C/O ratio anymore! but keep name
+                    co_ratio = c_elem / o_elem * (old_div(massn2, massn1))   # this has nothing to do with a C/O ratio anymore! but keep name
                     # comparator value
                     co_comp_val = float(cust_toggle[2])
 
@@ -906,10 +915,10 @@ class DataPlot():
                                     crich.append(i)
                                     dumb = True
                         else:
-                            print 'Select your enrichment!'
+                            print('Select your enrichment!')
                             return None
                 else:   # take whole star
-                    print 'Using all profiles to mix'
+                    print('Using all profiles to mix')
                     crich.append(0)
                     crich.append(len(co_toggle))
 
@@ -917,7 +926,7 @@ class DataPlot():
                     crich.append(len(co_ratio)-1)
 
                 if len(crich) == 0:
-                    print 'Star did not get rich in C or O, depending on what you specified'
+                    print('Star did not get rich in C or O, depending on what you specified')
                     return None
 
                 # make isotope_profile into array and transpose
@@ -927,31 +936,31 @@ class DataPlot():
                 # Ask user which zones to use
                 if co_toggle != 'a':
                     if cust_toggle != None:
-                        print '\n\nI have found the following zones:\n'
+                        print('\n\nI have found the following zones:\n')
                     elif co_toggle == 'c':
-                        print '\n\nI have found the following carbon rich zones:\n'
+                        print('\n\nI have found the following carbon rich zones:\n')
                     elif co_toggle == 'o':
-                        print '\n\nI have found the following oxygen rich zones:\n'
+                        print('\n\nI have found the following oxygen rich zones:\n')
 
                     mass_tmp = zeros((len(crich)))
                     for i in range(len(crich)):
                         mass_tmp[i] = mass[crich[i]]
 
                     j = 1
-                    for i in range(len(crich)/2):
-                        print 'Mass range (' + str(j) + '):\t' + str(mass_tmp[2*i]) + ' - ' + str(mass_tmp[2*i+1])
+                    for i in range(old_div(len(crich),2)):
+                        print('Mass range (' + str(j) + '):\t' + str(mass_tmp[2*i]) + ' - ' + str(mass_tmp[2*i+1]))
                         j += 1
-                    print '\n'
+                    print('\n')
                     if zoneselect == 'all':
                         usr_zones = 0
                     elif zoneselect == 'top':
                         usr_zones = [j-1]
                     else:
-                        usr_zones = input('Please select which mass range you want to use. Select 0 for all zones. Otherwise give one zone or a list of zones separated by comma (e.g.: 1, 2, 4): ')
+                        usr_zones = eval(input('Please select which mass range you want to use. Select 0 for all zones. Otherwise give one zone or a list of zones separated by comma (e.g.: 1, 2, 4): '))
 
                     crich_dumb = crich
                     if usr_zones == 0:
-                        print 'I continue w/ all zones then'
+                        print('I continue w/ all zones then')
                     elif type(usr_zones) == int:   # only one zone selected
                         tmp = int(usr_zones)-1
                         crich = crich_dumb[2*tmp:2*tmp+2]
@@ -966,7 +975,7 @@ class DataPlot():
                 # define isos_to_use variable for later
                 if weighting == None:
                     isos_to_use = []
-                    for i in range(len(crich)/2):
+                    for i in range(old_div(len(crich),2)):
                         isos_dumb = []
                         n = crich[2*i]
                         while n <= crich[2*i+1]:
@@ -977,11 +986,11 @@ class DataPlot():
 
                 elif weighting.lower() == 'zone' or weighting.lower() == 'zones':
                     # make array w/ mass weigted isotope ratio (4) for all mass zones
-                    isotope_profile_cweight = zeros((len(crich)/2,4))
+                    isotope_profile_cweight = zeros((old_div(len(crich),2),4))
                     mass_tot = []
                     for i in range(len(isotope_profile_cweight)):   # 2*i is start, 2*i+1 is stop value
                         if crich[2*i] == 0:
-                            print 'C- / O-rich in first shell (core).'
+                            print('C- / O-rich in first shell (core).')
                         else:
                             dumb = crich[2*i + 1]
                             j = crich[2*i]
@@ -1025,8 +1034,8 @@ class DataPlot():
                     ratiox_dumb = []
                     ratioy_dumb = []
                     for j in range(len(isos_to_use[i])):
-                        ratiox_dumb.append(isos_to_use[i][j][0] / isos_to_use[i][j][1])
-                        ratioy_dumb.append(isos_to_use[i][j][2] / isos_to_use[i][j][3])
+                        ratiox_dumb.append(old_div(isos_to_use[i][j][0], isos_to_use[i][j][1]))
+                        ratioy_dumb.append(old_div(isos_to_use[i][j][2], isos_to_use[i][j][3]))
                     ratiox.append(array(ratiox_dumb))
                     ratioy.append(array(ratioy_dumb))
 
@@ -1037,15 +1046,15 @@ class DataPlot():
                 # make number ratio out of everything
                 for i in range(len(ratiox)):
                     for j in range(len(ratiox[i])):
-                        ratiox[i][j] *= (float(xiso[1].split('-')[1]) / float(xiso[0].split('-')[1]))
-                        ratioy[i][j] *= (float(yiso[1].split('-')[1]) / float(yiso[0].split('-')[1]))
+                        ratiox[i][j] *= (old_div(float(xiso[1].split('-')[1]), float(xiso[0].split('-')[1])))
+                        ratioy[i][j] *= (old_div(float(yiso[1].split('-')[1]), float(yiso[0].split('-')[1])))
 
                 if deltax:
                     ratiox_tmp = []
                     for i in range(len(ratiox)):
                         ratiox_tmp_tmp = []
                         for j in range(len(ratiox[i])):
-                            ratiox_tmp_tmp.append((ratiox[i][j] / xrat_solsys - 1.) * 1000.)
+                            ratiox_tmp_tmp.append((old_div(ratiox[i][j], xrat_solsys) - 1.) * 1000.)
                         ratiox_tmp.append(ratiox_tmp_tmp)
                     ratiox = array(ratiox_tmp)
                 if deltay:
@@ -1053,7 +1062,7 @@ class DataPlot():
                     for i in range(len(ratioy)):
                         ratioy_tmp_tmp = []
                         for j in range(len(ratioy[i])):
-                            ratioy_tmp_tmp.append((ratioy[i][j] / yrat_solsys - 1.) * 1000.)
+                            ratioy_tmp_tmp.append((old_div(ratioy[i][j], yrat_solsys) - 1.) * 1000.)
                         ratioy_tmp.append(ratioy_tmp_tmp)
                     ratioy = array(ratioy_tmp)
 
@@ -1071,12 +1080,12 @@ class DataPlot():
                             mrng_i += 1
                         if mrng_i > 0:
                             mrng_i -= 1
-                        mratx = isotope_profile[mrng_i][0]/isotope_profile[mrng_i][1]
-                        mraty = isotope_profile[mrng_i][2]/isotope_profile[mrng_i][3]
+                        mratx = old_div(isotope_profile[mrng_i][0],isotope_profile[mrng_i][1])
+                        mraty = old_div(isotope_profile[mrng_i][2],isotope_profile[mrng_i][3])
                         if deltax:
-                            mratx = (mratx / ratiox_solsys - 1.) * 1000.
+                            mratx = (old_div(mratx, ratiox_solsys) - 1.) * 1000.
                         if deltay:
-                            mraty = (mraty / ratioy_solsys - 1.) * 1000.
+                            mraty = (old_div(mraty, ratioy_solsys) - 1.) * 1000.
                         plt_massrange_lst.append([mratx,mraty,mass[mrng_i]])
 
                 # make style and prepare for plotting here
@@ -1092,12 +1101,12 @@ class DataPlot():
                         style.append(style_tmp)
 
             else:
-                print 'You did not specify a useful spec argument -> abort.'
+                print('You did not specify a useful spec argument -> abort.')
                 return None
 
         ### PLOTS FROM GRAIN CLASS ###
         if self._classTest() == 'grain':
-            print 'Presolar grains are cool!'
+            print('Presolar grains are cool!')
             xdata,xdataerr,ydata,ydataerr,style = self.plot_ratio_return(xiso,yiso,deltax,deltay)
             legend=True
             plt_sparse=1   # to avoid monkey input
@@ -1160,7 +1169,7 @@ class DataPlot():
             pl.ylabel('$^{' + yiso[0].split('-')[1] + '}$' +yiso[0].split('-')[0] + '/$^{' + yiso[1].split('-')[1] + '}$' +yiso[1].split('-')[0])
 
         # plot horizontal and vertical lines
-        print xrat_solsys, yrat_solsys
+        print(xrat_solsys, yrat_solsys)
         if deltay:
             pl.axhline(0,color='k')
         else:
@@ -1255,7 +1264,7 @@ class DataPlot():
                     break
 
             if tmp2==-1:
-                print 'No valid element selected. Abort.'
+                print('No valid element selected. Abort.')
                 return None
 
             isos_tmp = []
@@ -1269,7 +1278,7 @@ class DataPlot():
                 isos_tmp.append([isos[i], normiso])
             isos = isos_tmp
         else:
-            print 'Specify a valid isotope, see docstring.'
+            print('Specify a valid isotope, see docstring.')
             return None
 
         # make a list with all isotopes just as a list (not the fraction as isos)
@@ -1290,17 +1299,17 @@ class DataPlot():
             ss_rat.append(inut.isoratio_init(isos[i]))
         # make number ratios
         for i in range(len(isos)):
-            ss_rat[i] *= (float(isos[i][1].split('-')[1]) / float(isos[i][0].split('-')[1]))
+            ss_rat[i] *= (old_div(float(isos[i][1].split('-')[1]), float(isos[i][0].split('-')[1])))
 
         ### DO PLOTS FROM NUGRIDSE CLASS ###
         if self._classTest() == 'se':
             if spec==None:
-                spec = str(input('Please specify \'surf\' for surface models (AGB stars) or \'exp\' for explosive'
-                             'models and zone finding, etc., and press enter: '))
+                spec = str(eval(input('Please specify \'surf\' for surface models (AGB stars) or \'exp\' for explosive'
+                             'models and zone finding, etc., and press enter: ')))
 
             ### SURFACE MODELS - PLOT AGB STAR STUFF ###
             if spec == 'surf':
-                print 'Plotting AGB star stuff'
+                print('Plotting AGB star stuff')
 
                 # read in thermal pulse position and co ratio
                 tp_pos, co_return = self._tp_finder(dcycle)
@@ -1323,18 +1332,18 @@ class DataPlot():
                 iso_ratios = np.zeros((len(iso_alldata),len(iso_alldata[0])))
                 for i in range(len(iso_ratios)):
                     for j in range(len(iso_ratios[i])):
-                        iso_ratios[i][j] = iso_alldata[i][j] / norm_isotope[i]
+                        iso_ratios[i][j] = old_div(iso_alldata[i][j], norm_isotope[i])
 
                 # make number ratios
                 for i in range(len(iso_ratios)):
                     for j in range(len(iso_ratios[i])):
-                        iso_ratios[i][j] *= float(isos[j][1].split('-')[1]) / float(isos[j][0].split('-')[1])
+                        iso_ratios[i][j] *= old_div(float(isos[j][1].split('-')[1]), float(isos[j][0].split('-')[1]))
 
                 # if delta values are requested, need to calculate those now
                 if deltay:
                     for i in range(len(iso_ratios)):
                         for j in range(len(iso_ratios[i])):
-                            iso_ratios[i][j] = (iso_ratios[i][j] / ss_rat[j] - 1.) * 1000.
+                            iso_ratios[i][j] = (old_div(iso_ratios[i][j], ss_rat[j]) - 1.) * 1000.
 
                 ### now prepare data to plot ###
 
@@ -1352,7 +1361,7 @@ class DataPlot():
                             ydata.append(iso_ratios[i])
                             style.append([plt_symb + plt_lt,  plt_col, plt_col, '7.', '1', legend])
                     if ydata == []:
-                        print 'No O rich thermal pulses found.'
+                        print('No O rich thermal pulses found.')
                         return None
                 else:   # this means carbon rich, either only or all, but make marker size first
                     msizelst = []   # marker size list for all subsequent ones
@@ -1362,7 +1371,7 @@ class DataPlot():
                             crich_list.append(co_return[i])
                     crich_max = np.max(crich_list)
                     crich_min = np.min(crich_list)
-                    slope_tmp = 9. / (crich_max-crich_min)
+                    slope_tmp = old_div(9., (crich_max-crich_min))
                     b_tmp = 3. - slope_tmp * crich_min
                     for i in range(len(crich_list)):
                         msizelst.append(crich_list[i] * slope_tmp + b_tmp)
@@ -1382,10 +1391,10 @@ class DataPlot():
 
             ### EXPLOSIVE MODELS ###
             elif spec=='exp':
-                print 'Explosive models not yet implemented... sorry'
+                print('Explosive models not yet implemented... sorry')
                 return None
             else:
-                print 'You did not specify a useful spec argument -> abort.'
+                print('You did not specify a useful spec argument -> abort.')
                 return None
 
         ###### PLOT ######
@@ -1508,11 +1517,11 @@ class DataPlot():
         '''
 
         if self._which('dvipng')==None:
-            print "This method may need the third party program dvipng to operate"
-            print 'It is located at http://sourceforge.net/projects/dvipng/'
+            print("This method may need the third party program dvipng to operate")
+            print('It is located at http://sourceforge.net/projects/dvipng/')
 
         max_num = max(cyclist)
-        for i in xrange(len(cyclist)):
+        for i in range(len(cyclist)):
             self.abu_chart( cyclist[i], mass_range ,ilabel,imlabel,imlabel_fontsize,imagic,\
                             boxstable,lbound,plotaxis,False,color_map)
             if title !=None:
@@ -1627,7 +1636,7 @@ class DataPlot():
             #and hence mass[-1] the center.
             if masses[0]>masses[-1]:
                 #invert
-                print 'Inverted order of mass cells will be taken into account.'
+                print('Inverted order of mass cells will be taken into account.')
                 yin=yin[::-1]
                 masses=masses[::-1]
 
@@ -1656,7 +1665,7 @@ class DataPlot():
             #        tmp[j]+=yin[i][j]
 
             tmp2=sum(yin,axis=0) # SJONES sum along axis instead of nested loop
-            tmp=tmp2/len(yin)
+            tmp=old_div(tmp2,len(yin))
 
             yin=tmp
 
@@ -1673,7 +1682,7 @@ class DataPlot():
                 tmpZ=[]
                 tmpIsom=[]
                 tmpyps=[]
-                for i in xrange(len(nin)):
+                for i in range(len(nin)):
                     if (ain[i] >mass_range[0] and ain[i]<mass_range[1])\
                     or (ain[i]==mass_range[0] or ain[i]==mass_range[1]):
                         tmpA.append(nin[i])
@@ -1829,7 +1838,7 @@ class DataPlot():
 
         # Add black frames for stable isotopes
         if boxstable:
-            for i in xrange(len(self.stable_el)):
+            for i in range(len(self.stable_el)):
                 if i == 0:
                     continue
 
@@ -1840,7 +1849,7 @@ class DataPlot():
                 except:
                     continue
 
-                for j in xrange(len(tmp)):
+                for j in range(len(tmp)):
                     if j == 0:
                         continue
 
@@ -1911,7 +1920,7 @@ class DataPlot():
             pl.title('Isotopic Chart for cycle '+str(int(cycle)))
         if savefig:
             fig.savefig(graphname)
-            print graphname,'is done'
+            print(graphname,'is done')
         if show:
             pl.show()
         if turnoff:
@@ -1997,10 +2006,10 @@ class DataPlot():
             cycle=self.se.findCycle(cycle)
             nin=zeros(len(self.se.A))
             zin=zeros(len(self.se.Z))
-            for i in xrange(len(nin)):
+            for i in range(len(nin)):
                 nin[i]=self.se.A[i]
                 zin[i]=self.se.Z[i]
-            for i in xrange(len(nin)):
+            for i in range(len(nin)):
                 nin[i]=nin[i]-zin[i]
             yin=self.get(cycle, 'iso_massf')
             isom=self.se.isomeric_states
@@ -2015,7 +2024,7 @@ class DataPlot():
                 masses = self.se.get(cycle,'mass')
                 masses = self.se.get(cycle,'mass')
                 masses.sort()
-                for i in xrange(len(masses)):
+                for i in range(len(masses)):
                     if (masses[i] >mass_range[0] and masses[i]<mass_range[1]) or\
                             (masses[i]==mass_range[0] or masses[i]==mass_range[1]):
                         tmpyps.append(yin[i])
@@ -2023,11 +2032,11 @@ class DataPlot():
 
 
             tmp=zeros(len(yin[0]))
-            for i in xrange(len(yin)):
-                for j in xrange(len(yin[i])):
+            for i in range(len(yin)):
+                for j in range(len(yin[i])):
                     tmp[j]+=yin[i][j]
 
-            tmp=tmp/len(yin)
+            tmp=old_div(tmp,len(yin))
 
             yin=tmp
 
@@ -2044,7 +2053,7 @@ class DataPlot():
                 tmpZ=[]
                 tmpIsom=[]
                 tmpyps=[]
-                for i in xrange(len(nin)):
+                for i in range(len(nin)):
                     if (ain[i] >mass_range[0] and ain[i]<mass_range[1])\
                     or (ain[i]==mass_range[0] or ain[i]==mass_range[1]):
                         tmpA.append(nin[i])
@@ -2057,8 +2066,8 @@ class DataPlot():
                 isom=tmpIsom
 
         else:
-            print 'This method, abu_chart, is not supported by this class'
-            print 'Returning None'
+            print('This method, abu_chart, is not supported by this class')
+            print('Returning None')
             return None
         # in case we call from ipython -pylab, turn interactive on at end again
         turnoff=False
@@ -2201,7 +2210,7 @@ class DataPlot():
 
         # Add black frames for stable isotopes
         if boxstable:
-            for i in xrange(len(self.stable_el)):
+            for i in range(len(self.stable_el)):
                 if i == 0:
                     continue
 
@@ -2212,7 +2221,7 @@ class DataPlot():
                 except:
                     continue
 
-                for j in xrange(len(tmp)):
+                for j in range(len(tmp)):
                     if j == 0:
                         continue
 
@@ -2292,7 +2301,7 @@ class DataPlot():
         # here below I read data from the flux_*****.DAT file.
         #
         file_name = 'flux_'+str(cycle).zfill(5)+'.DAT'
-        print file_name
+        print(file_name)
         f = open(file_name)
         lines = f.readline()
         lines = f.readlines()
@@ -2318,13 +2327,13 @@ class DataPlot():
         flux_log10 = []
 
         if which_flux == None or which_flux == 0:
-            print 'chart for nucleosynthesis fluxes [dYi/dt]'
+            print('chart for nucleosynthesis fluxes [dYi/dt]')
             line_to_read = 9
         elif which_flux == 1:
-            print 'chart for energy fluxes'
+            print('chart for energy fluxes')
             line_to_read = 10
         elif which_flux > 1:
-            print "you have only option 0 or 1, not larger than 1"
+            print("you have only option 0 or 1, not larger than 1")
 
         single_line = []
         for i in range(len(lines)):
@@ -2341,7 +2350,7 @@ class DataPlot():
                 flux_read.append(1.0E-99)
             flux_log10.append(log10(flux_read[i]+1.0e-99))
 
-        print file_name,' read!'
+        print(file_name,' read!')
 
         # I need to select smaller sample, with only fluxes inside plotaxis.
         if plotaxis!=[0,0,0,0]:
@@ -2386,7 +2395,7 @@ class DataPlot():
 
         # flow is plotted over "prange" dex. If flow < maxflow-prange it is not plotted
         if prange == None:
-            print 'plot range given by default'
+            print('plot range given by default')
             prange = 8.
 
         #############################################
@@ -2471,7 +2480,7 @@ class DataPlot():
         # Add black frames for stable isotopes
         # Add black frames for stable isotopes
         if boxstable:
-            for i in xrange(len(self.stable_el)):
+            for i in range(len(self.stable_el)):
                 if i == 0:
                     continue
 
@@ -2482,7 +2491,7 @@ class DataPlot():
                 except:
                     continue
 
-                for j in xrange(len(tmp)):
+                for j in range(len(tmp)):
                     if j == 0:
                         continue
 
@@ -2497,7 +2506,7 @@ class DataPlot():
 
         apatches = []
         acolor = []
-        m = 0.8/prange
+        m = old_div(0.8,prange)
         vmax=ceil(max(flux_log10_small))
         vmin=max(flux_log10_small)-prange
         b=-vmin*m+0.1
@@ -2605,7 +2614,7 @@ class DataPlot():
             ax2.text(plotaxis[1]-1.8,plotaxis[2]+0.1,max_flux_label,fontsize=10.)
 
         #fig.savefig(graphname)
-        print graphname,'is done'
+        print(graphname,'is done')
         if show:
             pl.show()
         if turnoff:
@@ -2673,7 +2682,7 @@ class DataPlot():
             
         '''
         max_num = max(cyclist)
-        for i in xrange(len(cyclist)):
+        for i in range(len(cyclist)):
             self.iso_abund(cyclist[i],stable,amass_range,mass_range,ylim,ref,\
                  decayed=decayed,show=False,color_plot=color_plot,grid=False,\
                  point_set=1,include_title=include_title)
@@ -2778,7 +2787,7 @@ class DataPlot():
 
             def get_av_elem(cycle):
                 mass=self.se.get(cycle,'mass')
-                print mass
+                print(mass)
                 if mass_range is not None:
                     idx1=abs(mass-mass_range[0]).argmin()
                     idx2=abs(mass-mass_range[1]).argmin()
@@ -2797,7 +2806,7 @@ class DataPlot():
                 eamsum=zeros(len(ea[0]))
                 for i in range(len(eamsum)):
                     eamsum[i]=sum([zone[i] for zone in mea])
-                ea=eamsum/totmass
+                ea=old_div(eamsum,totmass)
                 return np.maximum(ea,1.e-99)
 
             Z=array(self.se.Z)
@@ -2807,7 +2816,7 @@ class DataPlot():
                     
             ea=get_av_elem(cycle)
             if ref>0:
-                ea=ea/get_av_elem(ref)
+                ea=old_div(ea,get_av_elem(ref))
             elif ref==0 or bracket:
                 # initialise solar data
                 # If this import statment goes at the top of the file
@@ -2843,14 +2852,14 @@ class DataPlot():
                     xrefsol=np.maximum(xrefsol,1.e-99)
                     xref=ea[where(Zuq==ref_ZZ)[0]]
                     xref=np.maximum(xref,1.e-99)
-                    selem=selem/xrefsol
-                    ea=ea/xref
+                    selem=old_div(selem,xrefsol)
+                    ea=old_div(ea,xref)
                 
-                ea=ea/selem
+                ea=old_div(ea,selem)
 
         else:
             raise IOError("elem_abund currently unsupported for this data type:")
-            print plotType
+            print(plotType)
 
         pl.plot(Zuq,np.log10(ea),'ro')
         pl.plot(Zuq,np.log10(ea),'r-')
@@ -2959,16 +2968,16 @@ class DataPlot():
             return
 
         if mass_range!=None and mass_range[0]>mass_range[1]:
-            print 'Please input a proper mass range'
-            print 'Returning None'
+            print('Please input a proper mass range')
+            print('Returning None')
             return None
         if amass_range!=None and amass_range[0]>amass_range[1]:
-            print 'Please input a proper Atomic mass range'
-            print 'Returning None'
+            print('Please input a proper Atomic mass range')
+            print('Returning None')
             return None
         if plotType=='se':
             if decayed:
-                print 'Decay option not yet implemented for mppnp - but it is easy do! Consider investing the time!'
+                print('Decay option not yet implemented for mppnp - but it is easy do! Consider investing the time!')
                 return None
 
 
@@ -3000,7 +3009,7 @@ class DataPlot():
 
             if mass_range == None:
                 if verbose:
-                    print 'Using default mass range'
+                    print('Using default mass range')
                 mass_range = [min(masses),max(masses)]
             masses.sort()
             mass_range.sort()
@@ -3032,7 +3041,7 @@ class DataPlot():
             # apply mass range
             if mass_range == None:
                 if verbose:
-                    print 'Using default mass range'
+                    print('Using default mass range')
                 mass_range = [min(masses),max(masses)]
             mass_range.sort()
             aabs = []
@@ -3056,11 +3065,11 @@ class DataPlot():
 
                 # average over mass range:
                 aa = (aa.T*dmass).T.sum(0)
-                aa = aa / (mass_range[1] - mass_range[0])
+                aa = old_div(aa, (mass_range[1] - mass_range[0]))
                 # abunds has now length of isotope_to_plot
                 aabs.append(aa)
             if ref >-1:
-                abunds = aabs[0]/(aabs[1]+1.e-99)
+                abunds = old_div(aabs[0],(aabs[1]+1.e-99))
             else:
                 abunds = aabs[0]
 
@@ -3075,13 +3084,13 @@ class DataPlot():
 #                        self.isotopes = self.se.isotopes
 
         elif plotType=='PPN':
-            print "This method adds the following variables to the instance:"
-            print "a_iso_to_plot      mass number of plotted range of species"
-            print "isotope_to_plot    corresponding list of isotopes"
-            print "z_iso_to_plot      corresponding charge numbers"
-            print "el_iso_to_plot     corresponding element names"
-            print "abunds             corresponding abundances"
-            print "isom               isomers and their abundance"
+            print("This method adds the following variables to the instance:")
+            print("a_iso_to_plot      mass number of plotted range of species")
+            print("isotope_to_plot    corresponding list of isotopes")
+            print("z_iso_to_plot      corresponding charge numbers")
+            print("el_iso_to_plot     corresponding element names")
+            print("abunds             corresponding abundances")
+            print("isom               isomers and their abundance")
 
             self.get(cycle,decayed=decayed)
             if ref is not -1:
@@ -3089,11 +3098,11 @@ class DataPlot():
                     import ppn
                     pp=ppn.abu_vector(ref[0])
                     abunds_pp=pp.get(ref[1],decayed=decayed)
-                    self.abunds=self.abunds/pp.abunds
+                    self.abunds=old_div(self.abunds,pp.abunds)
                 else:
                     abunds=self.abunds
                     self.get(ref,decayed=decayed)
-                    self.abunds=abunds/(self.abunds+1.e-99)
+                    self.abunds=old_div(abunds,(self.abunds+1.e-99))
             if amass_range == None:
                 amass_range=[min(self.a_iso_to_plot),max(self.a_iso_to_plot)]
 
@@ -3104,7 +3113,7 @@ class DataPlot():
             abunds=ma.array(self.abunds,mask=aa.mask).compressed()
             a_iso_to_plot=aa.compressed()
             isomers_to_plot=[]
-            for i in xrange(len(self.isom)):
+            for i in range(len(self.isom)):
                 if int(self.isom[i][0].split('-')[1])>100:
                     isomers_to_plot.append(self.isom[i])
 
@@ -3115,18 +3124,18 @@ class DataPlot():
             self.abunds=abunds
             self.isomers_to_plot=isomers_to_plot
         else:
-            print 'This method, iso_abund, is not supported by this class'
-            print 'Returning None'
+            print('This method, iso_abund, is not supported by this class')
+            print('Returning None')
             return None
 
         if verbose:
-            print 'Using the following conditions:'
+            print('Using the following conditions:')
             if plotType=='se':
-                print '\tmass_range:', mass_range[0], mass_range[1]
-            print '\tAtomic mass_range:', amass_range[0], amass_range[1]
-            print '\tcycle:           ',cycle
-            print '\tplot only stable:',stable
-            print '\tplot decayed:    ',decayed
+                print('\tmass_range:', mass_range[0], mass_range[1])
+            print('\tAtomic mass_range:', amass_range[0], amass_range[1])
+            print('\tcycle:           ',cycle)
+            print('\tplot only stable:',stable)
+            print('\tplot decayed:    ',decayed)
 
 
         if stable: # remove unstables:
@@ -3190,7 +3199,7 @@ class DataPlot():
         if drawfig is not None:
             fig=drawfig
 
-        for j in xrange(len(abund_plot)):        #Loop through the elements of interest
+        for j in range(len(abund_plot)):        #Loop through the elements of interest
 #            for l in xrange(len(abund_plot[j])):
 #                if abund_plot[j][l] == 0:
 #                    abund_plot[j][l] = 1e-99
@@ -3287,7 +3296,7 @@ class DataPlot():
                 else:
                     title = str('Cycle %d' %int(cycle))+\
                             str(' relative to cycle %d'  %int(ref))
-            print "including title: ..."
+            print("including title: ...")
             if mov:
                 artist1,=ax.title(title)
                 artists.append(artist1)
@@ -3483,16 +3492,16 @@ class DataPlot():
                 else:
                     utils.solar(solar_filename,1)
                     menow = where(unique(utils.z_sol)==44.)[0][0]
-                    print 1, menow, utils.solar_elem_abund[menow]
+                    print(1, menow, utils.solar_elem_abund[menow])
                     el_abu_sun=np.array(utils.solar_elem_abund)
-                    print 2, el_abu_sun
-                    print 3, el_abu_sun[42]
+                    print(2, el_abu_sun)
+                    print(3, el_abu_sun[42])
                     el_abu_plot=np.zeros(len(el_abu))
                     for zs in z_el[zmin_ind:zmax_ind]:
                         zelidx=where(z_el[zmin_ind:zmax_ind]==zs)[0]
                         zsolidx=zs-1
                         if el_abu_sun[zsolidx] > 0. :
-                            el_abu_plot[zelidx]=el_abu[zelidx]/el_abu_sun[zsolidx]
+                            el_abu_plot[zelidx]=old_div(el_abu[zelidx],el_abu_sun[zsolidx])
                         else:
                             el_abu_plot[zelidx]=-1
                     
@@ -3501,7 +3510,7 @@ class DataPlot():
                 raise IOError('Your choice of ref is not available yet. Please use another.')
             if label != '':
                 if colour!='':
-                    print "Plotting without color and label:"
+                    print("Plotting without color and label:")
                     pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu_plot),
                             'o-',label=label,color=colour,markeredgecolor='None')
                 else:
@@ -3531,7 +3540,7 @@ class DataPlot():
                 pl.legend(loc='best').draw_frame(False)
             return z_el[zmin_ind:zmax_ind],el_abu_plot
         else:
-            print 'This method is not supported for '+plotType
+            print('This method is not supported for '+plotType)
             return
 
     def _do_title_string(self,title_items,cycle):
@@ -3616,12 +3625,12 @@ class DataPlot():
                 #
                 filename = str('%03d' % step)+'_test.png'
                 pl.savefig(filename, dpi=400)
-                print 'wrote file ', filename
+                print('wrote file ', filename)
                 #
                 pl.clf()
 
         else:
-            print 'This method is not supported for '+str(self.__class__)
+            print('This method is not supported for '+str(self.__class__))
             return
 
     def movie(self, cycles, plotstyle='',movname='',fps=12,**kwargs):
@@ -3675,7 +3684,7 @@ class DataPlot():
 
         modelself=self
         supported_styles=['iso_abund','abu_chart','plot']
-        class mov:
+        class mov(object):
                     
             def __init__(self,cyc,style,movname,fps,**kwargs):
                 self.fig = None
@@ -3714,7 +3723,7 @@ class DataPlot():
 
                     self.fig, self.ax = pl.subplots()
                     tmp=[]
-                    for i in xrange(len(self.y_ditems)):
+                    for i in range(len(self.y_ditems)):
                         tmp.append(self.data[0][0])
                         tmp.append(self.data[0][i+1])
                     self.lines = self.ax.plot(*tmp)
@@ -3783,9 +3792,9 @@ class DataPlot():
                     self.fig.canvas.draw()
 
                 if self.movname is not '':
-                    print '\n generating animation: '+self.movname
+                    print('\n generating animation: '+self.movname)
                     self.ani.save(self.movname,fps=self.fps)
-                    print 'animation '+self.movname+' saved with '+str(self.fps)+' frames per second'
+                    print('animation '+self.movname+' saved with '+str(self.fps)+' frames per second')
     
         plotType=self._classTest()
         
@@ -3819,7 +3828,7 @@ class DataPlot():
                     data=self.se.get(cycles,[x_item]+[y_items])
                 def draw_frame(i, self=None):
 #                    pl.title("cycle: " + self.cyc[i])
-                    for j in xrange(len(self.lines)):
+                    for j in range(len(self.lines)):
                         if 'logy' in kwargs and kwargs['logy']:
                             self.lines[j].set_data(self.data[i][0],
                                                    np.log10(self.data[i][j+1]))
@@ -3874,7 +3883,7 @@ class DataPlot():
             mod=self.header_attr['model_number']
             Xspecies=self.get(species)
         else:
-            print 'This method is not supported for '+str(self.__class__)
+            print('This method is not supported for '+str(self.__class__))
             return
 
         if symbol == None:
@@ -4021,7 +4030,7 @@ class DataPlot():
             x = np.log10(x)
             xlab='$\log_{10}(r\,/\,{\\rm cm})$'
         elif ixaxis is 'radius':
-            x = x / 1.e8
+            x = old_div(x, 1.e8)
             xlab = 'r / Mm'
         else:
             xlab='${\\rm Mass}\,/\,M_\odot$'
@@ -4201,16 +4210,16 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
     flux_log10 = []
 
     if which_flux == None or which_flux == 0:
-        print 'chart for nucleosynthesis fluxes [dYi/dt]'
+        print('chart for nucleosynthesis fluxes [dYi/dt]')
         line_to_read = 9
     elif which_flux == 1:
-        print 'chart for energy fluxes'
+        print('chart for energy fluxes')
         line_to_read = 10
     elif which_flux == 2:
-        print 'chart for timescales'
+        print('chart for timescales')
         line_to_read = 11
     elif which_flux > 2:
-        print "you have only option 0, 1 or 2, not larger than 2"
+        print("you have only option 0, 1 or 2, not larger than 2")
 
     single_line = []
     for i in range(len(lines)):
@@ -4227,7 +4236,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
             flux_read.append(1.0E-99)
         flux_log10.append(np.log10(flux_read[i]+1.0e-99))
 
-    print 'file read!'
+    print('file read!')
 
     # I need to select smaller sample, with only fluxes inside plotaxis.
     coord_y_1_small=[]
@@ -4260,7 +4269,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
 
 
     if plot_type == 1:
-        print 'I_am_the_target=',I_am_the_target
+        print('I_am_the_target=',I_am_the_target)
         #I_am_the_target = [56.-26.,26.]
     # here below need for plotting
     # plotaxis = [xmin,xmax,ymin,ymax]
@@ -4278,7 +4287,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
 
     # flow is plotted over "prange" dex. If flow < maxflow-prange it is not plotted
     if prange == None:
-        print 'plot range given by default'
+        print('plot range given by default')
         prange = 8.
 
     #############################################
@@ -4422,7 +4431,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
 
     apatches = []
     acolor = []
-    m = 0.8/prange#0.8/prange
+    m = old_div(0.8,prange)#0.8/prange
     if which_flux == None or which_flux < 2:
         vmax=np.ceil(max(flux_log10_small))
         vmin=max(flux_log10_small)-prange
@@ -4433,7 +4442,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
         b=vmax*m+0.1
     if which_flux == None or which_flux < 3:
         normr = colors.Normalize(vmin=vmin,vmax=vmax)
-        print 'vmin and vmax =',vmin,vmax
+        print('vmin and vmax =',vmin,vmax)
     ymax=0.
     xmax=0.
 
@@ -4649,11 +4658,11 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
 
 
     fig.savefig(graphname)
-    print graphname,'is done'
+    print(graphname,'is done')
     if which_flux == None or which_flux < 2:
-        print max_flux_label,'for reaction =',ind_max_flux+1
+        print(max_flux_label,'for reaction =',ind_max_flux+1)
     elif which_flux == 2:
-        print min_flux_label,'for reaction =',ind_min_flux+1
+        print(min_flux_label,'for reaction =',ind_min_flux+1)
 
     plt.show()
 

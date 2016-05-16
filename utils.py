@@ -4,6 +4,13 @@ utils.py
 Utility class for holding extra methods from mesa.py, nuh5p.py
 
 '''
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 
 import numpy as np
 import scipy as sc
@@ -12,7 +19,7 @@ from scipy import optimize
 import matplotlib.pyplot as pl
 import os
 
-class data_fitting():
+class data_fitting(object):
     ''' 
     Wrapper for the scipy method optimize.leastsq
 
@@ -80,35 +87,35 @@ class data_fitting():
             
         '''
         if func is 'linear':
-            print "Information: 'linear' fit needs coef list with 2 entries"
-            print " -> will use default: coef = "+str(coef)
+            print("Information: 'linear' fit needs coef list with 2 entries")
+            print(" -> will use default: coef = "+str(coef))
             if len(coef) is not 2:
-                print "Warning: you want a linear fit but you have not"
-                print "         provided a guess for coef with the"
-                print "         right length (2)."
-                print " -> I will continue and assume coef=(1,1)"
+                print("Warning: you want a linear fit but you have not")
+                print("         provided a guess for coef with the")
+                print("         right length (2).")
+                print(" -> I will continue and assume coef=(1,1)")
                 coef = (1,1)
             def ff(coef,x):
                 return coef[0]*x + coef[1]
-            self.func_name = func
+            self.__name__ = func
         elif func is 'powerlaw':
-            print "Information: 'powerlaw' fit needs coef list with 3 entries"
-            print " -> will use default: coef = "+str(coef)
+            print("Information: 'powerlaw' fit needs coef list with 3 entries")
+            print(" -> will use default: coef = "+str(coef))
             if len(coef) is not 3:
-                print "Warning: you want a power law fit but you have"
-                print "         not provided a guess for coef with the"
-                print "         right length (3)."
-                print " -> I will continue and assume coef=(1,1,1)"
+                print("Warning: you want a power law fit but you have")
+                print("         not provided a guess for coef with the")
+                print("         right length (3).")
+                print(" -> I will continue and assume coef=(1,1,1)")
                 coef = (1,1,1)
             def ff(coef,x):
                 return coef[0]*x**coef[1] + coef[2]
-            self.func_name = func
+            self.__name__ = func
         else:
-            print "Information: You provide a fit function yourself. I trust"
-            print "             you have provided a matching guess for the "
-            print "             coefficient list!"
+            print("Information: You provide a fit function yourself. I trust")
+            print("             you have provided a matching guess for the ")
+            print("             coefficient list!")
             ff = func
-            self.func_name = func.__name__
+            self.__name__ = func.__name__
 
 
         # we want to determine the coefficients that
@@ -180,24 +187,24 @@ class data_fitting():
         '''
 
         if len(self.coef) is not len(self.fcoef):
-            print "Warning: the fitted coefficient list is not same"
-            print "         length as guessed list - still I will try ..."
+            print("Warning: the fitted coefficient list is not same")
+            print("         length as guessed list - still I will try ...")
 
         pl.figure(ifig)
         pl.plot(self.x,self.y,data_shape,label=data_label)
         if fit_label is 'fit':
-            fit_label=self.func_name
+            fit_label=self.__name__
         pl.plot(self.x,self.func(self.fcoef,self.x),fit_shape,label=fit_label)
         pl.legend()
 
-class constants():
+class constants(object):
     mass_sun=1.9891e+33
     mass_sun_unit='g'
     one_year=31558149.984
     avogadro=6.02214179e23
     avogadro_unit='mol^-1'
 
-class Utils():
+class Utils(object):
     ''' 
     This private class contains utilities that are used by methods,
     mostly in the ppn and mppnp classes.  Users whould normally not use
@@ -271,7 +278,7 @@ class Utils():
 
         tmp=[]
         isom=[]
-        for i in xrange(len(a)):
+        for i in range(len(a)):
             if z[i]!=0 and isomers[i]==1: #if its not 'NEUt and not an isomer'
                 tmp.append([self.stable_names[int(z[i])]+'-'+str(int(a[i])),yps[i],z[i],a[i]])
             elif isomers[i]!=1: #if it is an isomer
@@ -286,7 +293,7 @@ class Utils():
         z_iso_to_plot=[]
         a_iso_to_plot=[]
         el_iso_to_plot=[]
-        for i in xrange(len(tmp)):
+        for i in range(len(tmp)):
             isotope_to_plot.append(tmp[i][0])
             abunds.append(tmp[i][1])
             z_iso_to_plot.append(int(tmp[i][2]))
@@ -324,7 +331,7 @@ class Utils():
 
         indX=0
         indY=0
-        for i in xrange(len(self.stable_names)):
+        for i in range(len(self.stable_names)):
             if self.stable_names[i] == x[0].split('-')[0]:
                 indX=i
             if self.stable_names[i] == y[0].split('-')[0]:
@@ -362,7 +369,7 @@ class Utils():
                 zz=z_db[np.where(el_db==name)][0]
                 charge_from_element_name[name]=zz
             except IndexError:
-                print name+" does not exist in this run"
+                print(name+" does not exist in this run")
         return z_db, a_db, el_db, stable_a_db,logic_db,charge_from_element_name
 
     def decay_indexpointer(self):
@@ -407,7 +414,7 @@ class Utils():
             try:
                 stable_a=stable_a_db[np.where(el_db==element_name)][0] # 4th column for that element in isotopedatabase.txt
             except IndexError:
-                print "Can't find element "+element_name+" in isotopedatabase.txt"
+                print("Can't find element "+element_name+" in isotopedatabase.txt")
             if a_iso_to_plot[i] <= 209 and stable_a <=209:  # Bi209 is last stable element
                 stable_mass_numbers=self.stable_el[self.stable_names.index(element_name)][1:]
                 iso_db_index_range_el=np.where(el_db==element_name)
@@ -428,14 +435,14 @@ class Utils():
                         try:
                             try_target_el=self.stable_names[charge_from_element_name[element_name]+i_search]
                         except TypeError:
-                            print "Maybe information about species "+isotope_to_plot[i]+" is not available in isotopedatabase.txt"
+                            print("Maybe information about species "+isotope_to_plot[i]+" is not available in isotopedatabase.txt")
                             decay_index_pointer[i]=-1
                             break
                         # print try_target_el
                         try:
                             stable_mass_numbers=self.stable_el[self.stable_names.index(try_target_el)][1:]
                         except ValueError:
-                            print "Can not find decay target for "+isotope_to_plot[i]
+                            print("Can not find decay target for "+isotope_to_plot[i])
                         if a_iso_to_plot[i] in stable_mass_numbers:
                             ind_range=np.where(np.array(el_iso_to_plot)==try_target_el)[0]
                             if a_iso_to_plot[i] in np.array(a_iso_to_plot)[ind_range]:
@@ -444,19 +451,19 @@ class Utils():
                                 # print isotope_to_plot[i]+" is unstable and decays to "+isotope_to_plot[this_ind]
                                 decay_index_pointer[i]=this_ind
                             else:
-                                print "It seems unstable species "+isotope_to_plot[i]+" wants to decay to " \
+                                print("It seems unstable species "+isotope_to_plot[i]+" wants to decay to " \
                                     +try_target_el+"-"+str(a_iso_to_plot[i])+", however this species is not in this run." \
                                     +" This points to an inconsistency in the network build. Here we will ignore the abundance of " \
-                                    +isotope_to_plot[i]+'.'
+                                    +isotope_to_plot[i]+'.')
                                 decay_index_pointer[i]=-1
                             found_decay_target=True
                         else:
                             i_search += -1*beta_for_this_species
         if self.debug:
-            print "Decay rules:"
+            print("Decay rules:")
             for i in range(len(isotope_to_plot)):
                 if decay_index_pointer[i]>= 0:
-                    print isotope_to_plot[i]+" -> "+isotope_to_plot[decay_index_pointer[i]]
+                    print(isotope_to_plot[i]+" -> "+isotope_to_plot[decay_index_pointer[i]])
         ind_tmp=idp_to_stables_in_isostoplot
         #ind_tmp=utils.strictly_monotonic(decay_index_pointer)  # this would do the same, but the method above is more straight forward
 
@@ -570,12 +577,12 @@ class iniabu(Utils):
             try:
                 mass_number[i]=int(names[i][2:5])
             except ValueError:
-                print "WARNING:"
-                print "This initial abundance file uses an element name that does"
-                print "not contain the mass number in the 3rd to 5th position."
-                print "It is assumed that this is the proton and we will change"
-                print "the name to 'h   1' to be consistent with the notation used"
-                print "in iniab.dat files"
+                print("WARNING:")
+                print("This initial abundance file uses an element name that does")
+                print("not contain the mass number in the 3rd to 5th position.")
+                print("It is assumed that this is the proton and we will change")
+                print("the name to 'h   1' to be consistent with the notation used")
+                print("in iniab.dat files")
                 names[i]='h   1'
             mass_number[i]=int(names[i][2:5])
         # now zip them together:
@@ -707,13 +714,13 @@ class iniabu(Utils):
         '''
         sum_before = 1.
         for i in range(len(species_hash)):
-            sum_before -=  self.abu[self.hindex[species_hash.keys()[i]]]
-        print "sum_before = "+str(sum_before)
-        normalization_factor=(1.-sum(species_hash.values()))/sum_before
-        print "normalizing the rest witih factor "+str(normalization_factor)
+            sum_before -=  self.abu[self.hindex[list(species_hash.keys())[i]]]
+        print("sum_before = "+str(sum_before))
+        normalization_factor=old_div((1.-sum(species_hash.values())),sum_before)
+        print("normalizing the rest witih factor "+str(normalization_factor))
         self.abu *= normalization_factor
         for i in range(len(species_hash)):
-            self.abu[self.hindex[species_hash.keys()[i]]]=species_hash.values()[i]
+            self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
 
@@ -731,7 +738,7 @@ class iniabu(Utils):
             dumb.append(isos[1].split('-')[0])
             dumb.append(isos[1].split('-')[1])
             isos = dumb
-        ssratio = self.habu[isos[0].ljust(2).lower() + str(int(isos[1])).rjust(3)] / self.habu[isos[2].ljust(2).lower() + str(int(isos[3])).rjust(3)]
+        ssratio = old_div(self.habu[isos[0].ljust(2).lower() + str(int(isos[1])).rjust(3)], self.habu[isos[2].ljust(2).lower() + str(int(isos[3])).rjust(3)])
         return ssratio
 
     def iso_abundance(self,isos):
@@ -778,7 +785,7 @@ def trajectory_SgConst(Sg=0.1, delta_logt_dex=-0.01):
     # reverse logarithmic time
     logtimerev=np.arange(5.,-6.,delta_logt_dex)
     logrho=np.linspace(0,8.5,len(logtimerev))
-    logT = (1./3.)*(logrho + 21.9161 + np.log10(Sg))
+    logT = (old_div(1.,3.))*(logrho + 21.9161 + np.log10(Sg))
 
     #rho_6=10**logrho/(0.1213*1.e6)
     #T9=rho_6**(1./3.)
@@ -798,7 +805,7 @@ def trajectory_SgConst(Sg=0.1, delta_logt_dex=-0.01):
     # [rho] cgs
     # [T]   K
 
-    T9=10**logT/1.e9
+    T9=old_div(10**logT,1.e9)
     data=[logtimerev,T9,logrho]
     att.writeTraj(filename='trajectory.input', data=data, ageunit=2, tunit=1, rhounit=1, idNum=1)
 
@@ -904,7 +911,7 @@ def colourblind(i):
 
     scaledRGBs = []
     for r in rawRGBs:
-        scaledRGBs.append((r[0]/255.,r[1]/255.,r[2]/255.))
+        scaledRGBs.append((old_div(r[0],255.),old_div(r[1],255.),old_div(r[2],255.)))
 
     idx = sc.mod(i,len(scaledRGBs))
     return scaledRGBs[idx]
@@ -1056,16 +1063,16 @@ def solar(filename_solar, solar_factor):
         try:
             mass_number[i]=int(names_sol[i][2:5])
         except ValueError:
-            print "WARNING:"
-            print "This initial abundance file uses an element name that does"
-            print "not contain the mass number in the 3rd to 5th position."
-            print "It is assumed that this is the proton and we will change"
-            print "the name to 'h   1' to be consistent with the notation used in"
-            print "iniab.dat files"
+            print("WARNING:")
+            print("This initial abundance file uses an element name that does")
+            print("not contain the mass number in the 3rd to 5th position.")
+            print("It is assumed that this is the proton and we will change")
+            print("the name to 'h   1' to be consistent with the notation used in")
+            print("iniab.dat files")
             names_sol[i]='h   1'
             mass_number[i]=int(names_sol[i][2:5])
         if mass_number[i] == 1 or mass_number[i] == 4:
-            yps[i] = yps[i]/solar_factor
+            yps[i] = old_div(yps[i],solar_factor)
     #  convert 'h   1' in prot, not needed any more??
     #names_sol[0] = 'prot '
 
@@ -1419,7 +1426,7 @@ def element_abund_marco(i_decay, stable_isotope_list,
 
     for i in range(z_bismuth):
         if index_stable[i] == 1:
-            elem_prod_fac[i] = float(elem_abund[i]/solar_elem_abund[i])
+            elem_prod_fac[i] = float(old_div(elem_abund[i],solar_elem_abund[i]))
         elif index_stable[i] == 0:
             elem_prod_fac[i] = 0.
 
@@ -1436,7 +1443,7 @@ def element_abund_marco(i_decay, stable_isotope_list,
 
         for i in range(z_bismuth):
             if index_stable[i] == 1:
-                elem_prod_fac_decayed[i] = float(elem_abund_decayed[i]/solar_elem_abund[i])
+                elem_prod_fac_decayed[i] = float(old_div(elem_abund_decayed[i],solar_elem_abund[i]))
             elif index_stable[i] == 0:
                 elem_prod_fac_decayed[i] = 0.
 
