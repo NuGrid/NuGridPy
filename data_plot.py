@@ -680,7 +680,7 @@ class DataPlot(object):
             line type for plot. 
         plt_lw : float, optional
             Line width for plot.
-	alpha_dum : trasparency to apply to grains data, in case of many data are plotted. 
+        alpha_dum : transparency to apply to grains data, in case of many data are plotted. 
             This may be allpied also for theoretical curves.
         plt_massrange : boolean, optional
             For explosive models. Plot mass of shell with first and last datapoint of

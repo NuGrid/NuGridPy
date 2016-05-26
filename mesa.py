@@ -2875,13 +2875,13 @@ class history_data(DataPlot):
 
         #fig=pl.figure()
 
-	ax1 = pyl.axes(frameon=False)
-	ax1.axes.get_xaxis().set_visible(False)
-	ax1.axes.get_yaxis().set_visible(False)
-	pyl.subplots_adjust(hspace=0.7)
+        ax1 = pyl.axes(frameon=False)
+        ax1.axes.get_xaxis().set_visible(False)
+        ax1.axes.get_yaxis().set_visible(False)
+        pyl.subplots_adjust(hspace=0.7)
 
         #axk=fig.add_subplot(211)
-	ax = pyl.subplot2grid((3,3), (0, 0), rowspan=2, colspan=3)
+        ax = pyl.subplot2grid((3,3), (0, 0), rowspan=2, colspan=3)
         #ax=pl.axes()
 
         if ixaxis == 'log_time_left':
@@ -3051,23 +3051,23 @@ class history_data(DataPlot):
                     pass
         if CO_ratio == True:
             surface_c12       = self.get('surface_c12')
-       	    surface_o16       = self.get('surface_o16')
+            surface_o16       = self.get('surface_o16')
             COratio=old_div((surface_c12*4.),(surface_o16*3.))
             ax2=pyl.twinx()
-       	    ax2.plot(xxx,COratio[modstart:modstop]-ylims[0],'-k',label='C/O ratio')
-	    ax2.axis([xlims[0],xlims[1],0,max(COratio)*1.1])
+            ax2.plot(xxx,COratio[modstart:modstop]-ylims[0],'-k',label='C/O ratio')
+            ax2.axis([xlims[0],xlims[1],0,max(COratio)*1.1])
             ax2.legend(loc=1, fontsize=0.5*fsize)
             ax2.set_ylabel('C/O ratio')
 
         if plot_radius == True:
             ax2=pyl.twinx()
-	    try:
+            try:
                ax2.plot(xxx,np.log10(self.get('he4_boundary_radius')[modstart:modstop]),label='He boundary radius',color='k',linewidth=1.,linestyle='-.')
             except:
-	       try:
+               try:
                    ax2.plot(xxx,np.log10(self.get('c_core_mass')[modstart:modstop]),label='He boundary radius',color='k',linewidth=1.,linestyle='-.')
-	       except:
-		   pass
+               except:
+                   pass
             ax2.plot(xxx,self.get('log_R')[modstart:modstop],label='radius',color='k',linewidth=1.,linestyle='-.')
             ax2.set_ylabel('log(radius)')
         if rad_lines == True:
@@ -3077,26 +3077,26 @@ class history_data(DataPlot):
 
         ax.axis([xlims[0],xlims[1],ylims[0],ylims[1]])
 
-	axm = pyl.subplot2grid((3,3), (2, 0), rowspan=1, colspan=3)
-	
-	Mdot=self.get('log_abs_mdot')[modstart:modstop]-ylims[0]
+        axm = pyl.subplot2grid((3,3), (2, 0), rowspan=1, colspan=3)
+        
+        Mdot=self.get('log_abs_mdot')[modstart:modstop]-ylims[0]
         axm.plot(xxx,Mdot,label='Log Mdot',linestyle='-')
-	minMdot=min(Mdot)
-	if minMdot==-99.0:
-	   minMdot=-20.0
-	else:
-	   minMdot=minMdot
-	axm.axis([xlims[0],xlims[1],minMdot,max(Mdot)*0.9])
+        minMdot=min(Mdot)
+        if minMdot==-99.0:
+           minMdot=-20.0
+        else:
+           minMdot=minMdot
+        axm.axis([xlims[0],xlims[1],minMdot,max(Mdot)*0.9])
         axm.legend(loc=4, fontsize=0.5*fsize)
         axm.set_ylabel('Log$_{10}$ |$\dot{M}$|')
-        #axm.set_xlabel('Model number')	
-	
-	axm2=pyl.twinx()
-	LogLum=self.get('log_L')[modstart:modstop]-ylims[0]
-	axm2.plot(xxx,LogLum,label='Log L',linestyle='-.')
-	axm2.axis([xlims[0],xlims[1],min(LogLum)*1.1,max(LogLum)*1.1])
-	axm2.set_ylabel('Log$_{10}$ L/L$_{\odot}$')
-	axm2.legend(loc=1, fontsize=0.5*fsize)
+        #axm.set_xlabel('Model number')        
+        
+        axm2=pyl.twinx()
+        LogLum=self.get('log_L')[modstart:modstop]-ylims[0]
+        axm2.plot(xxx,LogLum,label='Log L',linestyle='-.')
+        axm2.axis([xlims[0],xlims[1],min(LogLum)*1.1,max(LogLum)*1.1])
+        axm2.set_ylabel('Log$_{10}$ L/L$_{\odot}$')
+        axm2.legend(loc=1, fontsize=0.5*fsize)
 
         if outfile[-3:]=='png':
             fig.savefig(outfile,dpi=300)
@@ -3114,26 +3114,26 @@ class history_data(DataPlot):
 
         '''
         Find first TP of the TPAGB phase and returns the model
-	number at its LHe maximum.
+        number at its LHe maximum.
 
         Parameters
         ----------
 
-	'''	
+        '''        
 
         star_mass         = self.get('star_mass')
         he_lumi           = self.get('log_LHe')
         h_lumi            = self.get('log_LH')
         mx2_bot           = self.get('mx2_bot')*star_mass
-	try:
+        try:
            h1_boundary_mass  = self.get('h1_boundary_mass')
            he4_boundary_mass = self.get('he4_boundary_mass')
-	except:
-	   try:
-		h1_boundary_mass  = self.get('he_core_mass')
-		he4_boundary_mass = self.get('c_core_mass')		
-	   except:
-		pass
+        except:
+           try:
+                h1_boundary_mass  = self.get('he_core_mass')
+                he4_boundary_mass = self.get('c_core_mass')                
+           except:
+                pass
 
 
         TP_bot=np.array(self.get('conv_mx2_bot'))*np.array(self.get('star_mass'))
@@ -3141,25 +3141,25 @@ class history_data(DataPlot):
         lum_array=[]
         activate=False
         models=[]
-	pdcz_size=[]
+        pdcz_size=[]
         for i in range(len(h1_boundary_mass)):
             if (h1_boundary_mass[i]-he4_boundary_mass[i] <0.2) and (he4_boundary_mass[i]>0.2):
                 if (mx2_bot[i]>he4_boundary_mass[i]) and (he_lumi[i]>h_lumi[i]):
-			if TP_top[i]>he4_boundary_mass[i]:
-				pdcz_size.append(TP_top[i]-TP_bot[i])
-                    		activate=True
-                    		lum_array.append(he_lumi[i])
-                    		models.append(i)
-				print(TP_bot[i],TP_top[i])
+                    if TP_top[i]>he4_boundary_mass[i]:
+                        pdcz_size.append(TP_top[i]-TP_bot[i])
+                            activate=True
+                            lum_array.append(he_lumi[i])
+                            models.append(i)
+                        print(TP_bot[i],TP_top[i])
                 if (activate == True) and (he_lumi[i]<h_lumi[i]):
-			#if fake tp
-			if max(pdcz_size)<1e-5:
-				active=False
-				lum_array=[]
-				models=[]
-				print('fake tp')
-			else:	
-                        	break
+                    #if fake tp
+                    if max(pdcz_size)<1e-5:
+                        active=False
+                        lum_array=[]
+                        models=[]
+                        print('fake tp')
+                    else:        
+                        break
         t0_model = models[np.argmax(lum_array)]
         return t0_model
 
@@ -3205,13 +3205,13 @@ class history_data(DataPlot):
         h_lum=10**(self.get("log_LH")[t0_idx:])
         model=self.get("model_number")[t0_idx:]
         
-	try:
+        try:
            h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
-	except:
-	   try:
-		h1_bndry=self.get('he_core_mass')[t0_idx:]		
-	   except:
-		pass
+        except:
+           try:
+               h1_bndry=self.get('he_core_mass')[t0_idx:]                
+           except:
+               pass
         # SJ find TPs by finding local maxima in He-burning luminosity and
         # checking that the he_lum is greater than the h_lum:
         maxima=[0]
@@ -3274,158 +3274,158 @@ class history_data(DataPlot):
 
     def TPAGB_properties(self):
 
-	'''
-	Temporary, use for now same function in nugrid_set.py!	
-	Returns many TPAGB parameters which are
-	TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
-	Same function in nugrid_set.py.
+        '''
+        Temporary, use for now same function in nugrid_set.py!        
+        Returns many TPAGB parameters which are
+        TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
+        Same function in nugrid_set.py.
 
         Parameters
         ----------
 
-	'''
-	
-	peak_lum_model,h1_mass_min_DUP_model=self.find_TP_attributes( 3, t0_model=self.find_first_TP(), color='r', marker_type='o')
+        '''
+        
+        peak_lum_model,h1_mass_min_DUP_model=self.find_TP_attributes( 3, t0_model=self.find_first_TP(), color='r', marker_type='o')
 
-	print('first tp')
-	print(self.find_first_TP())
-	print('peak lum mmmodel')
-	print(peak_lum_model)
-	print(h1_mass_min_DUP_model)
+        print('first tp')
+        print(self.find_first_TP())
+        print('peak lum mmmodel')
+        print(peak_lum_model)
+        print(h1_mass_min_DUP_model)
 
-	TPmods=peak_lum_model
+        TPmods=peak_lum_model
 
-	DUPmods=h1_mass_min_DUP_model	
-	DUPmods1=[]
-	for k in range(len(DUPmods)):
-		DUPmods1.append(int(float(DUPmods[k]))+100) #to exclude HBB? effects
-	
-	DUPmods=DUPmods1
-	
-
-
-	TPstart=[]
-	#find beginning of TP, goes from TP peak backwards
-	# find end of PDCZ by seeking from TP peak and checking mx2_bot:
-	models=self.get('model_number')
-	mx2b_array=self.get('conv_mx2_bot')
-	mx2t_array=self.get('conv_mx2_top')
-	massbot=mx2b_array#*self.header_attr['initial_mass']
-	masstop=mx2t_array#*self.header_attr['initial_mass']
-	massenv=np.array(self.get('conv_mx1_bot'))*np.array(self.get('star_mass'))   #*self.header_attr['initial_mass']
-	
-	#h1_bdy=self.get('h1_boundary_mass')
-
-	for k in range(len(TPmods)):
-		idx=list(models).index(TPmods[k])
-		mx2b=mx2b_array[:idx]
-		for i in range(len(mx2b)-1,0,-1):
-			if mx2b[i]==0.:
-			    startTP=models[i]
-			    TPstart.append(int(float(startTP)))
-			    break
-	#Find end of TP, goes from TP forwards:
-	TPend=[]
-	max_m_TP=[]
-	min_m_TP=[]
-	DUP_m=[]
-	TP_max_env=[]
-	DUPm_min_h=[]
-	flagdecline=False
-	for k in range(len(TPmods)):
-		idx=list(models).index(TPmods[k])
-		mx2b=mx2b_array[idx:]
-		mx2t=mx2t_array[idx:]
-		refsize=mx2t[0]-mx2b[0]
-		for i in range(len(mx2b)):
-			if i==0:
-				continue
-			if ((mx2t[i]-mx2b[i])<(0.5*refsize)) and (flagdecline==False):
-				flagdecline=True
-				refmasscoord=mx2t[i]
-				print('flagdecline to true')
-				continue
-			if flagdecline==True:
-				if (mx2t[i]-mx2b[i])<(0.1*refsize):
-					#for the massive and HDUP AGB's where PDCZ conv zone becomes the Hdup CONV ZONE
-					if refmasscoord<mx2t[i]:
-						endTP=models[idx+i-1]
-						TPend.append(int(float(endTP)))
-						print('HDUp, TP end',endTP)
-						break
-					if (mx2t[i]-mx2b[i])<1e-5:
-						endTP=models[idx+i-1]
-						TPend.append(int(float(endTP)))
-						print('normal TPend',endTP)
-						break
-			'''
-			if max(mx2t[0:(i-1)])>mx2t[i]:
-				(max(mx2t[0:(i-1)]) - min(mx2b[0:(i-1)]))
-				flag=True
-				continue
-			if flag==True:
-			    endidx=idx+i
-			    endTP=models[endidx]
-			    TPend.append(int(float(endTP)))								
-	
-			if (mx2t[i]-mx2b[i])<1e-5:			#mx2b[i])==0.:
-			    endidx=idx+i
-			    endTP=models[endidx]
-			    TPend.append(int(float(endTP)))
-			    break
-			'''
-		print('found TP boundaries',TPstart[-1],TPend[-1])
-	#find max and minimum mass coord of TP at max Lum
-		mtot=self.get('star_mass')
-		masstop_tot=np.array(masstop)*np.array(mtot)
-		idx_tpext=list(masstop_tot).index(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
-		print('TP',k+1,TPmods[k])
-		print(TPstart[k],TPend[k])
-		print('INDEX',idx_tpext,models[idx_tpext])
-		print(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
-		mtot=self.get('star_mass')[idx_tpext]
-		max_m_TP.append(masstop[idx_tpext]*mtot)
-		min_m_TP.append(massbot[idx_tpext]*mtot)
-		
-		TP_max_env.append(massenv[idx_tpext])#*mtot)
-		if k> (len(DUPmods)-1):
-			continue		
-		idx=list(models).index(DUPmods[k])
-		mtot=self.get('star_mass')[idx]
-		#DUP_m.append(h1_bdy[idx])#*mtot)
-	#######identify if it is really a TDUP, Def.
-		try:
-           	   h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
-		except:
-	   	   try:
-			h1_bndry=self.get('he_core_mass')[t0_idx:]		
-	   	   except:
-			pass
+        DUPmods=h1_mass_min_DUP_model        
+        DUPmods1=[]
+        for k in range(len(DUPmods)):
+                DUPmods1.append(int(float(DUPmods[k]))+100) #to exclude HBB? effects
+        
+        DUPmods=DUPmods1
+        
 
 
-		if h1_bndry[idx]>=max_m_TP[-1]:
-			print('Pulse',k+1,'model',TPmods[k],'skip')
-			print(h1_bndry[idx],max_m_TP[-1])
-			DUPmods[k] = -1
-			DUPm_min_h.append( -1)  
-			continue
+        TPstart=[]
+        #find beginning of TP, goes from TP peak backwards
+        # find end of PDCZ by seeking from TP peak and checking mx2_bot:
+        models=self.get('model_number')
+        mx2b_array=self.get('conv_mx2_bot')
+        mx2t_array=self.get('conv_mx2_top')
+        massbot=mx2b_array#*self.header_attr['initial_mass']
+        masstop=mx2t_array#*self.header_attr['initial_mass']
+        massenv=np.array(self.get('conv_mx1_bot'))*np.array(self.get('star_mass'))   #*self.header_attr['initial_mass']
+        
+        #h1_bdy=self.get('h1_boundary_mass')
 
-		DUPm_min_h.append(h1_bdy[idx])
-	for k in range(len(TPmods)):
-		print('#############')
-		print('TP ',k+1)
-		print('Start: ',TPstart[k])
-		print('Peak' , TPmods[k],TP_max_env[k])
-		print('(conv) PDCZ size: ',min_m_TP[k],' till ',max_m_TP[k])
-		print('End',TPend[k])
-		if k <=(len(DUPmods)-1):
-			print(len(DUPmods),k)
-			print('DUP max',DUPmods[k])
-			print(DUPm_min_h[k])
-		else:
-			print('no DUP')
+        for k in range(len(TPmods)):
+            idx=list(models).index(TPmods[k])
+            mx2b=mx2b_array[:idx]
+            for i in range(len(mx2b)-1,0,-1):
+                if mx2b[i]==0.:
+                    startTP=models[i]
+                    TPstart.append(int(float(startTP)))
+                    break
+        #Find end of TP, goes from TP forwards:
+        TPend=[]
+        max_m_TP=[]
+        min_m_TP=[]
+        DUP_m=[]
+        TP_max_env=[]
+        DUPm_min_h=[]
+        flagdecline=False
+        for k in range(len(TPmods)):
+            idx=list(models).index(TPmods[k])
+            mx2b=mx2b_array[idx:]
+            mx2t=mx2t_array[idx:]
+            refsize=mx2t[0]-mx2b[0]
+            for i in range(len(mx2b)):
+                if i==0:
+                    continue
+                if ((mx2t[i]-mx2b[i])<(0.5*refsize)) and (flagdecline==False):
+                    flagdecline=True
+                    refmasscoord=mx2t[i]
+                    print('flagdecline to true')
+                    continue
+                if flagdecline==True:
+                    if (mx2t[i]-mx2b[i])<(0.1*refsize):
+                        #for the massive and HDUP AGB's where PDCZ conv zone becomes the Hdup CONV ZONE
+                        if refmasscoord<mx2t[i]:
+                            endTP=models[idx+i-1]
+                            TPend.append(int(float(endTP)))
+                            print('HDUp, TP end',endTP)
+                            break
+                        if (mx2t[i]-mx2b[i])<1e-5:
+                            endTP=models[idx+i-1]
+                            TPend.append(int(float(endTP)))
+                            print('normal TPend',endTP)
+                            break
+                        '''
+                        if max(mx2t[0:(i-1)])>mx2t[i]:
+                                (max(mx2t[0:(i-1)]) - min(mx2b[0:(i-1)]))
+                                flag=True
+                                continue
+                        if flag==True:
+                            endidx=idx+i
+                            endTP=models[endidx]
+                            TPend.append(int(float(endTP)))                                                                
+        
+                        if (mx2t[i]-mx2b[i])<1e-5:                        #mx2b[i])==0.:
+                            endidx=idx+i
+                            endTP=models[endidx]
+                            TPend.append(int(float(endTP)))
+                            break
+                        '''
+                print('found TP boundaries',TPstart[-1],TPend[-1])
+                #find max and minimum mass coord of TP at max Lum
+                mtot=self.get('star_mass')
+                masstop_tot=np.array(masstop)*np.array(mtot)
+                idx_tpext=list(masstop_tot).index(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
+                print('TP',k+1,TPmods[k])
+                print(TPstart[k],TPend[k])
+                print('INDEX',idx_tpext,models[idx_tpext])
+                print(max(masstop_tot[TPstart[k]:(TPend[k]-10)]))
+                mtot=self.get('star_mass')[idx_tpext]
+                max_m_TP.append(masstop[idx_tpext]*mtot)
+                min_m_TP.append(massbot[idx_tpext]*mtot)
+                
+                TP_max_env.append(massenv[idx_tpext])#*mtot)
+                if k> (len(DUPmods)-1):
+                        continue                
+                idx=list(models).index(DUPmods[k])
+                mtot=self.get('star_mass')[idx]
+                #DUP_m.append(h1_bdy[idx])#*mtot)
+                #######identify if it is really a TDUP, Def.
+                try:
+                    h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
+                except:
+                    try:
+                        h1_bndry=self.get('he_core_mass')[t0_idx:]                
+                    except:
+                        pass
 
-		return TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
+
+                if h1_bndry[idx]>=max_m_TP[-1]:
+                    print('Pulse',k+1,'model',TPmods[k],'skip')
+                    print(h1_bndry[idx],max_m_TP[-1])
+                    DUPmods[k] = -1
+                    DUPm_min_h.append( -1)  
+                    continue
+
+                DUPm_min_h.append(h1_bdy[idx])
+        for k in range(len(TPmods)):
+            print('#############')
+            print('TP ',k+1)
+            print('Start: ',TPstart[k])
+            print('Peak' , TPmods[k],TP_max_env[k])
+            print('(conv) PDCZ size: ',min_m_TP[k],' till ',max_m_TP[k])
+            print('End',TPend[k])
+            if k <=(len(DUPmods)-1):
+                print(len(DUPmods),k)
+                print('DUP max',DUPmods[k])
+                print(DUPm_min_h[k])
+            else:
+                print('no DUP')
+
+            return TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
 
 
     def find_TP_attributes(self, t0_model, fig=10, color='k', marker_type='*',
@@ -3456,48 +3456,46 @@ class history_data(DataPlot):
         #if len(t0_model)==0:
         
         t0_idx=(t0_model-self.get("model_number")[0])
-	#for first TPi
-	'''
-	peak_lum_save.append(10**(self.get("log_LHe")[t0_idx]))
-	peak_lum_model.append(t0_model)
-
-
+        #for first TPi
+        '''
+        peak_lum_save.append(10**(self.get("log_LHe")[t0_idx]))
+        peak_lum_model.append(t0_model)
 
         he_lum=10**(self.get("log_LHe")[t0_idx:])
         h_lum=10**(self.get("log_LH")[t0_idx:])
-        model=self.get("model_number")[t0_idx:]	
-	for k in range(len(he_lum)):
-		if he_lum[k]<h_lum[k]:
-			t0_idx=t0_idx+k 
-			break
+        model=self.get("model_number")[t0_idx:]        
+        for k in range(len(he_lum)):
+            if he_lum[k]<h_lum[k]:
+                t0_idx=t0_idx+k 
+                break
 
-	#find end of first TP
-	'''
+        #find end of first TP
+        '''
 
         first_TP_he_lum=10**(self.get("log_LHe")[t0_idx])
         he_lum=10**(self.get("log_LHe")[t0_idx:])
         h_lum=10**(self.get("log_LH")[t0_idx:])
         model=self.get("model_number")[t0_idx:]
-	try:
+        try:
            h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
-	   he4_bdy=self.get("he4_boundary_mass")[t0_idx:]
-	except:
-	   try:
-		h1_bndry=self.get('he_core_mass')[t0_idx:]	
-		he4_bdy=self.get("c_core_mass")[t0_idx:]	
-	   except:
-		pass
-	TP_bot=np.array(self.get('conv_mx2_bot')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
-	TP_top=np.array(self.get('conv_mx2_top')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
+           he4_bdy=self.get("he4_boundary_mass")[t0_idx:]
+        except:
+           try:
+               h1_bndry=self.get('he_core_mass')[t0_idx:]        
+               he4_bdy=self.get("c_core_mass")[t0_idx:]        
+           except:
+               pass
+        TP_bot=np.array(self.get('conv_mx2_bot')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
+        TP_top=np.array(self.get('conv_mx2_top')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
 
-	
+        
 
         #define label
         z=self.header_attr["initial_z"]
         mass=self.header_attr["initial_mass"]
         leg=str(mass)+"M$_{\odot}$ Z= "+str(z)
         peak_lum_model=[]
-	peak_lum_save=[]
+        peak_lum_save=[]
         h1_mass_tp=[]
         h1_mass_min_DUP_model=[]
         ##TP identification with he lum if within 1% of first TP luminosity
@@ -3511,8 +3509,8 @@ class history_data(DataPlot):
         TP_interpulse=False
         interpulse_counter=0
 
-	TP_size=TP_top[0]-TP_bot[0]
-	lastDUP=False
+        TP_size=TP_top[0]-TP_bot[0]
+        lastDUP=False
         for i in range(len(he_lum)):
                 #interpulse_counter+=1
             #if (h_lum[i]<he_lum[i]):
@@ -3522,125 +3520,125 @@ class history_data(DataPlot):
                 #if i > 0:
                 #    h1_mass_1.append(h1_bndry[i])
                 #    h1_mass_model.append(model[i])
-	    #in case when He-lum is dominating till the end of the calculation (He-burner?)
-	    if (TP_interpulse ==False) and (h_lum[i]<he_lum[i]):
-		if (len(he_lum)-1)==i:
-			TP_interpulse=True	
-			#interpulse_counter=1000 #value higher than 200
+            #in case when He-lum is dominating till the end of the calculation (He-burner?)
+            if (TP_interpulse ==False) and (h_lum[i]<he_lum[i]):
+                if (len(he_lum)-1)==i:
+                    TP_interpulse=True        
+                    #interpulse_counter=1000 #value higher than 200
 
-	    #if simulation stops during a TP
-	    if (len(he_lum)-1)==i:
-		 if (h_lum[i]<he_lum[i]):
-                        if  (he4_bdy[i]<TP_bot[i]):
-				lastDUP=True
-				break 
+            #if simulation stops during a TP
+            if (len(he_lum)-1)==i:
+                 if (h_lum[i]<he_lum[i]):
+                     if (he4_bdy[i]<TP_bot[i]):
+                         lastDUP=True
+                         break 
 
             #print i
             if i ==0:
                  #peak_lum_model=[t0_model]
-         #       #TP_counter=1 #for first TP
+                 #TP_counter=1 #for first TP
                  lum_1.append(first_TP_he_lum)
                  model_1.append(t0_model)
                  #h1_mass_1=[h1_bndry[0]]
                  #h1_mass_model=[t0_model]
             #else:
-	    #	 lum_1.append(he_lum[i])
-           #	 model_1.append(model[i])
-		 #h1_mass_1.append(h1_bndry[i])
-		
+            #         lum_1.append(he_lum[i])
+            #        model_1.append(model[i])
+                 #h1_mass_1.append(h1_bndry[i])
+                
 
-	    if True: #(TP_interpulse==False):
-		if (h_lum[i]<he_lum[i]):
-			if  (he4_bdy[i]<TP_bot[i]) and ( (TP_top[i]-TP_bot[i]) > TP_size*0.1) :
-				#if (len(he_lum)-1)==i:
-                #if (he_lum[i]> (perc*first_TP_he_lum)) or (i == len(he_lum)-1):
-                #if (model[i] - model_1[-1]     >min_TP_distance):
-                #calculate maximum of peak lum of certain TP
-                 		lum_1.append(he_lum[i])
-                 		model_1.append(model[i])
-		 		#print 'peak at model',model[i]
-				TP_interpulse=True	  	
+            if True: #(TP_interpulse==False):
+                if (h_lum[i]<he_lum[i]):
+                    if  (he4_bdy[i]<TP_bot[i]) and ( (TP_top[i]-TP_bot[i]) > TP_size*0.1) :
+                        #if (len(he_lum)-1)==i:
+                        #if (he_lum[i]> (perc*first_TP_he_lum)) or (i == len(he_lum)-1):
+                        #if (model[i] - model_1[-1]     >min_TP_distance):
+                        #calculate maximum of peak lum of certain TP
+                        lum_1.append(he_lum[i])
+                        model_1.append(model[i])
+                        #print 'peak at model',model[i]
+                        TP_interpulse=True                  
        
-	    if ( ((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
-                        print('test for last DUP')
-                        if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-                                print('last DUP after last TP')
-                                lastDUP=True
-       	                	break
-				
+            if ( ((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
+                print('test for last DUP')
+                if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
+                    print('last DUP after last TP')
+                    lastDUP=True
+                        break
+                                
 
             if ((h_lum[i]>he_lum[i]) and (TP_interpulse==True)) or ( ((len(he_lum)-1)==i) and (TP_interpulse==True)):
-		#make sure that pulse is fully computed
-               	if (len(he_lum)-1)<(i+2000):
-			print('test for last DUP')
-			if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-				print('last DUP after last TP')
-				lastDUP=True	
-			break
-		#print 'model',model[i] 
-		#print 'lum1',lum_1
-		TP_interpulse=True
+                #make sure that pulse is fully computed
+                if (len(he_lum)-1)<(i+2000):
+                    print('test for last DUP')
+                    if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
+                        print('last DUP after last TP')
+                        lastDUP=True        
+                    break
+                #print 'model',model[i] 
+                #print 'lum1',lum_1
+                TP_interpulse=True
                 max_value1=np.array(lum_1).max()
-		if len(lum_1)<10:
-			continue
-		if len(peak_lum_model)>2:
-			if ( 10**(old_div((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1])),2.))  )  >max_value1:
-				print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])	
-				print(leg)
-				continue
+                if len(lum_1)<10:
+                    continue
+                if len(peak_lum_model)>2:
+                    if ( 10**(old_div((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1])),2.))  )  >max_value1:
+                        print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])        
+                        print(leg)
+                        continue
                 max_value=np.array(lum_1).max()
                 max_index = lum_1.index(max_value)
-		#print 'TP with models',model_1
-		#if its a fake TP, he lum higher than h lum, happens in M7 models sometimes
-		#if len(peak_lum_model)>0:
-		#	if max_value < 0.01*peak_lum_save[-1]:
-		#		continue
-		prev_he_lum_start=lum_1[0]
+                #print 'TP with models',model_1
+                #if its a fake TP, he lum higher than h lum, happens in M7 models sometimes
+                #if len(peak_lum_model)>0:
+                #        if max_value < 0.01*peak_lum_save[-1]:
+                #                continue
+                prev_he_lum_start=lum_1[0]
 
-		peak_lum_save.append(max_value)
+                peak_lum_save.append(max_value)
                 #print max_index,i
                 peak_lum_model.append(model_1[max_index])
                 #for DUP calc
-		#print 'peak model',(model_1[max_index])
-		#print 'current peak lum',peak_lum_model[-1]
+                #print 'peak model',(model_1[max_index])
+                #print 'current peak lum',peak_lum_model[-1]
                 #max_lum_idx=h1_mass_model.index(model_1[max_index])
                 #min_value=np.array(h1_mass_1[max_lum_idx:]).min()
                 #min_index = h1_mass_1.index(min_value)
-		#if interpulse_counter<1000:
-                #	h1_mass_min_DUP_model.append(h1_mass_model[min_index])
-		#else:
-		#	h1_mass_min_DUP_model.append(-1)
+                #if interpulse_counter<1000:
+                #        h1_mass_min_DUP_model.append(h1_mass_model[min_index])
+                #else:
+                #        h1_mass_min_DUP_model.append(-1)
                 #TP_counter+=1
                 lum_1=[]
                 model_1=[]
-		TP_interpulse=False
+                TP_interpulse=False
                 #h1_mass_1=[]i
                 #h1_mass_model=[]
                 #new_TP=False
         #TP_interpulse=False
-	#here check if h1_mass_min_DUP_model is really at the lowest point
-	for k in range(len(peak_lum_model)-1):
-		idx1=list(model).index(peak_lum_model[k])
-		idx2=list(model).index(peak_lum_model[k+1])
-		h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]	)
-	if lastDUP==True:
-		idx1=list(model).index(peak_lum_model[-1])	
-		idx2=-1
-		h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
-	print(peak_lum_model)
-	print(h1_mass_min_DUP_model)
+        #here check if h1_mass_min_DUP_model is really at the lowest point
+        for k in range(len(peak_lum_model)-1):
+            idx1=list(model).index(peak_lum_model[k])
+            idx2=list(model).index(peak_lum_model[k+1])
+            h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]        )
+        if lastDUP==True:
+            idx1=list(model).index(peak_lum_model[-1])        
+            idx2=-1
+            h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
+        print(peak_lum_model)
+        print(h1_mass_min_DUP_model)
         #print peak_lum_model
         #print h1_mass_min_DUP_model
         #print h1_mass_tp
         modeln=[]
-	'''	
+        '''        
         if no_fig==True:
-	    for i in range(len(peak_lum_model)):
-            	modeln.append(peak_lum_model[i])
-            	modeln.append(h1_mass_min_DUP_model[i])
+            for i in range(len(peak_lum_model)):
+                    modeln.append(peak_lum_model[i])
+                    modeln.append(h1_mass_min_DUP_model[i])
             self.calc_DUP_parameter(fig,modeln,leg,color,marker_type,h_core_mass)
         '''
-	return peak_lum_model,h1_mass_min_DUP_model
+        return peak_lum_model,h1_mass_min_DUP_model
 
 
     def calc_DUP_parameter(self, modeln, label, fig=10, color='r', marker_type='*',
@@ -3669,13 +3667,13 @@ class history_data(DataPlot):
             
         '''
         number_DUP=(old_div(len(modeln),2) -1) #START WITH SECOND
-	try:
+        try:
            h1_bnd_m=self.get('h1_boundary_mass')
-	except:
-	   try:
-		h1_bnd_m=self.get('he_core_mass')	
-	   except:
-		pass
+        except:
+           try:
+               h1_bnd_m=self.get('he_core_mass')        
+           except:
+               pass
         star_mass=self.get('star_mass')
         age=self.get("star_age")
         firstTP=h1_bnd_m[modeln[0]]
