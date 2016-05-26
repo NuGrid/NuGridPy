@@ -91,7 +91,7 @@ class DataPlot(object):
         '''
 
         c=str(self.__class__)
-        Tmp=''
+        tmp=''
         if 'ppm.yprofile' == c:
             tmp='YProfile'
         elif 'ascii_table.ascii_table' == c:
