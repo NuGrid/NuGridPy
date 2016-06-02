@@ -1,4 +1,3 @@
-
 #
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
@@ -6,7 +5,7 @@
 # All rights reserved. See LICENSE.
 #
 
-''' 
+'''
 nugridse is a collection of plots of data in se-type h5 files.
 
 Usage
@@ -39,7 +38,7 @@ only every 10th.  For example,
    second.  The initialization module will automatically detect various
    situations in which the index file needs to be rewritten, for
    example if there is a new file.
- 
+
 look at the data that is available in your instance,
 
 >>> pt.sedir
@@ -76,7 +75,7 @@ with data.
    Note: A particularly nice feature is that you can work with instances
    of different types of data in a very flexible way, for example in
    lists:
-   
+
    >>> cases=[pt1,pt2,pt3]
    >>> for this_case in cases:
    ...    do something with this_case
@@ -121,7 +120,6 @@ from builtins import str
 from builtins import range
 from past.utils import old_div
 
-import h5T
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as pl
@@ -129,15 +127,17 @@ import matplotlib.pylab as pyl
 from matplotlib.ticker import MultipleLocator
 from matplotlib.collections import Collection
 from matplotlib.artist import allow_rasterization
+from matplotlib.patches import PathPatch
 from scipy import interpolate
 import os
 import re
 import sys
 import time
 import glob
-from utils import *
+from nuutils import *
 from data_plot import *
-from matplotlib.patches import PathPatch
+import h5T
+
 
 def set_nugrid_path(path):
     '''
@@ -150,7 +150,7 @@ def set_nugrid_path(path):
 
 def set_nice_params():
     fsize=18
-    
+
     params = {'axes.labelsize':  fsize,
     #    'font.family':       'serif',
     'font.family':        'Times New Roman',
@@ -163,7 +163,7 @@ def set_nice_params():
     pl.rcParams.update(params)
 
 class se(DataPlot, Utils):
-    ''' 
+    """
     This class provides easy access to h5 files from the NuGrid project,
     along with some standard plots.
 
@@ -176,7 +176,7 @@ class se(DataPlot, Utils):
         A string pattern that the file names have to contain in order
         to be read.  The default is ".h5".
     rewrite : boolean, optional
-        Would the user like to rewrite the preprocessor file.  The 
+        Would the user like to rewrite the preprocessor file.  The
         default is False.
     mass : integer or float, optional
         The user may select a mass and metallicity instead of providing
@@ -203,17 +203,17 @@ class se(DataPlot, Utils):
     --------
 
     >>> f=nu.plot_tools('.','260')
-    
+
     reads all h5 files with the string 260 in the name in the present
     directory.
-    
-    '''
+
+    """
 
     sedir = ''
     sefiles = []
     se = []         # main data dictionary
     pattern=''
-   
+
     def __init__(self, sedir='.', pattern='.h5', rewrite=False, mass=None, Z=None, type='ppd_wind', output='out', verbose=False):
 
         # seeker to find the data requested on VOspace:
@@ -241,20 +241,20 @@ class se(DataPlot, Utils):
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using nugridse.set_nugrid_path('path')'.")
 
             # which mass? [find nearest]
-            list=[el for el in os.listdir(sedir) if el[0]=='M']
-            if len(list) == 0:
+            mlist=[el for el in os.listdir(sedir) if el[0]=='M']
+            if len(mlist) == 0:
                 raise IOError("Sorry. There is no data available for this set at present: "+sedir)
 
-            setmasses=[el[1:el.index('Z')] for el in list]
+            setmasses=[el[1:el.index('Z')] for el in mlist]
             for i in range(len(setmasses)):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
                 setmasses[i] = float(setmasses[i])
             idx2=np.abs(np.array(setmasses)-mass).argmin()
-            modname=list[idx2]
+            modname=mlist[idx2]
             realmass=setmasses[idx2]
-            
+
             print('closest mass is '+str(realmass))
-                    
+
             sedir+=modname
             if 'ppd' in type:
                 sedir+='/H5_'+output
@@ -267,7 +267,7 @@ class se(DataPlot, Utils):
                         sedir+='/'+subdir
                     else:
                         raise IOError("Could not find any data.")
-    
+
         if verbose:
             print('sedir = ', sedir)
 
@@ -282,7 +282,7 @@ class se(DataPlot, Utils):
         self.deltat=None
         self.sefiles=sefiles
         self._stable_names() # provides in addition to stable_el from
-                             # utils also just the stable element names
+                             # nuutils also just the stable element names
 
         self.se=h5T.Files(sedir,sefiles,rewrite=rewrite)
 
@@ -290,17 +290,17 @@ class se(DataPlot, Utils):
         print('Closing plot_tools')
 
     def get(self, cycle_list, dataitem=None, isotope=None, sparse=1):
-        ''' 
+        """
         Simple function that simply calls h5T.py get method.  There
         are three ways to call this function.
-        
+
         Parameters
         ----------
         cycle_list : string, list
             If cycle_list is a string, then get interpates the argument
             cycle_list as a dataitem and fetches the dataitem for all
             cycles.
-            
+
             If cycle_list is a list, then get fetches the dataitem for
             the cycles in the list.
         dataitem : string, optional
@@ -308,9 +308,9 @@ class se(DataPlot, Utils):
             is None, then cycle_list must be a string and will be used
             as dataitem.  If dataitem is an isotope in the form 'H-2',
             it then returns the result of,
-            
+
             >>> self.get(cycle_list,'iso_massf',dataitem)
-            
+
             The default is None.
         isotope : string, optional
             The name of the isotope to fetch, it must be in the form
@@ -323,19 +323,19 @@ class se(DataPlot, Utils):
         Notes
         -----
         Calling the get method directly in the form,
-        
+
         >>> self.get(cycle_list,'iso_massf',dataitem)
-        
+
         is depricated, and only included for compatibility.
 
-        '''
+        """
         return self.se.get(cycle_list,dataitem,isotope,sparse)
 
     def get_decayed(self, cycle_list, dataitem=None, isotope=None,
                     sparse=1):
-        ''' 
+        """
         This function gives back the fully decayed isotope.
-        
+
         By default, it wants to beta-decays every isotope, however, it
         then checks if this is okay or not.  If not it actually goes
         into a database (see routine below) to do the proper decay.
@@ -343,14 +343,14 @@ class se(DataPlot, Utils):
         chart of the nuclides.
 
         Standard input is as in regular get function.
-        
+
         Parameters
         ----------
         cycle_list : string, list
             If cycle_list is a string, then get interpates the argument
             cycle_list as a dataitem and fetches the dataitem for all
             cycles.
-            
+
             If cycle_list is a list, then get fetches the dataitem for
             the cycles in the list.
         dataitem : string, optional
@@ -358,9 +358,9 @@ class se(DataPlot, Utils):
             is None, then cycle_list must be a string and will be used
             as dataitem.  If dataitem is an isotope in the form 'H-2',
             it then returns the result of,
-            
+
             >>> self.get(cycle_list,'iso_massf',dataitem)
-            
+
             The default is None.
         isotope : string, optional
             The name of the isotope to fetch, it must be in the form
@@ -369,7 +369,7 @@ class se(DataPlot, Utils):
         sparse : integer, optional
             Implements a sparsity factor on the fetched data.  The
             default is 1.
-        
+
         Notes
         -----
         Additional features are:
@@ -377,20 +377,20 @@ class se(DataPlot, Utils):
             IN PROGRESS: CONTACT RETO: trappitsch@uchicago.edu
 
         Calling the get method directly in the form,
-        
+
         >>> self.get_decayed(cycle_list,'iso_massf',dataitem)
-        
+
         is depricated, and only included for compatibility.
 
-        '''
+        """
         return None
 
     def get_elemental_abunds(self,cycle,index=None):
-        '''
+        """
         returns the elemental abundances for one cycle, either
         for the whole star or a specific zone depending upon
         the value of 'index'.
-            
+
         Parameters
         ----------
         cycle : string or integer
@@ -401,7 +401,7 @@ class se(DataPlot, Utils):
             list, the abundances are returned between indices of
             index[0] and index[1].
             The default is None.
-        '''
+        """
 
         isoabunds=self.se.get(cycle,'iso_massf')
         A=array(self.se.A)
@@ -412,7 +412,7 @@ class se(DataPlot, Utils):
 
         if index==None:
             index=[0,len(isoabunds)]
-        
+
         if type(index)==list:
             elemabunds=[]
             for zone in range(index[0],index[1]):
@@ -423,19 +423,19 @@ class se(DataPlot, Utils):
                 elemabunds.append([sum(isoabunds[zone][where(Z==iZ)]) for iZ in Zuq])
         else:
             elemabunds=[sum(isoabunds[index][where(Z==iZ)]) for iZ in Zuq]
-    
+
         return elemabunds
 
 
     def plot_prof_1(self, mod, species, xlim1, xlim2, ylim1, ylim2,
                     symbol=None):
-        ''' 
+        """
         plot one species for cycle between xlim1 and xlim2
 
         Parameters
         ----------
         mod : string or integer
-            Model to plot, same as cycle number.  
+            Model to plot, same as cycle number.
         species : list
             Which species to plot.
         xlim1, xlim2 : float
@@ -446,9 +446,9 @@ class se(DataPlot, Utils):
             Which symbol you want to use.  If None symbol is set to '-'.
             The default is None.
 
-        '''
+        """
         DataPlot.plot_prof_1(self,species,mod,xlim1,xlim2,ylim1,ylim2,symbol)
-        ''' 
+        """
         tot_mass=self.se.get(mod,'total_mass')
         age=self.se.get(mod,'age')
         mass=self.se.get(mod,'mass')
@@ -461,41 +461,41 @@ class se(DataPlot, Utils):
         pl.xlabel('$Mass$ $coordinate$', fontsize=20)
         pl.ylabel('$X_{i}$', fontsize=20)
         pl.title('Mass='+str(tot_mass)+', Time='+str(age)+' years, cycle='+str(mod))
-        '''
+        """
 
     def plot_prof_2(self, mod, species, xlim1, xlim2):
 
-        ''' 
+        """
         Plot one species for cycle between xlim1 and xlim2
 
         Parameters
         ----------
         mod : string or integer
-            Model to plot, same as cycle number.        
+            Model to plot, same as cycle number.
         species : list
             Which species to plot.
         xlim1, xlim2 : float
             Mass coordinate range.
 
-        '''
+        """
 
         mass=self.se.get(mod,'mass')
         Xspecies=self.se.get(mod,'yps',species)
         pyl.plot(mass,Xspecies,'-',label=str(mod)+', '+species)
         pyl.xlim(xlim1,xlim2)
         pyl.legend()
-        
+
     def write_deltatable(self, filename='default', decayed=True,
                          dcycle=500, iniabufile='../../frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn'):
-        ''' 
+        """
         This subroutine is to write out tables with delta values for
         cosmochemists to use in comparison with their data.
-        
+
         No options are necessarily needed to load this routine, however,
         it might be useful to specify a filename.  This file furthermore
         searches for thermal pulses, hence, it's only useful for
         non-explosive TP-AGB stars!
-        
+
         Parameters
         ----------
         filename : string, optional
@@ -511,13 +511,13 @@ class se(DataPlot, Utils):
             GN93 file is used (in USEEPP folder).  Important, input
             file has to be USEEPP conforming, see NuGrid book! The
             default is '../../frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn'.
-            
+
         Notes
         -----
         Regardless of what value is used as filename it will be replaced
         with 'delta_outfile.txt'.
-        
-        '''
+
+        """
         print('This is a preliminary version - contact Reto for more information!')
         # make filename
         filename = 'delta_outfile.txt'
@@ -666,11 +666,11 @@ class se(DataPlot, Utils):
 
 
     def _tp_finder(self, dcycle):   # Private routine
-        ''' 
+        """
         Routine to find thermal pulses in given star and returns an
         index vector that gives the cycle number in which the thermal
         pulse occure.
-        
+
         The routine looks for the C/O ratio jumping up and up, so only
         useful in TP-AGB star.  A vector is given back that indicates
         the position of the cycle that is at 95% of the thermal pulse
@@ -678,8 +678,8 @@ class se(DataPlot, Utils):
         processing is done). The script also returns the co_ratio
         vector - the C/O ratio (number fraction) at the given thermal
         pulse.
-        
-        '''
+
+        """
         # read in c and o isotopes for all cycles, regarding deltacycle
         last_cycle = int(self.se.cycles[len(self.se.cycles)-1])
         cyc_tp = list(range(1,last_cycle + dcycle, dcycle))
@@ -743,10 +743,10 @@ class se(DataPlot, Utils):
 
     def ernst_table_exporter(self, cycle, outfname='table_out',
                              sheetname='Sheet 1'):
-        ''' 
+        """
         This routine takes NuGrid data (model output) for a given
         cycle and writes it into an Excel sheet.
-        
+
         This is one format as requested by Ernst Zinner in June 2013
         (through Marco).  If you want all radioactive isotopes, start
         from the restart file.  Empty columns are not written out and
@@ -764,7 +764,7 @@ class se(DataPlot, Utils):
             Name of the sheet in the excel file.  The default is
             'Sheet 1'.
 
-        '''
+        """
 
         from xlsxwriter.workbook import Workbook # https://xlsxwriter.readthedocs.org/ Note: We neex xlswriter. Please meake sure it is installed. Run pip install xlsxwriter to install it using pip. If pip is not installed, install it via easy_install pip. Depending on the system you are on, you might need sudo rights for thesethings.'
 
@@ -820,9 +820,9 @@ class se(DataPlot, Utils):
         return None
 
     def plot4(self, num):
-        '''
+        """
            Plots the abundances of H-1, He-4, C-12 and O-16.
-        '''
+        """
         self.plot_prof_1(num,'H-1',0.,5.,-5,0.)
         self.plot_prof_1(num,'He-4',0.,5.,-5,0.)
         self.plot_prof_1(num,'C-12',0.,5.,-5,0.)
@@ -830,9 +830,9 @@ class se(DataPlot, Utils):
         pyl.legend(loc=3)
 
     def plot4_nolog(self, num):
-        '''
-           Plots the abundances of H-1, He-4, C-12 and O-16. 
-        '''
+        """
+           Plots the abundances of H-1, He-4, C-12 and O-16.
+        """
         self.plot_prof_2(num,'H-1',0.,5.)
         self.plot_prof_2(num,'He-4',0.,5.)
         self.plot_prof_2(num,'C-12',0.,5.)
@@ -842,7 +842,7 @@ class se(DataPlot, Utils):
     def plot_prof_sparse(self, mod, species, xlim1, xlim2, ylim1, ylim2,
                          sparse, symbol):
 
-        ''' 
+        """
         plot one species for cycle between xlim1 and xlim2.
 
         Parameters
@@ -859,8 +859,8 @@ class se(DataPlot, Utils):
             Sparsity factor for points.
         symbol : string
             which symbol you want to use?
-            
-        '''
+
+        """
         mass=self.se.get(mod,'mass')
         Xspecies=self.se.get(mod,'yps',species)
         pyl.plot(mass[0:len(mass):sparse],np.log10(Xspecies[0:len(Xspecies):sparse]),symbol)
@@ -870,7 +870,7 @@ class se(DataPlot, Utils):
 
     def trajectory(self, ini, end, delta, mass_coo, age_in_sec=False,
                    online=False):
-        ''' 
+        """
         create a trajectory out of a stellar model
 
         Parameters
@@ -897,7 +897,7 @@ class se(DataPlot, Utils):
         -----
         plus writes a file with the trajectory information to be used
         with ppn.
-        
+
         Warning: remove the old trajectory, if you have any for the same
         mass coordinate.  You are appending data, not overwriting.
 
@@ -909,7 +909,7 @@ class se(DataPlot, Utils):
         are you working online in the ipython notebook? If so,
         you will be given an HTML link to download the file.
 
-        '''
+        """
 
         filename='traj_'+str(mass_coo)+'.dat'
         f = open(filename,'a')
@@ -963,10 +963,10 @@ class se(DataPlot, Utils):
 
 
     def abund_at_masscoordinate(self, ini, mass_coo, online=False):
-        ''' 
+        """
         Create a file with distribution at a given mass coord, and at
         a given time step.
-        
+
         This for instance may be used as intial distribution for
         function trajectory, to reproduce local conditions in ppn.
 
@@ -982,7 +982,7 @@ class se(DataPlot, Utils):
             are you working online in the ipython notebook? If so,
             you will be given an HTML link to download the file.
 
-        '''
+        """
 
         age=self.se.get(ini,'age')
         mass=self.se.get(ini,'mass')
@@ -1048,7 +1048,7 @@ class se(DataPlot, Utils):
         # the for loop below maybe optimized, I believe
         # defining before isotopes and abundances. Marco 13 Jannuary 2011
         for i in range(len(self.se.isotopes)):
-	    if str(self.se.isotopes[i].split('-')[1][-2:]).upper() != 'M1':
+            if str(self.se.isotopes[i].split('-')[1][-2:]).upper() != 'M1':
             	string = 'D '+str(self.se.isotopes[i].split('-')[0]).upper()+'   '+str(self.se.isotopes[i].split('-')[1]).upper()+'    '+str(abunds[i])
             	f.write(string+"\n")
         f.close()
@@ -1057,7 +1057,7 @@ class se(DataPlot, Utils):
 
 
     def _kip(self, cycle_end, mix_thresh, xaxis, sparse):
-        ''' 
+        """
         *** Should be used with care, therefore has been flagged as
         a private routine ***
         This function uses a threshold diffusion coefficient, above
@@ -1079,8 +1079,8 @@ class se(DataPlot, Utils):
         --------
         >>> pt=mp.se('/ngpod1/swj/see/mppnp_out/scratch_data/M25.0Z1e-02','.h5')
         >>> pt.kip(10000,'log_time_left',100)
-        
-        '''
+
+        """
 
         original_cyclelist = self.se.cycles
         cyclelist = original_cyclelist[0:cycle_end:sparse]
@@ -1095,12 +1095,12 @@ class se(DataPlot, Utils):
         fsize = 12
 
         def getlims(d_coeff, massco):
-            ''' 
+            """
             This function returns the convective boundaries for a cycle,
             given the cycle's dcoeff and massco columns, taking into
             account whether surface or centre are at the top.
-            
-            '''
+
+            """
             plotlims = []
             if massco[0] > massco[-1]:
                 for j in range(-1,-len(d_coeff)-1,-1):
@@ -1175,17 +1175,17 @@ class se(DataPlot, Utils):
         ax.set_ylabel('Mass [$M_{\odot}$]',fontsize=fsize)
 
         pl.show()
-    
+
     def kip_cont(self, modstart, modstop, dcoeff_thresh=1.e12,
                  xres=1000, ylims=[0., 0.], xlims=[0., 0.], yres=2000,
                  ixaxis='log_time_left', outfile='',
                  landscape_plot=False, codev='KEP', kepswitch=12555,
                  outlines=False, write_preproc=False, hatching=False):
-        ''' 
+        """
         This function creates a Kippenhahn diagram as a contour plot of
         the se output using a convection flag or diffusion coefficient
         threshold.
-        
+
         Parameters
         ----------
         modstart, modstop : integer
@@ -1228,7 +1228,7 @@ class se(DataPlot, Utils):
         cannot implement a % bar, but this example call should not take
         more than 1 minute.
 
-        '''
+        """
 
         tmp_cycles=self.se.cycles
         original_cyclelist = [int(tmp_cycles[i]) for i in range(len(tmp_cycles))]
@@ -1319,18 +1319,18 @@ class se(DataPlot, Utils):
             sys.exit()
 
         def realarray(array):
-            ''' 
+            """
             Parameters
             ----------
             array : list
                 Takes array of strings
-            
+
             Returns
             --------
             list
                 array of floats
-            
-            '''
+
+            """
             floatarray=np.array([float(el) for el in array])
             return floatarray
 
@@ -1364,7 +1364,7 @@ class se(DataPlot, Utils):
                 print('getting deltat since not initialised')
                 self.deltat = self.se.get(self.se.cycles,'deltat')
             age=old_div(np.cumsum(self.deltat), (3600.*24.*365.))
-            
+
             if datatype=='convection':
                 conv=self.se.get(cyclelist,'convection_indicator')
             else:
@@ -1556,9 +1556,9 @@ class se(DataPlot, Utils):
                   netnuc_name='eps_nuc', engenalpha=0.6,
                   outfile='plot.pdf', annotation='',
                   KEPLER=False):
-        ''' 
+        """
         !! EXPERIMENTAL FEATURE (flagged as private) !!
-        
+
         This function creates a Kippenhahn diagram as a contour plot of
         the .se.h5 or .out.h5 files using any continuous variable
         (columns in the hdf5 cycle data). Multiple columns may be
@@ -1591,7 +1591,7 @@ class se(DataPlot, Utils):
             1-D array containing the thresholds corresponding to the
             variables in "plots".  The default is [1.0E+12].
         xax : string, optional
-            x-axis quantity; either 'log_time_left' or 'cycles'.  The 
+            x-axis quantity; either 'log_time_left' or 'cycles'.  The
             default is 'log_time_left'.
         alphas : list, optional
             Array containing the opacity (0 to 1) of the contour for
@@ -1641,8 +1641,8 @@ class se(DataPlot, Utils):
             is ''.
         KEPLER : boolean, optional
             The default is False.
-            
-        '''
+
+        """
 
         # Organize cycles and ages:
         original_cyclelist = self.se.cycles
@@ -1744,9 +1744,9 @@ class se(DataPlot, Utils):
         # called for every cycle in cyclelist, for every variable to be plotted
         # along with its corresponding threshold(s).
         def getlims(variable_array,thresh,massco_array):
-            '''This function returns the variable boundaries (in mass) for a cycle,
+            """This function returns the variable boundaries (in mass) for a cycle,
             given the cycle's variable and mass columns, ensuring that the boundaries
-            are ordered centre to surface (as some .se.h5 files are the opposite).'''
+            are ordered centre to surface (as some .se.h5 files are the opposite)."""
             plotlims = []
             # Just a fix for some get problem I was having:
             if len(massco_array) == 2:
@@ -1831,12 +1831,12 @@ class se(DataPlot, Utils):
         # y_res chunks), returning their index in the mass co-ordinate vector for
         # that timestep/cycle.
         def find_nearest(array,value):
-            ''' 
+            """
             Returns [lower,upper] indexes locating adjacent mass cells
             (in the massco vector) around y-value (one of y_res points
             equally spaced between centre and surface).
-            
-            '''
+
+            """
             idx=(np.abs(array-value)).argmin()
             lims=np.zeros([2],int)
             if idx == len(array)-1: # SJONES post-mod
@@ -1991,7 +1991,7 @@ class se(DataPlot, Utils):
 
     def abup_se_plot(mod,species):
 
-        ''' 
+        """
         plot species from one ABUPP file and the se file.
 
         You must use this function in the directory where the ABP files
@@ -2004,12 +2004,12 @@ class se(DataPlot, Utils):
             model.
         species : string
             The species to plot.
-            
+
         Notes
         -----
         The species is set to 'C-12'.
-          
-        '''
+
+        """
 
 # Marco, you have already implemented finding headers and columns in
 # ABUP files. You may want to transplant that into here?
@@ -2027,7 +2027,7 @@ class se(DataPlot, Utils):
 
 
     def _read_iso_abund_marco(self, mass_range, cycle):
-        ''' 
+        """
         plot the abundance of all the chemical species
 
         Parameters
@@ -2038,9 +2038,9 @@ class se(DataPlot, Utils):
         cycle : string or integer
             A string/integer of the cycle of interest.
 
-        '''
+        """
 
-        import utils as u
+        import nuutils as u
 
         masses = []
         #    Check the inputs
@@ -2096,24 +2096,24 @@ class se(DataPlot, Utils):
 
     def decay(self, mass_frac):
 
-        ''' 
+        """
         this module simply calculate abundances of isotopes after decay.
 
         It requires that before it is used a call is made to
         _read_iso_abund_marco and _stable_species.
-        
+
         Parameters
         ----------
         mass_frac : list
             alist of mass_frac dicts.
-        
+
         See Also
         --------
-        _read_iso_abund_marco(), utils.Utils._stable_species()
-        
-        '''
+        _read_iso_abund_marco(), nuutils.Utils._stable_species()
 
-        import utils as u
+        """
+
+        import nuutils as u
 
         global decayed_multi_d
         decayed_multi_d=[]
@@ -2161,7 +2161,7 @@ class se(DataPlot, Utils):
 
 
     def burnstage(self, **keyw):
-        """ 
+        """
         This function calculates the presence of burning stages and
         outputs the ages when key isotopes are depleted and uses them
         to calculate burning lifetimes.
@@ -2170,13 +2170,13 @@ class se(DataPlot, Utils):
         ----------
         keyw : dict
             A dict of key word arguments.
-            
+
         Returns
         -------
         list
             A list containing the following information: burn_cycles,
             burn_ages, burn_abun, burn_type and burn_lifetime.
-        
+
         Notes
         -----
         The following keywords can also be used:
@@ -2582,7 +2582,7 @@ class se(DataPlot, Utils):
         return [burn_cycles, burn_ages, burn_abun, burn_type, burn_lifetime]
 
     def burnstage_upgrade(self, **keyw):
-        """ 
+        """
         This function calculates the presence of burning stages and
         outputs the ages when key isotopes are depleted and uses them to
         calculate burning lifetimes.
@@ -2591,7 +2591,7 @@ class se(DataPlot, Utils):
         ----------
         keyw : dict
             A dict of key word arguments.
-            
+
         Returns
         -------
         list
@@ -3031,10 +3031,10 @@ class se(DataPlot, Utils):
 
 
     def cores(self, incycle, **keyw):
-        """ 
+        """
         This function uses the abundances as a function of time to
         return core masses.
-        
+
         Parameters
         ----------
         incycle : integer
@@ -3042,7 +3042,7 @@ class se(DataPlot, Utils):
             masses.
         keyw : dict
             A dict of key word arguments.
-        
+
         Returns
         -------
         list
@@ -3089,11 +3089,11 @@ class se(DataPlot, Utils):
         All arguments change the name of fields used to read data from
         HDF5 files, other than core_opt.  core_opt controls which
         scheme to use for calculating the core masses.
-        
+
             If core_opt is 0, then cores uses alpha-isotopes to
             calculate the silicon and iron cores.  Use this for stellar
             evolution output.
-            
+
                 Si_core = Si28+S32+Ar36+Ca40+Ti44
 
                 Fe_core = Cr48+Fe52+Ni56
@@ -3109,7 +3109,7 @@ class se(DataPlot, Utils):
         """
 
         def infomod(core_opt, *inp):
-            """ 
+            """
             This calls the correct infomod function depending on the
             value of core_opt.
 
@@ -3120,7 +3120,7 @@ class se(DataPlot, Utils):
                 return infomod2(inp[0], inp[1], inp[2], inp[3], inp[4])
 
         def infomod1(shell, yps, isoindex):
-            """ 
+            """
             Function for defining data to print into a string.  This is
             used for the case of core_opt = 0.
 
@@ -3147,10 +3147,10 @@ class se(DataPlot, Utils):
             ' si=' + "%12.4e"%(xsicore) + ' fe=' + "%12.4e"%(xfecore)
 
         def infomod2(shell, yps, isoindex, xsicore, xfecore):
-            """ 
+            """
             Function for defining data to print into a string.  This is
             used for the case of core_opt = 1.
-            
+
             """
             xsicore = 0.
             xsicoren = 0.
@@ -3478,7 +3478,7 @@ class se(DataPlot, Utils):
         return [cores, core_type, core_info]
 
     def presnyields(self, *cycles, **keyw):
-        """ 
+        """
         This function calculates the presupernova yields of a full
         structure profile from a remnant mass, mrem, to the surface.
 
@@ -3491,7 +3491,7 @@ class se(DataPlot, Utils):
             otherwise the ejected masses are outputted.
         keyw : dict
             A dict of key word arguments.
-                                    
+
         Notes
         -----
         The following keywords can be used:
@@ -3603,7 +3603,7 @@ class se(DataPlot, Utils):
         return X_i
 
     def windyields(self, ini, end, delta, **keyw):
-        """ 
+        """
         This function returns the wind yields and ejected masses.
 
         X_i, E_i = data.windyields(ini, end, delta)
@@ -3618,14 +3618,14 @@ class se(DataPlot, Utils):
             The cycle interval.
         keyw : dict
             A dict of key word arguments.
-            
+
         Returns
         -------
         list
             The function returns a list of the wind yields(X_i) and
             a list of the ejected masses(E_i) in the mass units that
             were used (usually solar masses).
-        
+
         Notes
         -----
         The following keywords cand also be used:
@@ -3646,7 +3646,7 @@ class se(DataPlot, Utils):
         name, use these keywords.  For example, if the table for the
         abundances is called "abundances" instead of "iso_massf", then
         use abund = "abundances" as a keyword argument.
-        
+
         """
 
         if ("tmass" in keyw) == False:
@@ -3697,7 +3697,7 @@ class se(DataPlot, Utils):
 
     def _windcalc(self, first, totalmass, nsteps, niso, ypssurf, ypsinit, \
     X_i, E_i, cycles):
-        '''
+        """
         This function calculates the windyields and ejected masses as called from
         windyields().  It uses a summation version of the formulae used in Hirschi
         et al. 2005, "Yields of rotating stars at solar metallicity".
@@ -3705,8 +3705,8 @@ class se(DataPlot, Utils):
         If it is the first file, the arrays need to be created and the initial
         abundances set
 
-        '''
-            
+        """
+
         if first == True:
             X_i = np.zeros([niso], float)
             E_i = np.zeros([niso], float)
@@ -3730,9 +3730,9 @@ class se(DataPlot, Utils):
 
 
     def average_iso_abund_marco(self,mass_range,cycle,stable,i_decay):
-        ''' 
+        """
         Interface to average over mass_range.
-        
+
         Parameters
         ----------
         mass_range : list
@@ -3745,15 +3745,15 @@ class se(DataPlot, Utils):
         i_decay : integer
             If i_decay is 1, then plot not decayed.  If i_decay is 2,
             then plot decayed.  Make sense only if stable is true.
-            
+
         See Also
         --------
         _read_iso_abund_marco()
 
-        '''
+        """
 
 
-        import utils as u
+        import nuutils as u
 
         if not stable and i_decay == 2:
             print('ERROR: choose i_decay = 1')
@@ -3814,9 +3814,9 @@ class se(DataPlot, Utils):
         # now I have the average abundances. We can do the plot.
 
     def _get_elem_names(self):
-        ''' returns for one cycle an element name dictionary.'''
+        """ returns for one cycle an element name dictionary."""
 
-        import utils as u
+        import nuutils as u
 
         # provide library for Z versus element names, and Z for elements
         #element_name = self.se.elements
@@ -3827,17 +3827,17 @@ class se(DataPlot, Utils):
 
 
     def get_abundance_iso_decay(self,cycle):
-        ''' 
+        """
         returns the decayed stable isotopes.
 
         Parameters
         ----------
         cycle : integer
             The cycle.
-            
-        '''
 
-        import utils as u
+        """
+
+        import nuutils as u
 
         masses_for_this_cycle = self.se.get(cycle,'mass')
         self._read_iso_abund_marco([min(masses_for_this_cycle),max(masses_for_this_cycle)],cycle)
@@ -3884,18 +3884,18 @@ class se(DataPlot, Utils):
 
 
     def get_abundance_elem(self,cycle):
-        ''' 
+        """
         returns the undecayed element profile (all elements that are
         in elem_names).
-        
+
         Parameters
         ----------
         cycle : integer
             The cycle number
-            
-        '''
 
-        import utils as u
+        """
+
+        import nuutils as u
 
         masses_for_this_cycle = self.se.get(cycle,'mass')
         self._read_iso_abund_marco([min(masses_for_this_cycle),max(masses_for_this_cycle)],cycle)
@@ -3933,9 +3933,9 @@ class se(DataPlot, Utils):
 def _obsolete_plot_iso_abund_marco(directory, name_h5_file, mass_range,
                                   cycle, logic_stable, i_decay,
                                   file_solar, solar_factor):
-    ''' 
+    """
     Interface to plot average over mass_range.
-    
+
     Parameters
     ----------
     directory : string
@@ -3957,12 +3957,12 @@ def _obsolete_plot_iso_abund_marco(directory, name_h5_file, mass_range,
     solar_factor : float
         value to correct initial abundances to solar, e.g. for Z=0.01
         and AG89 solar_factor = 2.
-    
+
     See Also
     --------
     se._read_iso_abund_marco()
-    
-    '''
+
+    """
 
 
     # provide library for Z versus element names, and Z for elements
@@ -4038,7 +4038,7 @@ def _obsolete_plot_iso_abund_marco(directory, name_h5_file, mass_range,
 
 
 def _obsolete_plot_el_abund_marco(directory,name_h5_file,mass_range,cycle,logic_stable,i_decay,file_solar,solar_factor,symbol='ko'):
-    ''' 
+    """
     Interface to plot elements abundances averaged over mass_range.
 
     Parameters
@@ -4062,12 +4062,12 @@ def _obsolete_plot_el_abund_marco(directory,name_h5_file,mass_range,cycle,logic_
     solar_factor : float
         value to correct initial abundances to solar, e.g. for Z=0.01
         and AG89 solar_factor = 2.
-    
+
     See Also
     --------
     se._read_iso_abund_marco()
 
-    '''
+    """
 
     # provide library for Z versus element names, and Z for elements
     u.give_zip_element_z_and_names()

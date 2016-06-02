@@ -7,7 +7,7 @@
 # All rights reserved. See LICENSE.
 #
 
-""" 
+"""
 h5T.py V1.1 created by Will Hillary
 
     email: will.hillary@gmail.com
@@ -26,6 +26,12 @@ Modified to V1.2 by Samuel Jones and Luke Siemens
 
     Date: March 2014
 
+Modified by Alexander Heger for some python3 compatibility
+
+    Email: alexander.heger@monash.edu
+
+    Date May 2016
+
 This is a simple python terminal interface for hdf5 files generated
 using NuGrid Stellar evolution code.  It provides as simple as possible
 interface by allowing for intuitive, but sparse commands.  Refer to the
@@ -36,6 +42,7 @@ from __future__ import print_function
 from builtins import map
 from builtins import str
 from builtins import range
+from builtins import sorted
 from past.builtins import basestring
 
 import os
@@ -59,9 +66,9 @@ except ImportError :
     import h5py as mrT
 
 class Files(threading.Thread):
-    ''' 
+    '''
     Changes made by Daniel Conti
-    
+
     A. Txtfile preprocessor: When the Files class is run in a directory
        for the first time, a preprocessor file is written, in the same
        directory.  When loading in a directory of files, this class
@@ -84,7 +91,7 @@ class Files(threading.Thread):
 
        where h5 is one of these h5File threads, the future author should
        have this aswell:
-    
+
        >>> if not self.h5sStarted[self.h5s.index(h5)]
        >>>     h5.start()
        >>>     h5.join()
@@ -118,33 +125,33 @@ class Files(threading.Thread):
 
     Assumptions
     ===========
-    
+
     The user must have the module ascii_table and in the python path.
     It can be checked out from the svn svn://forum.astro.keele.ac.uk/ut$
     To use the preprocessor, the user need write access to the folder
     he is working in.
-    
+
     Cycle numbers are 10 digits long
-    
+
     Cycle numbers are allways whole numbers
-    
+
     The preprocessor file will become unstable (ie not return accurite
     results), if any of the H5 files, internally, change their cycles
     or ages.
-    
+
     If any H5 files are added and removed, the method will realize that
     there are additional or missing files and will write a new
     preprocessor file.
-    
+
     If any of the files are renamed, The program realize that files were
     renamed and will write a new preprocessor file.
-    
+
     If a new selection of files are slected, The program realize this
     and will write a new preprocessor file.
-    
+
     If a prprocessor file is removed, The program realize this and will
     write a new preprocessor file.
-    
+
     In each file name the cycle number is the list of numbers
     .(surf/out.h5)
 
@@ -179,7 +186,7 @@ class Files(threading.Thread):
     'W','Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po','At']
 
     def findCycle(self, cycNum):
-        ''' 
+        '''
         Method that looks through the self.cycles and returns the
         nearest cycle:
 
@@ -215,7 +222,7 @@ class Files(threading.Thread):
     #    Upon initialization of an h5fileholder, the h5 files are defined (in their own wrapper-see below)
     #    and gathers some important data from the files.
     def __init__(self ,path='.', fName=None, pattern='*', rewrite=False, verbose=False):
-        ''' 
+        '''
         Init method
 
         Parameters
@@ -417,17 +424,15 @@ class Files(threading.Thread):
             'At the time of the creation of this file there were '+str(len(self.h5files))+\
             ' h5 files.']
 
-
             try:
-                self.cycles = sorted(self.cycles, cmp=self.numeric_compare)
+                self.cycles = sorted(self.cycles, key=int)
             except TypeError:
-                print("There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again")
+                print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
 
             try:
-                self.ages = sorted(self.ages, cmp=self.numeric_compare)
+                self.ages = sorted(self.ages, key=int)
             except TypeError:
                 None
-
 
             print('Writing preprocessor files')
             data=[]
@@ -486,17 +491,17 @@ class Files(threading.Thread):
                 for j in range(len(dat)):
                     if dat[j]!=3.14159265:
                         dat1.append(dat[j])
-                
+
                 dat=dat1
                 for j in range(len(dat)):
                     dat[j]=str(int(dat[j]))
                     for k in range(10-len(dat[j])):
                         dat[j]='0'+dat[j]
-                
+
                 for j in range(len(dat)):
                     self.cycles.append(dat[j])
                 self.h5s[i].cycle=dat
-                dat=preprocTable.get(os.path.basename(self.h5s[i].filename)+'-age')
+                dat=preprocTable.get(os.path.basename(self.h5s[i].filename) + '-age')
                 dat1=[]
                 for j in range(len(dat)):
                     if dat[j]!=3.14159265:
@@ -507,12 +512,12 @@ class Files(threading.Thread):
                     self.ages.append(dat[j])
 ### end of new section ###
             try:
-                self.cycles = sorted(self.cycles, cmp=self.numeric_compare)
+                self.cycles = sorted(self.cycles, key=int)
             except TypeError:
-                print("There was a problem sorting the cycles.  You may have problems later.  Please consider reloading(h5T) and trying again")
+                print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
 
             try:
-                self.ages = sorted(self.ages, cmp=self.numeric_compare)
+                self.ages = sorted(self.ages, key=int)
             except TypeError:
                 None
         print('File search complete.')
@@ -521,14 +526,7 @@ class Files(threading.Thread):
             print("Total duration is " + str(t2-t1) + " seconds.")
         return
 
-    def numeric_compare(self, x, y):
-        if int(x)>int(y):
-            return 1
-        elif int(x)==int(y):
-            return 0
-        else: # x<y
-            return -1
-    ''' 
+    '''
     def startThreads(self,threads,IsConcurrent):
          """
          Method that starts the h5 file threads
@@ -541,7 +539,7 @@ class Files(threading.Thread):
 
     # This function determines which cycle, which file, which storage mechanism (cattr or data) and returns it
     def get(self, cycle_list, dataitem=None, isotope=None, sparse=1):
-        ''' 
+        '''
         Get Data from HDF5 files.
 
         There are three ways to call this function
@@ -616,7 +614,7 @@ class Files(threading.Thread):
             isotope = [isotope]
 
 
-            
+
         if dataitem==None and isotope==None:
             option_ind = 1
             dataitem = cycle_list
@@ -755,7 +753,7 @@ class Files(threading.Thread):
         dat = []
         cycle_list.sort()
 
-        cyclelist=np.array(list(map(int,cycle_list)))
+        cyclelist=np.array(list(map(int, cycle_list)))
 
         # cycles_requested is a list of indices from cyclelist
         # The index of the larges and smallest indices should be stored
@@ -779,7 +777,7 @@ class Files(threading.Thread):
             raise IOError('Cycle-less file encountered')
         file_min.sort()
         file_max.sort()
-    
+
         for h5 in self.h5s:
             #initalize file metadata
             min_file = int(h5.cycle[0])
@@ -791,8 +789,8 @@ class Files(threading.Thread):
 
             # SJONES Now we need to add the case that the set only contains one file:
             if len(file_min) == 1:
-                min_file=min_list - 1
-                max_file=max_list + 1
+                min_file = min_list - 1
+                max_file = max_list + 1
             else:
                 file_index = file_min.index(min_file)
                 if file_index == 0:
@@ -814,8 +812,8 @@ class Files(threading.Thread):
                 continue
             elif (min_list <= min_file) and (max_file <= max_list):
                 # all of h5.cycle is within cyclelist
-                index_min = bisect.bisect_left(cyclelist,min_file)
-                index_max = bisect.bisect_right(cyclelist,max_file)
+                index_min = bisect.bisect_left(cyclelist, min_file)
+                index_max = bisect.bisect_right(cyclelist, max_file)
             elif (min_file <= min_list) and (max_list <= max_file):
                 # all of cyclelist is within h5.cycle
                 index_min = None
@@ -824,24 +822,24 @@ class Files(threading.Thread):
                 if min_list > min_file:
                 # cyclelist overlaps the right edge of h5.cycle
                     index_min = None
-                    index_max = bisect.bisect_right(cyclelist,max_file)
+                    index_max = bisect.bisect_right(cyclelist, max_file)
                 else:
                     # cyclelist overlaps the left edge of h5.cylce
-                    index_min = bisect.bisect_left(cyclelist,min_file)
+                    index_min = bisect.bisect_left(cyclelist, min_file)
                     index_max = None
 
             # maintin list of all requested cycles by keeping trak of
             # the maximum and minimum indices
-            min = index_min
+            imin = index_min
             if index_min == None:
-                min = 0
+                imin = 0
 
-            max = index_max
+            imax = index_max
             if index_max == None:
-                max = len(cyclelist)
+                imax = len(cyclelist)
 
-            request_min = bisect.bisect_left(cycles_requested,min)
-            request_max = bisect.bisect_right(cycles_requested,max)
+            request_min = bisect.bisect_left(cycles_requested, imin)
+            request_max = bisect.bisect_right(cycles_requested, imax)
 
             # if the new request overlabs older request remove them
             del cycles_requested[request_min:request_max]
@@ -849,16 +847,16 @@ class Files(threading.Thread):
                 # new and old request overlaped on one edge only
                 if request_min % 2 == 0:
                     # add new starting index
-                    cycles_requested.insert(request_min,min)
+                    cycles_requested.insert(request_min, imin)
                 else:
                     # add new ending index
-                    cycles_requested.insert(request_min,max)
+                    cycles_requested.insert(request_min, imax)
             else:
                 # new and old requests overlaped on two edges
                 if request_min % 2 == 0:
                     # old request was contained with in new request
-                    cycles_requested.insert(request_min,min)
-                    cycles_requested.insert(request_min + 1,max)
+                    cycles_requested.insert(request_min, imin)
+                    cycles_requested.insert(request_min + 1, imax)
                 else:
                     # new request wat contained within old request
                     pass
@@ -931,12 +929,13 @@ class Files(threading.Thread):
             # calculate the proper insertion point for the data colected from
             # the file h5 in self.h5s
             insert_pnt = 0
-            for i in range(len(cycles_requested)):
-                if i % 2 == 1:
-                    if cycles_requested[i] < index_min:
-                        insert_pnt += cycles_requested[i] - cycles_requested[i-1]
-                    elif cycles_requested[i - 1] < index_min:
-                        insert_pnt += index_min - cycles_requested[i - 1]
+            if index_min is not None: #alex: in py2: x < None == False
+                for i in range(len(cycles_requested)):
+                    if i % 2 == 1:
+                        if cycles_requested[i] < index_min:
+                            insert_pnt += cycles_requested[i] - cycles_requested[i-1]
+                        elif cycles_requested[i - 1] < index_min:
+                            insert_pnt += index_min - cycles_requested[i - 1]
             # insert the cycle data from the current file into the apropiat place
             # in the output data.
             dat[insert_pnt:insert_pnt] = temp_dat
@@ -990,7 +989,7 @@ class Files(threading.Thread):
 
 
     def red_dim(self, array):
-        """ 
+        """
         This function reduces the dimensions of an array until it is
         no longer of length 1.
 
@@ -1150,7 +1149,7 @@ class h5File(threading.Thread):
                             dataitem_data.append(self.h5[self.cycle_header+str(cycledummy)][dataitem])
                 data.append(dataitem_data)
 #                continue
-        
+
         if is_error:
             if not quiet:
                 print("The requested cycles: " + str(missing_cycles) + " are not available in this data set. They have been replaced with the nearest available data.")
@@ -1334,7 +1333,7 @@ class h5File(threading.Thread):
                 self.age=[float(self.h5[str(asd)].attrs.get("age",None)) for asd in temp if 'cyc' in asd]
             except ValueError:
                 self.age=[self.h5[str(asd)].attrs.get("age",None)[0] for asd in temp if 'cyc' in asd]
-                    
+
         others=[]
         for t in temp:
             if 'cyc' not in t:
@@ -1362,9 +1361,9 @@ class h5File(threading.Thread):
                 self.isomeric_state.append(holder)
 
         self.cycle.sort()
-    
+
         # This is kind of stupid, but I have not found a way to access this information directly.
-            
+
         try:
             temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
         except ValueError:
@@ -1381,7 +1380,7 @@ class h5File(threading.Thread):
         for at in attrs:
             self.hattr.append(at)
         self.cattr = list(self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys())
-        
+
         table = []
         grp = self.h5[self.cycle_header+str(self.cycle[0])]
         for gr in grp:
@@ -1389,7 +1388,6 @@ class h5File(threading.Thread):
                 table.append(float(gr[0]))
             except ValueError:
                 None
-        
+
         self.h5.close()
         return None
-

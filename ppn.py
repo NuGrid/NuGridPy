@@ -6,7 +6,7 @@
 # All rights reserved. See LICENSE.
 #
 
-""" 
+"""
 Analyze and visualize the output of single-zone ppn simulations
 
 Contains:
@@ -55,14 +55,14 @@ from data_plot import *
 import matplotlib
 from matplotlib.pylab import *
 from data_plot import *
-from utils import *
+from nuutils import *
 import os
-import utils
+import nuutils
 
 import pdb
 
 class xtime(DataPlot):
-    ''' 
+    '''
     read and plot x-time.dat output files.
 
     Parameters
@@ -72,7 +72,7 @@ class xtime(DataPlot):
     fname : string, optional
         Specify alternative filename of file of type x-time.dat.  The
         default is 'x-time.dat'.
-        
+
     Returns
     -------
     xtime
@@ -117,7 +117,7 @@ class xtime(DataPlot):
     ydat = []
 
     def __init__(self, sldir='./', fname='x-time.dat'):
-        ''' 
+        '''
         A xtime instance
 
         Parameters
@@ -146,7 +146,7 @@ class xtime(DataPlot):
 
 
     def _readFile(self, fname, sldir):
-        ''' 
+        '''
         Private method that reads in the data file and organizes it
         within this object.
 
@@ -190,14 +190,14 @@ class xtime(DataPlot):
         return data,col_num,cols,col_tot,ilines
 
     def get(self, col_str):
-        ''' 
+        '''
         get one data column with the data
 
         Parameters
         ----------
         col_str : string
             One of the column strings in self.cols.
-            
+
         '''
         data_column=zeros(self.ilines)
         for i in range(self.ilines):
@@ -207,13 +207,13 @@ class xtime(DataPlot):
     def plot_xtime(self, y, x='t_y', label='default', labelx=None,
                    labely=None ,title=None, shape='.', logx=False,
                    logy=True, base=10):
-        ''' 
+        '''
         make a simple plot of two columns against each other.
-        
+
         An example would be instance.plot_xtime('PB206', label='PB206 vs t_y'
         Recomend using the plot function DataPlot.plot() it has more
         functionality.
-        
+
         Parameters
         ----------
         Y : string
@@ -239,12 +239,12 @@ class xtime(DataPlot):
             logarithmically.  The default is True.
         base : integer, optional
             The base of the logarithm.  The default is 10.
-        
+
         Notes
         -----
         For all possable choices visit,
         <http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot>
-        
+
         '''
         if label is 'default':
             lab_str=y
@@ -258,7 +258,7 @@ class xtime(DataPlot):
 
         DataPlot.plot(self,x,y,legend=lab_str,labelx=labelx, labely=labely,
                       title=title, shape=shape,logx=logx, logy=logy, base=base)
-        ''' 
+        '''
         print X,Y
         xdat=self.get(X)
         ydat=self.get(Y)
@@ -271,7 +271,7 @@ class xtime(DataPlot):
         '''
 
 class abu_vector(DataPlot, Utils):
-    ''' 
+    '''
     Class for reading selem00xxxx.DAT files
 
     Parameters
@@ -340,7 +340,7 @@ class abu_vector(DataPlot, Utils):
     plotting them, will then save a .png for each cycle.  Also if you
     just want a singular plot saved, the user can input their cycle,
     in a list like [0]. And that will save their plot.
-    
+
     '''
     sldir = ''  #Standard Directory
     inputdir = '' # A copy of Standard Directory which never changes
@@ -351,9 +351,9 @@ class abu_vector(DataPlot, Utils):
     isotopes=[]# list of isotopes
     def __init__(self, sldir='./', filenames='iso_massf',
                  USEEPP='auto'):
-        ''' 
+        '''
         initial method of this class
-        
+
         Parameters
         ----------
         sldir : string, optional
@@ -372,7 +372,7 @@ class abu_vector(DataPlot, Utils):
         '''
         self.debug=False
         self._stable_names() # provides in addition to stable_el from
-                             # utils also just the stable element names
+                             # nuutils also just the stable element names
         self.sldir = sldir
         self.inputdir = ''
         self.startdir = os.getcwd()
@@ -407,7 +407,7 @@ class abu_vector(DataPlot, Utils):
             indexp_cyc2filels={}  # created index pointer from mod (cycle
             i = 0                 # name) to index in files array
             for file in self.files:
-                mod=utils.iniabu(file)
+                mod=nuutils.iniabu(file)
                 indexp_cyc2filels[mod] = i
                 i += 1
             self.indexp_cyc2filels = indexp_cyc2filels
@@ -450,7 +450,7 @@ class abu_vector(DataPlot, Utils):
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
 
-        ''' 
+        '''
         In this chunk of code we find whether the specified directory includes USEEPP
         and if it does, go to 'iniabmode' otherwise (or if USEEPP='off' is thrown) we
         deal with 'iso_massfmode'
@@ -470,10 +470,10 @@ class abu_vector(DataPlot, Utils):
             iso_massfmode()
 
     def getCycleData(self, attri, fname, numtype='cycNum'):
-        """ 
+        """
         In this method a column of data for the associated cycle
         attribute is returned.
-        
+
         Parameters
         ----------
         attri : string
@@ -486,7 +486,7 @@ class abu_vector(DataPlot, Utils):
             cycle number.  If it is 'file' it will then  interpret it as
             a file, if it is 'cycNum' it will then  interpret it as a
             cycle number.  The default is "cycNum".
-            
+
         """
 
         fname=self.findFile(fname,numtype)
@@ -537,7 +537,7 @@ class abu_vector(DataPlot, Utils):
 
 
     def getColData(self, attri, fname, numtype='cycNum'):
-        """ 
+        """
         In this method a column of data for the associated column
         attribute is returned.
 
@@ -601,11 +601,11 @@ class abu_vector(DataPlot, Utils):
         return array(data)
 
     def getElement(self, attri, fname, numtype='cycNum'):
-        ''' 
+        '''
         In this method instead of getting a particular column of data,
         the program gets a particular row of data for a particular
         element name.
-        
+
         attri : string
             The name of the attribute we are looking for. A complete
             list of them can be obtained by calling
@@ -619,13 +619,13 @@ class abu_vector(DataPlot, Utils):
             cycle number.  If it is 'file' it will then  interpret it as
             a file, if it is 'cycNum' it will then  interpret it as a
             cycle number.  The default is "cycNum".
-       
+
         Returns
         -------
         array
             A numpy array of the four element attributes, number, Z, A
             and abundance, in that order.
-            
+
         Notes
         -----
         Warning
@@ -684,7 +684,7 @@ class abu_vector(DataPlot, Utils):
 
 
     def get(self, attri, fname=None, numtype='cycNum', decayed=False):
-        ''' 
+        '''
         In this method all data for an entire cycle (basically the
         content of an iso_massfnnnn.DAT file) or a column of data for
         the associated attribute is returned.
@@ -694,7 +694,7 @@ class abu_vector(DataPlot, Utils):
         attri : string or integer
             If attri is a string, attri is the cycle or name of the
             attribute we are looking for.
-            
+
             If attri is an integer, attri is the cycle number (cycle arrays
             are not supported).
         fname : string, optional
@@ -702,48 +702,48 @@ class abu_vector(DataPlot, Utils):
             getting the data from or the cycle number found in the
             filename, or a List of either cycles or filenames.  If fname
             is None, the data from all cycles is returned.
-            
+
             If attri is an integer, then fname is not supported.
-            
-            The default is None. 
+
+            The default is None.
         numtype : string, optional
             If attri is a string, numtype determines whether fname is
             the name of a file or, the cycle number.  If numtype is
             'file' it will then  interpret fname as a file.  If numtype
             is 'cycNum' it will then interpret fname as a cycle number.
-            
+
             If attri is an Integer, then numtype is not supported.
-            
+
             The default is "cycNum".
         decayed : boolean, optional
             If attri is a string, then decayed is not supported.
-            
+
             If attri is an integer, then get instantaneously decay
             abundance distribution.
-            
+
             The default is False.
-            
+
         Returns
         -------
         array
             If attri is a string, data in the form of a numpy array is
             returned.
-            
+
             If attri is an integer, Nothing is returned.
-            
+
         Notes
         -----
         If attri is an integer, then the following variables will be
         added to the instance.
-        
+
         a_iso_to_plot: mass number of plotted range of species.
-        
+
         isotope_to_plot: corresponding list of isotopes.
-        
+
         z_iso_to_plot: corresponding charge numbers.
-        
+
         el_iso_to_plot: corresponding element names.
-        
+
         abunds: corresponding abundances.
 
         isom: list of isomers with their abundances.
@@ -845,7 +845,7 @@ class abu_vector(DataPlot, Utils):
 
 
     def _readPPN(self, fname, sldir):
-        ''' 
+        '''
         Private method that reads in and organizes the .ppn file
         Loads the data of the .ppn file into the variable cols.
 
@@ -871,7 +871,7 @@ class abu_vector(DataPlot, Utils):
 
 
     def _readFile(self, fname, sldir):
-        ''' 
+        '''
         private method that reads in and organizes the .DAT file
         Loads the data of the .DAT File into the variables cattrs and cols.
         In both these cases they are dictionaries, but in the case of cols,
@@ -920,10 +920,10 @@ class abu_vector(DataPlot, Utils):
         return cattrs,cols, index
 
     def findFile(self, fname, numtype):
-        """ 
+        """
         Function that finds the associated file for fname when Fname is
         time or NDump.
-        
+
         Parameters
         ----------
         fname : string

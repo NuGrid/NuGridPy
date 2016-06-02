@@ -6,7 +6,7 @@
 # All rights reserved. See LICENSE.
 #
 
-""" 
+"""
 data_plot.py
 
 SuperClass module for the YProfile and Table Classes.  It contains
@@ -55,12 +55,12 @@ import time
 import sys
 
 def _padding_model_number(number, max_num):
-    ''' 
+    '''
     This method returns a zero-front padded string
 
     It makes out of str(45) -> '0045' if 999 < max_num < 10000. This is
     meant to work for reasonable integers (maybe less than 10^6).
-    
+
     Parameters
     ----------
     number : integer
@@ -81,13 +81,13 @@ def _padding_model_number(number, max_num):
 class DataPlot(object):
 
     def _classTest(self):
-        ''' 
+        '''
         Determines what the type of class instance the subclass is, so
         we can dynamically determine the behaviour of methods.
 
         This method NEEDS to be modified if any names of files or
         classes are changed.
-        
+
         '''
 
         c=str(self.__class__)
@@ -114,9 +114,9 @@ class DataPlot(object):
         return tmp
 
     def _which(self, program):
-        ''' 
+        '''
         Mimics which in the unix shell.
-        
+
         '''
         def is_exe(fpath):
             return os.path.exists(fpath) and os.access(fpath, os.X_OK)
@@ -193,9 +193,9 @@ class DataPlot(object):
         return tmpX,tmpY
 
     def _sparse(self, x, y, sparse):
-        """ 
+        """
         Method that removes every non sparse th element.
-        
+
         For example:
         if this argument was 5, This method would plot the 0th, 5th,
         10th ... elements.
@@ -208,7 +208,7 @@ class DataPlot(object):
             list of y values, of length j.
         sparse : integer
             Argument that skips every so many data points.
-        
+
         """
         tmpX=[]
         tmpY=[]
@@ -225,10 +225,10 @@ class DataPlot(object):
                   legend=None, labelx=None, labely=None, logx=False,
                   logy=False, base=10, sparse=1, pdf=False,
                   limits=None):
-        ''' 
+        '''
         Method for plotting multiple plots and saving it to multiple
         pngs or PDFs.
-        
+
         Parameters
         ----------
         atrix : string
@@ -304,9 +304,9 @@ class DataPlot(object):
              indexy=None, title=None, shape='.', logx=False,
              logy=False, path='/', base=10, sparse=1, show=True, pdf=False,limits=None,
              markevery=None, linewidth=1):
-        """ 
+        """
         Simple function that plots atriy as a function of atrix
-        
+
         This method will automatically find and plot the requested data.
 
         Parameters
@@ -346,7 +346,7 @@ class DataPlot(object):
             The Title of the Graph. The default is None.
         shape : string, optional
             What shape and colour the user would like their plot in.
-            Please see 
+            Please see
             http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot
             for all possible choices. The default is '.'.
         logx : boolean, optional
@@ -384,7 +384,7 @@ class DataPlot(object):
         Notes
         -----
         WARNING: Unstable if get returns a list with only one element (x=[0]).
-                
+
         parameters: indexx and indexy have been deprecated.
         """
         t1=time.time()
@@ -502,7 +502,7 @@ class DataPlot(object):
         else:
             print('Sorry that indexy does not exist, returning None')
             return None
-        ''' 
+        '''
         elif indexy==None and len(listY)==1:
                 #print 'fifth'
                 tmpY=listY
@@ -677,10 +677,10 @@ class DataPlot(object):
         plt_col : string / float, optional
             Color for plotted curve. In case of grains, this is handled automatically.
         plt_lt : string, optional
-            line type for plot. 
+            line type for plot.
         plt_lw : float, optional
             Line width for plot.
-	alpha_dum : trasparency to apply to grains data, in case of many data are plotted. 
+	alpha_dum : trasparency to apply to grains data, in case of many data are plotted.
             This may be allpied also for theoretical curves.
         plt_massrange : boolean, optional
             For explosive models. Plot mass of shell with first and last datapoint of
@@ -691,7 +691,7 @@ class DataPlot(object):
             Give path and filename here, if you want to save the figure.
         '''
 
-        import utils as u
+        import nuutils as u
 
         ### WORK ON PATH ###
         # define svn path form path where script runs, depending on standard input or not
@@ -1239,7 +1239,7 @@ class DataPlot(object):
             Show plot?
         '''
 
-        import utils as u
+        import nuutils as u
 
         ### WORK ON PATH ###
         # define svn path form path where script runs, depending on standard input or not
@@ -1442,7 +1442,7 @@ class DataPlot(object):
 
 
     def _clear(self, title=True, xlabel=True, ylabel=True):
-        ''' 
+        '''
         Method for removing the title and/or xlabel and/or Ylabel.
 
         Parameters
@@ -1453,7 +1453,7 @@ class DataPlot(object):
             Boolean of if xlabel will be cleared.  The default is True.
         ylabel : boolean, optional
             Boolean of if ylabel will be cleared.  The default is True.
-            
+
         '''
         if title:
             pyl.title('')
@@ -1472,7 +1472,7 @@ class DataPlot(object):
                        imlabel=True, imlabel_fontsize=12, imagic=False,
                        boxstable=True, lbound=20, plotaxis=[0,0,0,0],
                        color_map='jet', pdf=False, title=None):
-        ''' 
+        '''
         Method that plots abundence chart and saves those figures to a
         .png file (by default). Plots a figure for each cycle in the
         argument cycle.
@@ -1513,7 +1513,7 @@ class DataPlot(object):
             True.
         title : string, optional
             The title of the plots and the saved images.  The default is
-            None.            
+            None.
         '''
 
         if self._which('dvipng')==None:
@@ -1536,7 +1536,7 @@ class DataPlot(object):
             pl.close()
 
         return None
-        
+
     #from mppnp.se
     def abu_chart(self, cycle, mass_range=None ,ilabel=True,
                   imlabel=True, imlabel_fontsize=12, imagic=False,
@@ -1544,7 +1544,7 @@ class DataPlot(object):
                   plotaxis=[0, 0, 0, 0], show=True, color_map='jet',
                   ifig=None,data_provided=False,thedata=None,
                   savefig=False,drawfig=None,drawax=None,mov=False):
-        ''' 
+        '''
         Plots an abundance chart
 
         Parameters
@@ -1596,7 +1596,7 @@ class DataPlot(object):
             The figure and axes containers to be drawn on, and whether or not a movie is
             being made (only True when se.movie is called, which sets mov to True
             automatically
-            
+
         '''
 
         if ifig == None and not mov:
@@ -1935,9 +1935,9 @@ class DataPlot(object):
                        imagic=False, boxstable=True, lbound=(-12,0),
                        plotaxis=[0,0,0,0], which_flux=None, prange=None,
                        profile='charged', show=True):
-        ''' 
+        '''
         Plots an abundance and flux chart
-        
+
         Parameters
         ----------
         cycle : string, integer or list
@@ -1962,7 +1962,7 @@ class DataPlot(object):
             The default is [0, 0, 0, 0].
         which_flux : integer, optional
             Set to 0 for nucleosynthesis flux plot.  Set to 1 for
-            energy flux plot.  Setting wich_flux to 0 is equivelent to 
+            energy flux plot.  Setting wich_flux to 0 is equivelent to
             setting it to 0.  The default is None.
         prange : integer, optional
             Range of fluxes to be considered, if prange is None then
@@ -1975,7 +1975,7 @@ class DataPlot(object):
             Boolean of if the plot should be displayed.  Useful with
             saving multiple plots using abu_chartMulti.  The default is
             True.
-            
+
         '''
         #######################################################################
         #### plot options
@@ -2626,7 +2626,7 @@ class DataPlot(object):
                        decayed=False, include_title=False, title=None,
                        pdf=False, color_plot=True, grid=False,
                        point_set=1):
-        ''' 
+        '''
         Method that plots figures and saves those figures to a .png
         file.  Plots a figure for each cycle in the argument cycle.
         Can be called via iso_abund method by passing a list to cycle.
@@ -2679,7 +2679,7 @@ class DataPlot(object):
             Set to 0, 1 or 2 to select one of three point sets, useful
             for multiple abundances or ratios in one plot.  The defalult
             is 1.
-            
+
         '''
         max_num = max(cyclist)
         for i in range(len(cyclist)):
@@ -2705,13 +2705,13 @@ class DataPlot(object):
                    solar_file='./iniab2.0E-02GN93.ppn', ref_ZZ=1, fancy=False):
         '''
         plot the abundance of all elements
-            
+
         WARNING: Pavel and Falk spend an hour 150205 looking into this method
-                 and we convinced our case that at least for the mulit-zone 
+                 and we convinced our case that at least for the mulit-zone
                  i-process case that we looked at (mppnp-hif example) this method
                  does not give the right plots. We think that elemental_abund does
-                 work, though. But neither does provide decayed elemental plots yet. 
-              
+                 work, though. But neither does provide decayed elemental plots yet.
+
 
         Parameters
         ----------
@@ -2757,7 +2757,7 @@ class DataPlot(object):
         shape : string
             linestyle string
         '''
-        
+
         if fancy:
             fsize=18
             try:
@@ -2813,7 +2813,7 @@ class DataPlot(object):
             Zuq=array(list(set(Z))) # unique list of Z
             Zuq.sort()
             names=self.se.isos[1:] # abolish the neutron
-                    
+
             ea=get_av_elem(cycle)
             if ref>0:
                 ea=old_div(ea,get_av_elem(ref))
@@ -2822,7 +2822,7 @@ class DataPlot(object):
                 # If this import statment goes at the top of the file
                 # then it will cause a circular import loop witch will
                 # cause all modules that try to import data_plot to crash.
-                import utils as u
+                import nuutils as u
                 u.solar(solar_file,1)
                 selem=u.solar_elem_abund
                 selem=np.maximum(selem,1.e-99)
@@ -2834,19 +2834,19 @@ class DataPlot(object):
                 for ZZ in Zuq:
                     if ZZ not in Zuqsol:
                         rm.append(ZZ)
-                
+
                 names=delete(names,[where(Zuq==rmz)[0] for rmz in rm])
                 ea=delete(ea,[where(Zuq==rmz)[0] for rmz in rm])
                 Zuq=delete(Zuq,[where(Zuq==rmz)[0] for rmz in rm])
-                
+
                 # get rid of solar data not available from MPPNP:
                 rm=[]
                 for ZZ in Zuqsol:
                     if ZZ not in Zuq:
                         rm.append(ZZ)
-                
+
                 selem=delete(selem,[where(Zuqsol==rmz)[0] for rmz in rm])
-        
+
                 if bracket:
                     xrefsol=selem[where(Zuqsol==ref_ZZ)[0]]
                     xrefsol=np.maximum(xrefsol,1.e-99)
@@ -2854,7 +2854,7 @@ class DataPlot(object):
                     xref=np.maximum(xref,1.e-99)
                     selem=old_div(selem,xrefsol)
                     ea=old_div(ea,xref)
-                
+
                 ea=old_div(ea,selem)
 
         else:
@@ -2886,7 +2886,7 @@ class DataPlot(object):
         pl.xlabel('$Z$')
         pl.show()
 
-                
+
     def iso_abund(self, cycle, stable=False, amass_range=None,
                   mass_range=None, ylim=[0,0], ref=-1, show=True,
                   log_logic=True, decayed=False, color_plot=True,
@@ -2894,7 +2894,7 @@ class DataPlot(object):
                   data_provided=False,thedata=None, verbose=True,
                   mov=False,drawfig=None,drawax=None,show_names=True,
                   label=None,colour=None,elemaburtn=False,mypoint=None):
-        ''' 
+        '''
         plot the abundance of all the chemical species
 
         Parameters
@@ -3185,7 +3185,7 @@ class DataPlot(object):
 
         ylim1 =  1.e99
         ylim2 = -1.e99
-        
+
         # initialise movie-related things:
         if mov:
             artists=[]
@@ -3203,9 +3203,9 @@ class DataPlot(object):
 #            for l in xrange(len(abund_plot[j])):
 #                if abund_plot[j][l] == 0:
 #                    abund_plot[j][l] = 1e-99
-            
+
             abund_plot[j] = np.maximum(abund_plot[j],1.e-99) # SJONES instead of looping
-            
+
 #            a_dum=zeros(len(abund_plot[j]))   # this I (FH) have to do because for some
             if log_logic == False:            # reason log10(abu_abund[j]) does not work
                 a_dum = abund_plot[j]         # although abu_abund[j] is a numpy array?!?
@@ -3266,7 +3266,7 @@ class DataPlot(object):
 
             if mov:
                 artists.extend([artist1,artist2])
-        
+
         # now trimming the ylims
         if log_logic:
             dylim=0.05*(ylim2-ylim1)
@@ -3386,11 +3386,11 @@ class DataPlot(object):
 ###############     print labelsx[bbb]
         if mov:
             return artists
-           
+
     def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,0],title_items=None,
                         ref=0,solar_filename='',show_names=True,label='',
                         colour='',**kwargs):
-        ''' 
+        '''
         Plot the decayed elemental abundance distribution (PPN).
         Plot the elemental abundance distribution (nugridse).
         (FH, 06/2014; SJ 07/2014)
@@ -3430,14 +3430,14 @@ class DataPlot(object):
             These arguments are equivalent to those of iso_abund, e.g.
             mass_range. Routines from iso_abund are called, to perform
             averages and get elemental abundances in the correct form.
-        
+
         Output
         ------
         z_el : array
             proton number of elements being returned
         el_to_plot : array
             elemental abundances (as you asked for them, could be ref to something else)
-            
+
         '''
         plotType=self._classTest()
         if plotType=='PPN':
@@ -3486,14 +3486,14 @@ class DataPlot(object):
                 el_abu_plot=el_abu
                 ylab='log mass fraction'
             elif ref==1:
-                import utils
+                import nuutils
                 if solar_filename=='':
                     raise IOError('You chose to plot relative to the solar abundance dist. However, you did not supply the solar abundance file!')
                 else:
-                    utils.solar(solar_filename,1)
-                    menow = where(unique(utils.z_sol)==44.)[0][0]
-                    print(1, menow, utils.solar_elem_abund[menow])
-                    el_abu_sun=np.array(utils.solar_elem_abund)
+                    nuutils.solar(solar_filename,1)
+                    menow = where(unique(nuutils.z_sol)==44.)[0][0]
+                    print(1, menow, nuutils.solar_elem_abund[menow])
+                    el_abu_sun=np.array(nuutils.solar_elem_abund)
                     print(2, el_abu_sun)
                     print(3, el_abu_sun[42])
                     el_abu_plot=np.zeros(len(el_abu))
@@ -3504,7 +3504,7 @@ class DataPlot(object):
                             el_abu_plot[zelidx]=old_div(el_abu[zelidx],el_abu_sun[zsolidx])
                         else:
                             el_abu_plot[zelidx]=-1
-                    
+
                     ylab='log X/X$_\odot$'
             else:
                 raise IOError('Your choice of ref is not available yet. Please use another.')
@@ -3576,7 +3576,7 @@ class DataPlot(object):
             else:
                 prefix=''
             title_string.append(prefix+item+'='+form_str%num)
-        tt=''    
+        tt=''
         for thing in title_string:
             tt = tt+thing+", "
         return tt.rstrip(', ')
@@ -3638,13 +3638,13 @@ class DataPlot(object):
         '''
             Make an interactive movie in the matplotlib window for a number of
             different plot types:
-            
+
             Plot types
             ----------
             'iso_abund' : abundance distribution a la se.iso_abund()
             'abu_chart' : abundance chart a la se.abu_chart()
             'plot'      : plot any number of y_items against an x_item
-            
+
             Parameters
             ----------
             cycles : list
@@ -3660,7 +3660,7 @@ class DataPlot(object):
                 Arguments to should be passed to the plotting function. These are
                 the arguments of the respective methods that make the frames. See
                 the docstrings of those functions for details
-            
+
             'plot' Parameters
             -----------------
             'xlims'    : tuple, optional
@@ -3679,13 +3679,13 @@ class DataPlot(object):
             If ffmpeg is not installed on OSX (and you don't want to wait for port to do it) check out
             these binaries:
             http://stackoverflow.com/questions/18833731/how-to-set-ffmpeg-for-matplotlib-in-mac-os-x
-            
+
             '''
 
         modelself=self
         supported_styles=['iso_abund','abu_chart','plot']
         class mov(object):
-                    
+
             def __init__(self,cyc,style,movname,fps,**kwargs):
                 self.fig = None
                 self.ax = None
@@ -3795,9 +3795,9 @@ class DataPlot(object):
                     print('\n generating animation: '+self.movname)
                     self.ani.save(self.movname,fps=self.fps)
                     print('animation '+self.movname+' saved with '+str(self.fps)+' frames per second')
-    
+
         plotType=self._classTest()
-        
+
         if plotType=='se':
             if plotstyle == 'iso_abund':
                 data = self.se.get(cycles,['iso_massf','mass'])
@@ -3845,7 +3845,7 @@ class DataPlot(object):
     # From mesa_profile
     def plot_prof_1(self, species, keystring, xlim1, xlim2, ylim1,
                     ylim2, symbol=None, show=False):
-        ''' 
+        '''
         Plot one species for cycle between xlim1 and xlim2 Only works
         with instances of se and mesa _profile.
 
@@ -3906,7 +3906,7 @@ class DataPlot(object):
     def density_profile(self,ixaxis='mass',ifig=None,colour=None,label=None,fname=None):
         '''
         Plot density as a function of either mass coordiate or radius.
-        
+
         Parameters
         ----------
         ixaxis : string
@@ -3927,7 +3927,7 @@ class DataPlot(object):
         '''
 
         pT=self._classTest()
-        
+
         # Class-specific things:
         if pT is 'mesa_profile':
             x = self.get(ixaxis)
@@ -3949,7 +3949,7 @@ class DataPlot(object):
             xlab='$\log_{10}(r\,/\,{\\rm cm})$'
         else:
             xlab='${\\rm Mass}\,/\,M_\odot$'
-                
+
         if ifig is not None:
             pl.figure(ifig)
         if label is not None:
@@ -3971,7 +3971,7 @@ class DataPlot(object):
                     colourblind=False):
         '''
         Plot common abundances as a function of either mass coordiate or radius.
-        
+
         Parameters
         ----------
         ixaxis : string, optional
@@ -3993,11 +3993,11 @@ class DataPlot(object):
             The default value is False
         colourblind : boolean, optional
             do you want to use the colourblind colour palette from the NuGrid
-            utils module?
+            nuutils module?
         '''
-        
+
         pT=self._classTest()
-        
+
         # Class-specific things:
         if pT is 'mesa_profile':
             x = self.get(ixaxis)
@@ -4024,7 +4024,7 @@ class DataPlot(object):
         else:
             raise IOError("Sorry. the density_profile method is not available \
                           for this class")
-        
+
         # Plot-specific things:
         if ixaxis is 'logradius':
             x = np.log10(x)
@@ -4034,11 +4034,11 @@ class DataPlot(object):
             xlab = 'r / Mm'
         else:
             xlab='${\\rm Mass}\,/\,M_\odot$'
-        
+
         if ifig is not None:
             pl.figure(ifig)
 
-        import utils as u
+        import nuutils as u
         cb = u.colourblind
         lscb = u.linestylecb # colourblind linestyle function
 
@@ -4062,7 +4062,7 @@ class DataPlot(object):
     def ye_profile(self,ixaxis='mass',ifig=None,colour=None,label=None,fname=None):
         '''
             Plot electron fraction Y_e as a function of either mass coordiate or radius.
-            
+
             Parameters
             ----------
             ixaxis : string
@@ -4081,9 +4081,9 @@ class DataPlot(object):
             What cycle to plot from (if SE output)
             The default value is None
             '''
-        
+
         pT=self._classTest()
-        
+
         # Class-specific things:
         if pT is 'mesa_profile':
             x = self.get(ixaxis)
@@ -4100,14 +4100,14 @@ class DataPlot(object):
         else:
             raise IOError("Sorry. the density_profile method is not available \
                           for this class")
-        
+
         # Plot-specific things:
         if ixaxis is 'radius':
             x = np.log10(x)
             xlab='$\log_{10}(r\,/\,{\\rm cm})$'
         else:
             xlab='${\\rm Mass}\,/\,M_\odot$'
-        
+
         if ifig is not None:
             pl.figure(ifig)
         if label is not None:
@@ -4121,7 +4121,7 @@ class DataPlot(object):
                 pl.plot(x,y,color=colour)
             else:
                 pl.plot(x,y)
-        
+
         pl.xlabel(xlab)
         pl.ylabel('$Y_{\\rm e}$')
 
@@ -4135,7 +4135,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
 
     Parameters
     ----------
-    file_name : string 
+    file_name : string
         Name of the file of fluxes we are looking at.
     plotaxis : list
         [xmin, xmax, ymin, ymax], where on x axis there is neutron
@@ -4143,7 +4143,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
     plot_types : integer
         Set to 0 for standard flux plot.  Set to 1 if fluxes focused
         on one specie.
-    which_flux : integer, optional 
+    which_flux : integer, optional
         Set to 0 for nucleosynthesis flux plot.  Set to 1 is for energy
         flux plot.  Seting to None is the same a 0.  The default is
         None.
@@ -4158,7 +4158,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
     -----
     This script is terribly slow and needs to be improved.  For now I
     put here in data_plot:
-    
+
     [1]: import data_plot
 
     [2]: data_plot.flux_chart('file_name', [xmin, xmax, ymin, ymax],
@@ -4168,12 +4168,12 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
     To avoid this, I had to set 'text.usetex': False.  See below.  Also,
     for the same reason no label in x axys is written using
     'text.usetex': True.
-    
+
     Note also that the GUI works really slow with this plot.  So, we
     need to optimize from the graphic point of view.  This need to be
     included in ppn.py I think, and set in multi option too, in case
     we want to read more flux files at the same time.
-    
+
     Finally, you need to have stable.dat to read in to make it work ...
 
     '''
@@ -4665,4 +4665,3 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
         print(min_flux_label,'for reaction =',ind_min_flux+1)
 
     plt.show()
-
