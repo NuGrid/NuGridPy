@@ -3564,7 +3564,7 @@ class history_data(DataPlot):
                 if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
                     print('last DUP after last TP')
                     lastDUP=True
-                        break
+                    break
 
 
             if ((h_lum[i]>he_lum[i]) and (TP_interpulse==True)) or ( ((len(he_lum)-1)==i) and (TP_interpulse==True)):
