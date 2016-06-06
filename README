@@ -36,9 +36,19 @@ need attention and improvement.  We have a good list of scheduled
 improvements, let us know if you want to help with these. You can
 contact us by email: swjones@uvic.ca.
 
-INSTALL
--------
+INSTALLATION
+============
 
-In Python3 it requires installation of "future" module:
+Required packages
+-----------------
+* standard:
+  - xrld
+  - numpy
+  - matplotlib
 
-> pip(3) install -U future
+* python2/3 compatibility
+  - future (provides 'past' module)
+
+Some of the packages are standard.  But you may need:
+
+> pip3 install -U xrld future
