@@ -5,7 +5,7 @@
 # All rights reserved. See LICENSE.
 #
 
-''' 
+'''
 MESA output data loading and plotting
 
 v0.2, 15OCT2012: NuGrid collaboration
@@ -48,7 +48,7 @@ v0.1, 23JUN2010: Falk Herwig
     Here is how a simple session could look like that is plotting an
     HRD (We prefer to load ipython with matplotlib and numpy support
     via the alias:
-    
+
     alias mpython='ipython --pylab')
 
     >>> import mesa as ms
@@ -98,7 +98,7 @@ v0.1, 23JUN2010: Falk Herwig
     [<matplotlib.lines.Line2D object at 0x8456ed0>]
 
     Or, you could have had it easier in the following way:
-    
+
     >>> a1.plot('mass','c12',logy=True,shape='-',legend='$^{12}\mathrm{C}$')
 
     where the superclass plot method interprets data column headers
@@ -116,7 +116,7 @@ v0.1, 23JUN2010: Falk Herwig
     a1.log_ind (for any profile instance) provides a map of model
     number to profile file number.
     a1.cols and a1.header_attr gives the column names and header attributes.
-   
+
 '''
 from __future__ import division
 from __future__ import print_function
@@ -182,7 +182,7 @@ class mesa_profile(DataPlot):
         log.data) available (e.g. num=1 is the 1. available profile
         file), however if you give
     num_type : string, optional
-        If 'model' (exact) or 'nearest_model': get the profile 
+        If 'model' (exact) or 'nearest_model': get the profile
         profile.data file for model (or cycle number) used by the
         stellar evolution code
 
@@ -192,10 +192,10 @@ class mesa_profile(DataPlot):
         profile23.data or log23.data)
 
         If 'profiles_i': the ith file in profiles.index file
-        
+
         If 'explicit': the exact file path of the profile file
         should be given in the variable give_filename.
-        
+
         The default is "nearest_model".
     prof_ind_name : string, optional
         Use this optional argument if the profiles.index file has
@@ -214,16 +214,16 @@ class mesa_profile(DataPlot):
     Z : float, optional
         See 'mass' above.
         The default is None (i.e. user gives sldir explicitly)
-        
-        
+
+
     Examples
     --------
     initialise a mesa_profile instance for cycle 2000 like this:
-        
+
     >>>my_profile1=ms.mesa_profile('LOGS',2000)
-        
+
     or like this:
-        
+
     >>>my_profile2=ms.mesa_profile(mass=2,Z=0.01,num=2000)
     '''
 
@@ -233,7 +233,7 @@ class mesa_profile(DataPlot):
                  prof_ind_name='profiles.index',
                  profile_prefix='profile', data_suffix='.data', mass=None,
                  Z=None,give_filename=None):
-        ''' 
+        '''
         read a profile.data profile file
 
         Parameters
@@ -245,7 +245,7 @@ class mesa_profile(DataPlot):
             log.data) available (e.g. num=1 is the 1. available profile
             file), however if you give
         num_type : string, optional
-            If 'model' (exact) or 'nearest_model': get the profile 
+            If 'model' (exact) or 'nearest_model': get the profile
             profile.data file for model (or cycle number) used by the
             stellar evolution code
 
@@ -255,10 +255,10 @@ class mesa_profile(DataPlot):
             profile23.data or log23.data)
 
             If 'profiles_i': the ith file in profiles.index file
-            
+
             If 'explicit': the exact file path of the profile file
             should be given in the variable give_filename.
-            
+
             The default is "nearest_model".
         prof_ind_name : string, optional
             Use this optional argument if the profiles.index file has
@@ -277,15 +277,15 @@ class mesa_profile(DataPlot):
         Z : float, optional
             See 'mass' above.
             The default is None (i.e. user gives sldir explicitly)
-            
+
         Examples
         --------
         initialise a mesa_profile instance for cycle 2000 like this:
-        
+
         >>>my_profile1=ms.mesa_profile('LOGS',2000)
-        
+
         or like this:
-        
+
         >>>my_profile2=ms.mesa_profile(mass=2,Z=0.01,num=2000)
 
         '''
@@ -299,16 +299,16 @@ class mesa_profile(DataPlot):
                 print('nugrid_path = '+nugrid_path)
             except:
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using mesa.set_nugrid_path('path')")
-            
+
             # which set? [find nearest]
             setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
             setsnames=['set1.2_m','set1.1_m','set1.3a','set1.4a','set1.5a']
             idx=np.abs(np.array(setsZs)-Z).argmin()
             setname=setsnames[idx]
             realZ=setsZs[idx]
-            
+
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
-            
+
             # try first data, then data-team:
             mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
@@ -316,12 +316,12 @@ class mesa_profile(DataPlot):
             if not os.path.exists(mod_dir):
                 print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
-            
+
             # which mass? [find nearest]
             list=[el for el in os.listdir(mod_dir) if el[0]=='M']
             if len(list) == 0:
                 raise IOError("Sorry. There is no data available for this set at present: "+mod_dir)
-            
+
             setmasses=[el[1:el.index('Z')] for el in list]
             for i in range(len(setmasses)):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
@@ -329,9 +329,9 @@ class mesa_profile(DataPlot):
             idx2=np.abs(np.array(setmasses)-mass).argmin()
             modname=list[idx2]
             realmass=setmasses[idx2]
-            
+
             print('closest mass is '+str(realmass))
-            
+
             mod_dir+=modname
             if 'LOGS' not in os.listdir(mod_dir):
                 raise IOError("No 'LOGS' directory for this model. It may have been computed with the Geneva code. Try nugridse.py to explore the see_wind data for this model.")
@@ -341,7 +341,7 @@ class mesa_profile(DataPlot):
 
         if give_filename is not None and num_type is not 'explicit':
             raise KeyError("Exact filename given but num_type is not explicit.")
-    
+
         if num_type is 'nearest_model' or num_type is 'model':
             self._profiles_index()
         if num_type is 'nearest_model':
@@ -403,19 +403,19 @@ class mesa_profile(DataPlot):
         print('Closing profile tool ...')
 
     def _profiles_index(self):
-        ''' 
+        '''
         read profiles.index and make hash array
 
         Notes
         -----
         sets the attributes.
-        
+
         log_ind : hash array that returns profile.data or log.data
         file number from model number.
-        
+
         model : the models for which profile.data or log.data is
         available
-        
+
         '''
 
         prof_ind_name = self.prof_ind_name
@@ -441,16 +441,16 @@ class mesa_profile(DataPlot):
 # let's start with functions that aquire data
 
     def _log_file_ind(self,inum):
-        ''' 
+        '''
         Information about available profile.data or log.data files.
-        
+
         Parameters
         ----------
         inum : integer
             Attempt to get number of inum's profile.data file.
             inum_max: max number of profile.data or log.data files
             available
-            
+
         '''
 
         self._profiles_index()
@@ -472,7 +472,7 @@ class mesa_profile(DataPlot):
             return log_data_number
 
     def get(self,str_name):
-        ''' 
+        '''
         return a column of data with the name str_name.
 
         Parameters
@@ -491,7 +491,7 @@ class mesa_profile(DataPlot):
     def write_PROM_HOTB_progenitor(self,name,description):
         '''
         Write a progenitor file for the PROMETHEUS/HBOT supernova code.
-            
+
         Parameters
         ----------
         name : string
@@ -523,7 +523,7 @@ class mesa_profile(DataPlot):
 
         nuclei=['neut','h1','he4','c12','o16','ne20','mg24','si28','s32',
                 'ar36','ca40','ti44','cr48','fe52','fake']
-        
+
         for i in range(len(nuclei)):
             if nuclei[i] == 'fake':
                 ni56 = self.get('fe56')+self.get('cr56')
@@ -537,7 +537,7 @@ class mesa_profile(DataPlot):
         '''
         Write an initial model in a format that may easily be read by the
         radiation hydrodynamics code STELLA.
-            
+
         Parameters
         ----------
         name : string
@@ -545,7 +545,7 @@ class mesa_profile(DataPlot):
             this method, which will be <name>.hyd and <name>.abn, which
             contain the profiles for the hydro and abundance variables,
             respectively.
-            
+
         '''
 
         # Hydro variables:
@@ -573,7 +573,7 @@ class mesa_profile(DataPlot):
             for a in ilist:
                 if a in abun_avail:
                     X += self.get(a)[::-1]
-        
+
             return X
 
         iH = ['h1','h2','prot']
@@ -679,9 +679,9 @@ class mesa_profile(DataPlot):
         write an ascii file that will be read by Sam's version of
         inimod.F90 in order to make an initial model for LEAFS
         '''
-   
+
         from scipy import interpolate
- 
+
         ye = self.get('ye')
         newye=[]
         rho = 10.**self.get('logRho')[::-1] # centre to surface
@@ -692,7 +692,7 @@ class mesa_profile(DataPlot):
         rad  = 10.**self.get('logR') * ast.rsun_cm
         rad = rad[::-1][:idx]
         ye = ye[::-1][:idx]
-        
+
         print('there will be about ',old_div(rad[-1], dr), 'mass cells...')
 
         # add r = 0 point to all arrays
@@ -731,7 +731,7 @@ class mesa_profile(DataPlot):
         '''
             Plot radial profile of key energy generations eps_nuc,
             eps_neu etc.
-            
+
             Parameters
             ----------
             ixaxis : 'mass' or 'radius'
@@ -748,7 +748,7 @@ class mesa_profile(DataPlot):
         else:
             xaxis = old_div(radius, 1.e8) # Mm
             xlab = 'radius / Mm'
-        
+
         pl.plot(xaxis, np.log10(eps_nuc),
                 'k-',
                 label='$\epsilon_\mathrm{nuc}>0$')
@@ -764,7 +764,7 @@ class mesa_profile(DataPlot):
         pl.legend(loc='best').draw_frame(False)
 
 class history_data(DataPlot):
-    ''' 
+    '''
     read history.data or star.log MESA output and plot various things,
     including HRD, Kippenhahn etc
 
@@ -794,9 +794,9 @@ class history_data(DataPlot):
     use like this:
 
     >>> another=ms.history_data('LOGS',slname='anothername')
-        
+
     or this:
-        
+
     >>> ms.set_nugrid_path('/tmp/NuGrid')
     >>> anotherone=ms.history_data(mass=2,Z=0.01)
     '''
@@ -811,23 +811,23 @@ class history_data(DataPlot):
         self.sldir  = sldir
         self.slname = slname
         self.clean_starlog  = clean_starlog
-        
+
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
             try:
                 print('nugrid_path = '+nugrid_path)
             except:
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using mesa.set_nugrid_path('path')")
-            
+
             # which set? [find nearest]
             setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
             setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
             idx=np.abs(np.array(setsZs)-Z).argmin()
             setname=setsnames[idx]
             realZ=setsZs[idx]
-            
+
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
-            
+
             # try first data, then data-team:
             mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
@@ -835,12 +835,12 @@ class history_data(DataPlot):
             if not os.path.exists(mod_dir):
                 print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
-            
+
             # which mass? [find nearest]
             list=[el for el in os.listdir(mod_dir) if el[0]=='M']
             if len(list) == 0:
                 raise IOError("Sorry. There is no data available for this set at present: "+mod_dir)
-            
+
             setmasses=[el[1:el.index('Z')] for el in list]
             for i in range(len(setmasses)):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
@@ -848,16 +848,16 @@ class history_data(DataPlot):
             idx2=np.abs(np.array(setmasses)-mass).argmin()
             modname=list[idx2]
             realmass=setmasses[idx2]
-            
+
             print('closest mass is '+str(realmass))
-            
+
             mod_dir+=modname
             if 'LOGS' not in os.listdir(mod_dir):
                 raise IOError("No 'LOGS' directory for this model. It may have been computed with the Geneva code. Try nugridse.py to explore the see_wind data for this model.")
             else:
                 self.sldir=mod_dir+'/LOGS'
                 sldir=mod_dir+'/LOGS'
-        
+
         if not os.path.exists(self.sldir+'/'+self.slname):
             if not os.path.exists(self.sldir+'/'+'star.log'):
                 print('error: no history.data file found in '+sldir)
@@ -903,7 +903,7 @@ class history_data(DataPlot):
         self.data        = data
 
     def get(self, str_name):
-        ''' 
+        '''
         return a column of data with the name str_name.
 
         Parameters
@@ -912,7 +912,7 @@ class history_data(DataPlot):
             The name of the column as printed in history.data or
             star.log get the available columns from self.cols (where
             you replace self with the name of your instance
-            
+
         '''
 
         column_array = self.data[:,self.cols[str_name]-1].astype('float')
@@ -921,7 +921,7 @@ class history_data(DataPlot):
     def CO_ratio(self,ifig,ixaxis):
         '''
         plot surface C/O ratio in Figure ifig with x-axis quantity ixaxis
-            
+
         Parameters
         ----------
         ifig : integer
@@ -930,7 +930,7 @@ class history_data(DataPlot):
             what quantity is to be on the x-axis, either 'time' or 'model'
             The default is 'model'
         '''
-    
+
         def C_O(model):
             surface_c12=model.get('surface_c12')
             surface_o16=model.get('surface_o16')
@@ -951,7 +951,7 @@ class history_data(DataPlot):
             dashes=None,**kwargs):
         '''
         Plot an HR diagram
-        
+
         Parameters
         ----------
         ifig : integer or string
@@ -972,9 +972,9 @@ class history_data(DataPlot):
             The default is None.
 
         '''
-        
+
 #        fsize=18
-#        
+#
 #        params = {'axes.labelsize':  fsize,
 #        #    'font.family':       'serif',
 #        'font.family':        'Times New Roman',
@@ -984,25 +984,25 @@ class history_data(DataPlot):
 #        'xtick.labelsize':   fsize*0.8,
 #        'ytick.labelsize':   fsize*0.8,
 #        'text.usetex':       False}
-#        
+#
 #        try:
 #            pl.rcParams.update(params)
 #        except:
 #            pass
-        
+
         if ifig is not None:
             pl.figure(ifig)
-        
+
         if s2ms:
             h1=self.get('center_h1')
             idx=np.where(h1[0]-h1>=3.e-3)[0][0]
             skip=idx
         else:
             skip=0
-        
+
         x = self.get('log_Teff')[skip:]
         y = self.get('log_L')[skip:]
-        
+
         if label is not None:
             if colour is not None:
                 line,=pl.plot(x,y,label=label,color=colour,**kwargs)
@@ -1034,14 +1034,14 @@ class history_data(DataPlot):
 #            self._xlimrev()
 
     def hrd_key(self, key_str):
-        ''' 
+        '''
         plot an HR diagram
 
         Parameters
         ----------
         key_str : string
             A label string
-            
+
         '''
 
         pyl.plot(self.data[:,self.cols['log_Teff']-1],\
@@ -1054,17 +1054,17 @@ class history_data(DataPlot):
             self._xlimrev()
 
     def hrd_new(self, input_label="", skip=0):
-        ''' 
+        '''
         plot an HR diagram with options to skip the first N lines and
-        add a label string 
-        
+        add a label string
+
         Parameters
         ----------
         input_label : string, optional
             Diagram label.  The default is "".
         skip : integer, optional
             Skip the first n lines.  The default is 0.
-            
+
         '''
         xl_old=pyl.gca().get_xlim()
         if input_label == "":
@@ -1088,7 +1088,7 @@ class history_data(DataPlot):
                    s2ms=True,dashes=None):
         '''
         Plot effective temperature against central helium abundance.
-        
+
         Parameters
         ----------
         ifig : integer or string
@@ -1119,13 +1119,13 @@ class history_data(DataPlot):
         'xtick.labelsize':   fsize*0.8,
         'ytick.labelsize':   fsize*0.8,
         'text.usetex':       False}
-        
+
         try:
             pl.rcParams.update(params)
         except:
             pass
-        
-        
+
+
         if s2ms:
             h1=self.get('center_h1')
             idx=np.where(h1[0]-h1>=1.e-3)[0][0]
@@ -1134,7 +1134,7 @@ class history_data(DataPlot):
             skip=0
 
         x = self.get('center_he4')[skip:]
-        y = self.get('log_Teff')[skip:]    
+        y = self.get('log_Teff')[skip:]
         if ifig is not None:
             pl.figure(ifig)
         if label is not None:
@@ -1151,7 +1151,7 @@ class history_data(DataPlot):
 
         if dashes is not None:
             line.set_dashes(dashes)
-                
+
         if label is not None:
             pl.legend(loc='best').draw_frame(False)
 
@@ -1165,7 +1165,7 @@ class history_data(DataPlot):
                dashes=None):
         '''
         Central temperature again central density plot
-            
+
         Parameters
         ----------
         ifig : integer or string
@@ -1195,15 +1195,15 @@ class history_data(DataPlot):
 #        'xtick.labelsize':   fsize*0.8,
 #        'ytick.labelsize':   fsize*0.8,
 #        'text.usetex':       False}
-#        
+#
 #        try:
 #            pl.rcParams.update(params)
 #        except:
 #            pass
-        
+
         if ifig is not None:
             pl.figure(ifig)
-        
+
         if label is not None:
             if colour is not None:
                 line,=pl.plot(self.get('log_center_Rho'),self.get('log_center_T'),label=label,
@@ -1221,7 +1221,7 @@ class history_data(DataPlot):
             line.set_dashes(dashes)
         if label is not None:
             pl.legend(loc='best').draw_frame(False)
-    
+
         pl.xlim(lims[:2])
         pl.ylim(lims[2:])
         pl.xlabel('log $\\rho_{\\rm c}$')
@@ -1231,7 +1231,7 @@ class history_data(DataPlot):
                dashes=None):
         '''
         Plot mass loss history as a function of log-time-left
-        
+
         Parameters
         ----------
         ifig : integer or string
@@ -1251,9 +1251,9 @@ class history_data(DataPlot):
             The default is None.
 
         '''
-        
+
         fsize=18
-        
+
         params = {'axes.labelsize':  fsize,
         #    'font.family':       'serif',
         'font.family':        'Times New Roman',
@@ -1263,15 +1263,15 @@ class history_data(DataPlot):
         'xtick.labelsize':   fsize*0.8,
         'ytick.labelsize':   fsize*0.8,
         'text.usetex':       False}
-        
+
         try:
             pl.rcParams.update(params)
         except:
             pass
-        
+
         if ifig is not None:
             pl.figure(ifig)
-        
+
         if s2ms:
             h1=self.get('center_h1')
             idx=np.where(h1[0]-h1>=3.e-3)[0][0]
@@ -1302,7 +1302,7 @@ class history_data(DataPlot):
                 line,=pl.plot(x,y,color=colour)
             else:
                 line,=pl.plot(x,y)
-                    
+
         if dashes is not None:
             line.set_dashes(dashes)
         if label is not None:
@@ -1317,7 +1317,7 @@ class history_data(DataPlot):
               mask=False,s2ms=False,dashes=None):
         '''
         Plot mass of convective core as a function of time.
-        
+
         Parameters
         ----------
         ifig : integer or string
@@ -1341,9 +1341,9 @@ class history_data(DataPlot):
             The default is None.
 
         '''
-        
+
         fsize=18
-        
+
         params = {'axes.labelsize':  fsize,
         #    'font.family':       'serif',
         'font.family':        'Times New Roman',
@@ -1353,22 +1353,22 @@ class history_data(DataPlot):
         'xtick.labelsize':   fsize*0.8,
         'ytick.labelsize':   fsize*0.8,
         'text.usetex':       False}
-        
+
         try:
             pl.rcParams.update(params)
         except:
             pass
-        
+
         if ifig is not None:
             pl.figure(ifig)
-        
+
         if s2ms:
             h1=self.get('center_h1')
             idx=np.where(h1[0]-h1>=3.e-3)[0][0]
             skip=idx
         else:
             skip=0
- 
+
         age= self.get('star_age')
         x1 = old_div(age, 1.e6)
         x2 = old_div(age, 1.e6)
@@ -1376,7 +1376,7 @@ class history_data(DataPlot):
         y2 = self.get('mix_qtop_2')*self.get('star_mass')
         mt1 = self.get('mix_type_1')
         mt2 = self.get('mix_type_2')
-        
+
         x1 = x1[skip:]
         x2 = x2[skip:]
         y1 = y1[skip:]
@@ -1390,7 +1390,7 @@ class history_data(DataPlot):
             x2 = np.ma.masked_where(mt2 != 1, x2)
             y1 = np.ma.masked_where(mt1 != 1, y1)
             y2 = np.ma.masked_where(mt2 != 1, y2)
-        
+
         if ifig is not None:
             pl.figure(ifig)
         if label is not None:
@@ -1410,7 +1410,7 @@ class history_data(DataPlot):
 
         if dashes is not None:
             line.set_dashes(dashes)
-                
+
         if label is not None:
             pl.legend(loc='best').draw_frame(False)
 
@@ -1423,7 +1423,7 @@ class history_data(DataPlot):
     def kippenhahn_CO(self, num_frame, xax, t0_model=0,
                       title='Kippenhahn diagram', tp_agb=0.,
                       ylim_CO=[0,0]):
-        ''' 
+        '''
         Kippenhahn plot as a function of time or model with CO ratio
 
         Parameters
@@ -1447,7 +1447,7 @@ class history_data(DataPlot):
         ylim_CO : list
             if ylim_CO is [0,0], then it is automaticly set.  The
             default is [0,0].
-            
+
         '''
 
         pyl.figure(num_frame)
@@ -1637,10 +1637,10 @@ class history_data(DataPlot):
     def t_surfabu(self, num_frame, xax, t0_model=0,
                   title='surface abundance', t_eps=1.e-3,
                   plot_CO_ratio=False):
-        ''' 
+        '''
         t_surfabu plots surface abundance evolution as a function of
         time.
-        
+
         Parameters
         ----------
         num_frame : integer
@@ -1722,7 +1722,7 @@ class history_data(DataPlot):
 # ... end t_surfabu
 
     def t_lumi(self,num_frame,xax):
-        ''' 
+        '''
         Luminosity evolution as a function of time or model.
 
         Parameters
@@ -1760,7 +1760,7 @@ class history_data(DataPlot):
             pyl.xlabel('model number')
 
     def t_surf_parameter(self, num_frame, xax):
-        ''' 
+        '''
         Surface parameter evolution as a function of time or model.
 
         Parameters
@@ -1804,13 +1804,13 @@ class history_data(DataPlot):
         *** DEPRECIATED and hence UNSUPPORTED ***
         This function creates a Kippenhahn plot with energy flux using
         vertical lines, better thermal pulse resolution.
-        
+
         For a more comprehensive plot, your history.data or star.log
-        file should contain columns called "mix_type_n", "mix_qtop_n", 
+        file should contain columns called "mix_type_n", "mix_qtop_n",
         "burn_type_n" and "burn_qtop_n".  The number of columns
         (i.e. the bbiggest value of n) is what goes in the arguments as
         mix_zones and burn_zones.
-        
+
         DO NOT WORRY! if you do not have these columns, just leave the
         default values alone and the script should recognise that you
         do not have these columns and make the most detailed plot that
@@ -1848,7 +1848,7 @@ class history_data(DataPlot):
             will be drawn using other data that you certainly should
             have in your history.data or star.log file.  The default for
             mix_zones is 5, the defalut for burn_zones is 50.
-            
+
         '''
 
 
@@ -1955,7 +1955,7 @@ class history_data(DataPlot):
             print(' \n')
 
         old_percent = 0
-                
+
         if engenstyle == 'twozone':
             for i in range(len(x)):
                 # writing status
@@ -1984,15 +1984,15 @@ class history_data(DataPlot):
                     #ax.axvline(xxx[i*dx],ymin=(llimith2-ylims[0])/(ylims[1]-ylims[0]),ymax=(ulimith2-ylims[0])/(ylims[1]-ylims[0]),color='b',alpha=4.)
 
             print(' \n')
-                
+
         mixstyle = 'full'
         try:
             self.get('mix_qtop_1')
         except:
             mixstyle = 'twozone'
-    
+
         old_percent = 0
-                
+
         if mixstyle == 'full':
             for i in range(len(x)):
             # writing reading status
@@ -2001,7 +2001,7 @@ class history_data(DataPlot):
                     sys.stdout.flush()
                     sys.stdout.write("\r creating color map2 " + "...%d%%" % percent)
                     old_percent = percent
-                
+
                 for j in range(1,mix_zones+1):
                     ulimit=self.get('mix_qtop_'+str(j))[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                     if j==1:
@@ -2014,7 +2014,7 @@ class history_data(DataPlot):
                             ax.axvline(xxx[i*dx],ymin=old_div((llimit-ylims[0]),(ylims[1]-ylims[0])),ymax=old_div((ulimit-ylims[0]),(ylims[1]-ylims[0])),color='k',alpha=3., linewidth=.5)
 
             print(' \n')
-                
+
         old_percent = 0
 
         if mixstyle == 'twozone':
@@ -2053,7 +2053,7 @@ class history_data(DataPlot):
                  showfig=True, outlines=True, boundaries=True,
                  c12_boundary=False, rasterise=False, yscale='1.',
                  engenlevels=None,CBM=False):
-        ''' 
+        '''
         This function creates a Kippenhahn plot with energy flux using
         contours.
 
@@ -2164,20 +2164,20 @@ class history_data(DataPlot):
             The default is None.
         CBM : boolean, optional
             plot contours for where CBM is active?
-            
+
         Notes
         -----
         The parameter xlims is depricated.
-        
+
         '''
-        
+
         # Find correct modstart and modstop:
         mod=np.array([int(i) for i in self.get('model_number')])
         mod1=np.abs(mod-modstart).argmin()
         mod2=np.abs(mod-modstop).argmin()
         if modstart != 0 : modstart=mod1
         if modstop != -1 : modstop=mod2
-        
+
         xxyy=[self.get('star_age')[modstart:modstop],self.get('star_age')[modstart:modstop]]
         mup = max(float(self.get('star_mass')[0])*1.02,1.0)
         nmodels=len(self.get('model_number')[modstart:modstop])
@@ -2311,7 +2311,7 @@ class history_data(DataPlot):
                     sys.stdout.flush()
                     sys.stdout.write("\r creating color map mix " + "...%d%%" % percent)
                     old_percent = percent
-                
+
                 ulimit=self.get('conv_mx1_top')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 llimit=self.get('conv_mx1_bot')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 if llimit!=ulimit:
@@ -2426,7 +2426,7 @@ class history_data(DataPlot):
             cmapCBM = matplotlib.colors.ListedColormap(['w','g']) # green
         cmapB1  = pyl.cm.get_cmap('Blues')
         cmapB2  = pl.cm.get_cmap('Reds')
-        
+
         ylims1=[0.,0.]
         ylims1[0]=ylims[0]
         ylims1[1]=ylims[1]
@@ -2506,11 +2506,11 @@ class history_data(DataPlot):
                 bound=self.get('h1_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='H boundary',linestyle='-')
-                
+
                 bound=self.get('he4_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='He boundary',linestyle='--')
-                
+
                 bound=self.get('c12_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
@@ -2520,23 +2520,23 @@ class history_data(DataPlot):
                     bound=self.get('he_core_mass')[modstart:modstop]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='H boundary',linestyle='-')
-                    
+
                     bound=self.get('c_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='He boundary',linestyle='--')
-                    
+
                     bound=self.get('o_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                    
+
                     bound=self.get('si_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                    
+
                     bound=self.get('fe_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                
+
                 except:
 #                    print 'problem to plot boundaries for this plot'
                     pass
@@ -2573,7 +2573,7 @@ class history_data(DataPlot):
                  showfig=True, outlines=True, boundaries=True,
                  c12_boundary=False, rasterise=False, yscale='1.',
                  engenlevels=None,CO_ratio=True):
-        ''' 
+        '''
         This function creates a Kippenhahn plot with energy flux using
         contours.
 
@@ -2682,20 +2682,20 @@ class history_data(DataPlot):
             Give cusstom levels to the engenPlus contour. If None,
             the levels are chosen automatically.
             The default is None.
-            
+
         Notes
         -----
         The parameter xlims is depricated.
-        
+
         '''
-        
+
         # Find correct modstart and modstop:
         mod=np.array([int(i) for i in self.get('model_number')])
         mod1=np.abs(mod-modstart).argmin()
         mod2=np.abs(mod-modstop).argmin()
         if modstart != 0 : modstart=mod1
         if modstop != -1 : modstop=mod2
-        
+
         xxyy=[self.get('star_age')[modstart:modstop],self.get('star_age')[modstart:modstop]]
         mup = max(float(self.get('star_mass')[0])*1.02,1.0)
         nmodels=len(self.get('model_number')[modstart:modstop])
@@ -2824,7 +2824,7 @@ class history_data(DataPlot):
                     sys.stdout.flush()
                     sys.stdout.write("\r creating color map mix " + "...%d%%" % percent)
                     old_percent = percent
-                
+
                 ulimit=self.get('conv_mx1_top')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 llimit=self.get('conv_mx1_bot')[modstart:modstop][i*dx]*self.get('star_mass')[modstart:modstop][i*dx]
                 if llimit!=ulimit:
@@ -2945,7 +2945,7 @@ class history_data(DataPlot):
         cmapMIX = matplotlib.colors.ListedColormap(['w','#8B8386']) # rose grey
         cmapB1  = pyl.cm.get_cmap('Blues')
         cmapB2  = pl.cm.get_cmap('Reds')
-        
+
         ylims1=[0.,0.]
         ylims1[0]=ylims[0]
         ylims1[1]=ylims[1]
@@ -3015,11 +3015,11 @@ class history_data(DataPlot):
                 bound=self.get('h1_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='H boundary',linestyle='-')
-                
+
                 bound=self.get('he4_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='He boundary',linestyle='--')
-                
+
                 bound=self.get('c12_boundary_mass')[modstart:modstop]
                 bound1=(bound-ylims1[0])*float(yscale)
                 ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
@@ -3029,23 +3029,23 @@ class history_data(DataPlot):
                     bound=self.get('he_core_mass')[modstart:modstop]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='H boundary',linestyle='-')
-                    
+
                     bound=self.get('c_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='He boundary',linestyle='--')
-                    
+
                     bound=self.get('o_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                    
+
                     bound=self.get('si_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                    
+
                     bound=self.get('fe_core_mass')[modstart:modstop]-ylims[0]
                     bound1=(bound-ylims1[0])*float(yscale)
                     ax.plot(xxx,bound1,label='C boundary',linestyle='-.')
-                
+
                 except:
 #                    print 'problem to plot boundaries for this plot'
                     pass
@@ -3078,7 +3078,7 @@ class history_data(DataPlot):
         ax.axis([xlims[0],xlims[1],ylims[0],ylims[1]])
 
         axm = pyl.subplot2grid((3,3), (2, 0), rowspan=1, colspan=3)
-        
+
         Mdot=self.get('log_abs_mdot')[modstart:modstop]-ylims[0]
         axm.plot(xxx,Mdot,label='Log Mdot',linestyle='-')
         minMdot=min(Mdot)
@@ -3089,8 +3089,8 @@ class history_data(DataPlot):
         axm.axis([xlims[0],xlims[1],minMdot,max(Mdot)*0.9])
         axm.legend(loc=4, fontsize=0.5*fsize)
         axm.set_ylabel('Log$_{10}$ |$\dot{M}$|')
-        #axm.set_xlabel('Model number')        
-        
+        #axm.set_xlabel('Model number')
+
         axm2=pyl.twinx()
         LogLum=self.get('log_L')[modstart:modstop]-ylims[0]
         axm2.plot(xxx,LogLum,label='Log L',linestyle='-.')
@@ -3119,7 +3119,7 @@ class history_data(DataPlot):
         Parameters
         ----------
 
-        '''        
+        '''
 
         star_mass         = self.get('star_mass')
         he_lumi           = self.get('log_LHe')
@@ -3131,7 +3131,7 @@ class history_data(DataPlot):
         except:
            try:
                 h1_boundary_mass  = self.get('he_core_mass')
-                he4_boundary_mass = self.get('c_core_mass')                
+                he4_boundary_mass = self.get('c_core_mass')
            except:
                 pass
 
@@ -3147,9 +3147,9 @@ class history_data(DataPlot):
                 if (mx2_bot[i]>he4_boundary_mass[i]) and (he_lumi[i]>h_lumi[i]):
                     if TP_top[i]>he4_boundary_mass[i]:
                         pdcz_size.append(TP_top[i]-TP_bot[i])
-                            activate=True
-                            lum_array.append(he_lumi[i])
-                            models.append(i)
+                        activate=True
+                        lum_array.append(he_lumi[i])
+                        models.append(i)
                         print(TP_bot[i],TP_top[i])
                 if (activate == True) and (he_lumi[i]<h_lumi[i]):
                     #if fake tp
@@ -3158,18 +3158,18 @@ class history_data(DataPlot):
                         lum_array=[]
                         models=[]
                         print('fake tp')
-                    else:        
+                    else:
                         break
         t0_model = models[np.argmax(lum_array)]
         return t0_model
 
 
     def find_TPs_and_DUPs(self, percent=5., makefig=False):
-        ''' 
+        '''
         Function which finds TPs and uses the calc_DUP_parameter
         function.  To calculate DUP parameter evolution dependent of
         the star or core mass.
-        
+
         Parameters
         ----------
         fig : integer
@@ -3181,9 +3181,9 @@ class history_data(DataPlot):
             percent of the total mass dredged up during that event, which
             is set by the user in this variable.
             The default is 5.
-        makefig : 
+        makefig :
             do you want a figure to be made?
-            
+
         Returns
         -------
         TPmods : array
@@ -3204,12 +3204,12 @@ class history_data(DataPlot):
         he_lum=10**(self.get("log_LHe")[t0_idx:])
         h_lum=10**(self.get("log_LH")[t0_idx:])
         model=self.get("model_number")[t0_idx:]
-        
+
         try:
            h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
         except:
            try:
-               h1_bndry=self.get('he_core_mass')[t0_idx:]                
+               h1_bndry=self.get('he_core_mass')[t0_idx:]
            except:
                pass
         # SJ find TPs by finding local maxima in He-burning luminosity and
@@ -3220,7 +3220,7 @@ class history_data(DataPlot):
                 if he_lum[i-1] > he_lum[i-2] and he_lum[i+1] > he_lum[i+2]:
                     if he_lum[i] > h_lum[i]:
                         maxima.append(i)
-    
+
         # find DUPs when h-boundary first decreases by more than XX% of the total DUP
         # depth:
         DUPs=[]
@@ -3250,7 +3250,7 @@ class history_data(DataPlot):
 #                top=self.get('mx2_top')[idx1]
 #                DUP=np.abs(bound-top).argmin()
 #                DUPs.append(DUP+idx1)
-    
+
         # find end of PDCZ by seeking from TP peak and checking mx2_bot:
             mx2b=self.get('mx2_bot')[t0_idx:][idx1:idx2]
             for i in range(len(mx2b)):
@@ -3258,7 +3258,7 @@ class history_data(DataPlot):
                     endTP=i+idx1
                     TPend.append(endTP)
                     break
-        
+
         # 3DUP efficiency:
         lambd=[0.]
         for i in range(1,len(maxima)):
@@ -3269,13 +3269,13 @@ class history_data(DataPlot):
         TPmods = maxima + t0_idx
         DUPmods = DUPs + t0_idx
         TPend = TPend + t0_idx
-    
+
         return TPmods, DUPmods, TPend, lambd
 
     def TPAGB_properties(self):
 
         '''
-        Temporary, use for now same function in nugrid_set.py!        
+        Temporary, use for now same function in nugrid_set.py!
         Returns many TPAGB parameters which are
         TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
         Same function in nugrid_set.py.
@@ -3284,7 +3284,7 @@ class history_data(DataPlot):
         ----------
 
         '''
-        
+
         peak_lum_model,h1_mass_min_DUP_model=self.find_TP_attributes( 3, t0_model=self.find_first_TP(), color='r', marker_type='o')
 
         print('first tp')
@@ -3295,13 +3295,13 @@ class history_data(DataPlot):
 
         TPmods=peak_lum_model
 
-        DUPmods=h1_mass_min_DUP_model        
+        DUPmods=h1_mass_min_DUP_model
         DUPmods1=[]
         for k in range(len(DUPmods)):
                 DUPmods1.append(int(float(DUPmods[k]))+100) #to exclude HBB? effects
-        
+
         DUPmods=DUPmods1
-        
+
 
 
         TPstart=[]
@@ -3313,7 +3313,7 @@ class history_data(DataPlot):
         massbot=mx2b_array#*self.header_attr['initial_mass']
         masstop=mx2t_array#*self.header_attr['initial_mass']
         massenv=np.array(self.get('conv_mx1_bot'))*np.array(self.get('star_mass'))   #*self.header_attr['initial_mass']
-        
+
         #h1_bdy=self.get('h1_boundary_mass')
 
         for k in range(len(TPmods)):
@@ -3366,8 +3366,8 @@ class history_data(DataPlot):
                         if flag==True:
                             endidx=idx+i
                             endTP=models[endidx]
-                            TPend.append(int(float(endTP)))                                                                
-        
+                            TPend.append(int(float(endTP)))
+
                         if (mx2t[i]-mx2b[i])<1e-5:                        #mx2b[i])==0.:
                             endidx=idx+i
                             endTP=models[endidx]
@@ -3386,10 +3386,10 @@ class history_data(DataPlot):
                 mtot=self.get('star_mass')[idx_tpext]
                 max_m_TP.append(masstop[idx_tpext]*mtot)
                 min_m_TP.append(massbot[idx_tpext]*mtot)
-                
+
                 TP_max_env.append(massenv[idx_tpext])#*mtot)
                 if k> (len(DUPmods)-1):
-                        continue                
+                        continue
                 idx=list(models).index(DUPmods[k])
                 mtot=self.get('star_mass')[idx]
                 #DUP_m.append(h1_bdy[idx])#*mtot)
@@ -3398,7 +3398,7 @@ class history_data(DataPlot):
                     h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
                 except:
                     try:
-                        h1_bndry=self.get('he_core_mass')[t0_idx:]                
+                        h1_bndry=self.get('he_core_mass')[t0_idx:]
                     except:
                         pass
 
@@ -3407,7 +3407,7 @@ class history_data(DataPlot):
                     print('Pulse',k+1,'model',TPmods[k],'skip')
                     print(h1_bndry[idx],max_m_TP[-1])
                     DUPmods[k] = -1
-                    DUPm_min_h.append( -1)  
+                    DUPm_min_h.append( -1)
                     continue
 
                 DUPm_min_h.append(h1_bdy[idx])
@@ -3434,7 +3434,7 @@ class history_data(DataPlot):
         Function which finds TPs and uses the calc_DUP_parameter
         function.  To calculate DUP parameter evolution dependent of
         the star or core mass.
-        
+
         Parameters
         ----------
         fig : integer
@@ -3450,11 +3450,11 @@ class history_data(DataPlot):
         The default is False.
         no_fig : boolean, optional
         The default is False.
-        
+
         '''
-        
+
         #if len(t0_model)==0:
-        
+
         t0_idx=(t0_model-self.get("model_number")[0])
         #for first TPi
         '''
@@ -3463,10 +3463,10 @@ class history_data(DataPlot):
 
         he_lum=10**(self.get("log_LHe")[t0_idx:])
         h_lum=10**(self.get("log_LH")[t0_idx:])
-        model=self.get("model_number")[t0_idx:]        
+        model=self.get("model_number")[t0_idx:]
         for k in range(len(he_lum)):
             if he_lum[k]<h_lum[k]:
-                t0_idx=t0_idx+k 
+                t0_idx=t0_idx+k
                 break
 
         #find end of first TP
@@ -3481,14 +3481,14 @@ class history_data(DataPlot):
            he4_bdy=self.get("he4_boundary_mass")[t0_idx:]
         except:
            try:
-               h1_bndry=self.get('he_core_mass')[t0_idx:]        
-               he4_bdy=self.get("c_core_mass")[t0_idx:]        
+               h1_bndry=self.get('he_core_mass')[t0_idx:]
+               he4_bdy=self.get("c_core_mass")[t0_idx:]
            except:
                pass
         TP_bot=np.array(self.get('conv_mx2_bot')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
         TP_top=np.array(self.get('conv_mx2_top')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
 
-        
+
 
         #define label
         z=self.header_attr["initial_z"]
@@ -3523,7 +3523,7 @@ class history_data(DataPlot):
             #in case when He-lum is dominating till the end of the calculation (He-burner?)
             if (TP_interpulse ==False) and (h_lum[i]<he_lum[i]):
                 if (len(he_lum)-1)==i:
-                    TP_interpulse=True        
+                    TP_interpulse=True
                     #interpulse_counter=1000 #value higher than 200
 
             #if simulation stops during a TP
@@ -3531,7 +3531,7 @@ class history_data(DataPlot):
                  if (h_lum[i]<he_lum[i]):
                      if (he4_bdy[i]<TP_bot[i]):
                          lastDUP=True
-                         break 
+                         break
 
             #print i
             if i ==0:
@@ -3545,7 +3545,7 @@ class history_data(DataPlot):
             #         lum_1.append(he_lum[i])
             #        model_1.append(model[i])
                  #h1_mass_1.append(h1_bndry[i])
-                
+
 
             if True: #(TP_interpulse==False):
                 if (h_lum[i]<he_lum[i]):
@@ -3557,15 +3557,15 @@ class history_data(DataPlot):
                         lum_1.append(he_lum[i])
                         model_1.append(model[i])
                         #print 'peak at model',model[i]
-                        TP_interpulse=True                  
-       
+                        TP_interpulse=True
+
             if ( ((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
                 print('test for last DUP')
                 if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
                     print('last DUP after last TP')
                     lastDUP=True
                         break
-                                
+
 
             if ((h_lum[i]>he_lum[i]) and (TP_interpulse==True)) or ( ((len(he_lum)-1)==i) and (TP_interpulse==True)):
                 #make sure that pulse is fully computed
@@ -3573,9 +3573,9 @@ class history_data(DataPlot):
                     print('test for last DUP')
                     if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
                         print('last DUP after last TP')
-                        lastDUP=True        
+                        lastDUP=True
                     break
-                #print 'model',model[i] 
+                #print 'model',model[i]
                 #print 'lum1',lum_1
                 TP_interpulse=True
                 max_value1=np.array(lum_1).max()
@@ -3583,7 +3583,7 @@ class history_data(DataPlot):
                     continue
                 if len(peak_lum_model)>2:
                     if ( 10**(old_div((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1])),2.))  )  >max_value1:
-                        print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])        
+                        print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])
                         print(leg)
                         continue
                 max_value=np.array(lum_1).max()
@@ -3622,7 +3622,7 @@ class history_data(DataPlot):
             idx2=list(model).index(peak_lum_model[k+1])
             h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]        )
         if lastDUP==True:
-            idx1=list(model).index(peak_lum_model[-1])        
+            idx1=list(model).index(peak_lum_model[-1])
             idx2=-1
             h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
         print(peak_lum_model)
@@ -3631,7 +3631,7 @@ class history_data(DataPlot):
         #print h1_mass_min_DUP_model
         #print h1_mass_tp
         modeln=[]
-        '''        
+        '''
         if no_fig==True:
             for i in range(len(peak_lum_model)):
                     modeln.append(peak_lum_model[i])
@@ -3643,7 +3643,7 @@ class history_data(DataPlot):
 
     def calc_DUP_parameter(self, modeln, label, fig=10, color='r', marker_type='*',
                            h_core_mass=False):
-        ''' 
+        '''
         Method to calculate the DUP parameter evolution for different
         TPs specified specified by their model number.
 
@@ -3664,14 +3664,14 @@ class history_data(DataPlot):
         h_core_mass : boolean, optional
             If True: plot dependence from h free core , else star mass.
             The default is False.
-            
+
         '''
         number_DUP=(old_div(len(modeln),2) -1) #START WITH SECOND
         try:
            h1_bnd_m=self.get('h1_boundary_mass')
         except:
            try:
-               h1_bnd_m=self.get('he_core_mass')        
+               h1_bnd_m=self.get('he_core_mass')
            except:
                pass
         star_mass=self.get('star_mass')
@@ -3714,10 +3714,10 @@ class history_data(DataPlot):
 
 
 class star_log(history_data):
-    ''' 
+    '''
     Class derived from history_data class (copy). Existing just (for
     compatibility reasons) for older mesa python scripts.
-    
+
     '''
 
 
@@ -3778,7 +3778,7 @@ def _read_mesafile(filename,data_rows=0,only='all'):
 
 
 def _cleanstarlog(file_in):
-    ''' 
+    '''
     cleaning history.data or star.log file, e.g. to take care of
     repetitive restarts.
 
