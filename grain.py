@@ -30,6 +30,8 @@ again. if this does not work, good luck...
 '''
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import input
 from builtins import zip
 from builtins import str
@@ -42,8 +44,9 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import xlrd
-from nuutils import *
-from data_plot import *
+
+from .utils import *
+from .data_plot import *
 
 ### find the path to the tree ###
 

@@ -120,14 +120,13 @@ v0.1, 23JUN2010: Falk Herwig
 """
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import str
 from builtins import range
 from past.utils import old_div
-import ascii_table
 import numpy as np
-import nuutils as u
-from data_plot import *
 import numpy as np
 import matplotlib
 import matplotlib.pylab as pyl
@@ -137,6 +136,11 @@ from matplotlib.artist import allow_rasterization
 from matplotlib.patches import PathPatch
 import os
 import sys
+
+from . import ascii_table
+from . import utils as u
+from .data_plot import *
+
 
 def set_nugrid_path(path):
     """

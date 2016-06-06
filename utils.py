@@ -1,11 +1,12 @@
 '''
-nuutils.py
+utils.py
 
 Utility class for holding extra methods from mesa.py, nuh5p.py
 
 '''
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
 
 from builtins import zip
 from builtins import str
@@ -15,7 +16,8 @@ from builtins import object
 
 import numpy as np
 import scipy as sc
-import ascii_table as att
+from . import ascii_table as att
+
 from scipy import optimize
 import matplotlib.pyplot as pl
 import os
@@ -57,7 +59,7 @@ class data_fitting(object):
 
     and then call the data_fitting instance.
 
-    >>> f=nuutils.data_fitting(ff,coef=(1,0,0))
+    >>> f=utils.data_fitting(ff,coef=(1,0,0))
 
     Once you have initialized this class, the instance provides two
     methods; fit and plot to check the fit.
@@ -466,7 +468,7 @@ class Utils(object):
                 if decay_index_pointer[i]>= 0:
                     print(isotope_to_plot[i]+" -> "+isotope_to_plot[decay_index_pointer[i]])
         ind_tmp=idp_to_stables_in_isostoplot
-        #ind_tmp=nuutils.strictly_monotonic(decay_index_pointer)  # this would do the same, but the method above is more straight forward
+        #ind_tmp=utils.strictly_monotonic(decay_index_pointer)  # this would do the same, but the method above is more straight forward
 
         self.decay_idp=decay_index_pointer
         self.idp_to_stables_in_isostoplot=ind_tmp
@@ -504,7 +506,7 @@ class Utils(object):
 
 class iniabu(Utils):
     '''
-    This class in the nuutils package reads an abundance distribution file
+    This class in the utils package reads an abundance distribution file
     of the type iniab.dat. It then provides you with methods to change
     some abundances, modify, normalise and eventually write out the
     final distribution in a format that can be used as an initial
@@ -549,8 +551,8 @@ class iniabu(Utils):
 
         Example - generate modified input file ppn calculations:
 
-        >>> import nuutils
-        >>> p=nuutils.iniabu('iniab1.0E-02.ppn_asplund05')
+        >>> from NuGridPy import utils
+        >>> p=utils.iniabu('iniab1.0E-02.ppn_asplund05')
         >>> sp={}
         >>> sp['h   1']=0.2
         >>> sp['c  12']=0.5
@@ -649,12 +651,12 @@ class iniabu(Utils):
         Examples
         --------
 
-        >>> import nuutils
+        >>> from NuGridPy import utils
         >>> !ls ~/PPN/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/   # find ppn initial abundance file
         >>> !cat ~/mesa/data/net_data/nets/agb.net                   # find isos needed in mesa net
         >>> !cat > isos.txt                                          # paste needed isos into file
-        >>> help(nuutils.iniabu)                                       # check documentation of method
-        >>> x=nuutils.iniabu('path_to_here/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn')
+        >>> help(utils.iniabu)                                       # check documentation of method
+        >>> x=utils.iniabu('path_to_here/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn')
         >>> x.write_mesa?
         >>> mnames,mabus = x.write_mesa(add_excess_iso='ne22',
         ...                header_string='mppnp/USEEPP/iniab2.0E-02GN93.ppn for mesa/agb.net',
@@ -1401,8 +1403,8 @@ def element_abund_marco(i_decay, stable_isotope_list,
     # this way is done in a really simple way. May be done better for sure, in a couple of loops.
     # I keep this, since I have only to copy over old script. Falk will probably redo it.
 
-    import numpy as np
-    #import nuutils as u
+    #import numpy as np
+    #from NuGridPy import utils as u
 
     global elem_abund
     elem_abund = np.zeros(z_bismuth)
@@ -1452,7 +1454,7 @@ def stable_specie():
     ''' provide the list of stable species, and decay path feeding stables '''
 
 
-    import numpy as np
+    #import numpy as np
 
 
     stable_raw=[]
@@ -1858,11 +1860,10 @@ def stable_specie():
     ['U 238','PA238','TH238','AC238','RA238','FR238','RN238']]
     #print decay_raw
 
-
 def give_zip_element_z_and_names(element_name):
     ''' create 2 indexes that, given the name of the element/specie, give the atomic number.'''
 
-    import numpy as np
+    #import numpy as np
 
     global z_bismuth
     z_bismuth = 83

@@ -38,11 +38,13 @@ Assumptions for Trajectory Files:
 
 """
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import input
 from builtins import str
 from builtins import range
 from numpy import *
-from data_plot import *
+from .data_plot import *
 import matplotlib.pylab as pyl
 import matplotlib.pyplot as pl
 import os
@@ -524,7 +526,7 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
     '''
 
     import re
-    import nuutils as u
+    from . import utils as u
 
     #check if input are elements or isotopes
     if not '-' in data[0][0]:
@@ -669,7 +671,7 @@ def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],hea
     '''
 
     import re
-    import nuutils as u
+    from . import utils as u
 
     #check if input are elements or isotopes
     if not '-' in data[0][0]:

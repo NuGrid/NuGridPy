@@ -46,20 +46,22 @@ must be here as well.
 
 """
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import str
 from builtins import range
 
 from numpy import *
-from data_plot import *
 import matplotlib
 from matplotlib.pylab import *
-from data_plot import *
-from nuutils import *
 import os
-import nuutils
 
-import pdb
+from .data_plot import *
+from .utils import *
+from . import utils
+
+#import pdb
 
 class xtime(DataPlot):
     '''
@@ -372,7 +374,7 @@ class abu_vector(DataPlot, Utils):
         '''
         self.debug=False
         self._stable_names() # provides in addition to stable_el from
-                             # nuutils also just the stable element names
+                             # utils also just the stable element names
         self.sldir = sldir
         self.inputdir = ''
         self.startdir = os.getcwd()
@@ -407,7 +409,7 @@ class abu_vector(DataPlot, Utils):
             indexp_cyc2filels={}  # created index pointer from mod (cycle
             i = 0                 # name) to index in files array
             for file in self.files:
-                mod=nuutils.iniabu(file)
+                mod=utils.iniabu(file)
                 indexp_cyc2filels[mod] = i
                 i += 1
             self.indexp_cyc2filels = indexp_cyc2filels

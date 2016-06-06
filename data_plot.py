@@ -26,6 +26,8 @@ C. To properly use DataTable's methods properly one will need these
 """
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import str
 from builtins import input
@@ -40,7 +42,6 @@ import matplotlib.pyplot as pl
 #from matplotlib.mpl import colors,cm # depreciated in mpl ver 1.3
                                       # use line below instead
 from matplotlib import colors,cm
-import astronomy as ast
 import matplotlib
 from matplotlib.patches import Rectangle, Arrow
 from matplotlib.collections import PatchCollection
@@ -53,6 +54,9 @@ import os
 import threading
 import time
 import sys
+
+from . import astronomy as ast
+
 
 def _padding_model_number(number, max_num):
     '''
@@ -691,7 +695,7 @@ class DataPlot(object):
             Give path and filename here, if you want to save the figure.
         '''
 
-        import nuutils as u
+        from . import utils as u
 
         ### WORK ON PATH ###
         # define svn path form path where script runs, depending on standard input or not
@@ -1239,7 +1243,7 @@ class DataPlot(object):
             Show plot?
         '''
 
-        import nuutils as u
+        from . import utils as u
 
         ### WORK ON PATH ###
         # define svn path form path where script runs, depending on standard input or not
@@ -2822,7 +2826,7 @@ class DataPlot(object):
                 # If this import statment goes at the top of the file
                 # then it will cause a circular import loop witch will
                 # cause all modules that try to import data_plot to crash.
-                import nuutils as u
+                from . import utils as u
                 u.solar(solar_file,1)
                 selem=u.solar_elem_abund
                 selem=np.maximum(selem,1.e-99)
@@ -3486,7 +3490,7 @@ class DataPlot(object):
                 el_abu_plot=el_abu
                 ylab='log mass fraction'
             elif ref==1:
-                import nuutils
+                from . import utils
                 if solar_filename=='':
                     raise IOError('You chose to plot relative to the solar abundance dist. However, you did not supply the solar abundance file!')
                 else:
@@ -4038,7 +4042,7 @@ class DataPlot(object):
         if ifig is not None:
             pl.figure(ifig)
 
-        import nuutils as u
+        from . import utils as u
         cb = u.colourblind
         lscb = u.linestylecb # colourblind linestyle function
 

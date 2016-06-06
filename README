@@ -45,10 +45,14 @@ Required packages
   - xrld
   - numpy
   - matplotlib
+  - h5py
 
 * python2/3 compatibility
   - future (provides 'past' module)
 
 Some of the packages are standard.  But you may need:
 
-> pip3 install -U xrld future
+> pip(3) install -U xrld future h5py
+
+- on Fedora python2:
+  > dnf install -y h5py python2-future

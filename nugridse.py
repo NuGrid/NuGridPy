@@ -112,6 +112,8 @@ that will save their plot.
 '''
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import filter
 from builtins import next
@@ -134,9 +136,10 @@ import re
 import sys
 import time
 import glob
-from nuutils import *
-from data_plot import *
-import h5T
+
+from .utils import *
+from .data_plot import *
+from . import h5T
 
 
 def set_nugrid_path(path):

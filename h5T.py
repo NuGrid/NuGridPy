@@ -39,6 +39,8 @@ users manual and docstring below for more information.
 
 """
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import map
 from builtins import str
 from builtins import range
@@ -55,7 +57,7 @@ import sys
 import bisect
 
 try:
-    from ascii_table import *
+    from .ascii_table import *
 except ImportError:
     print('No module ascii_table')
     print('Please checkout ascii_table.py svn://forum.astro.keele.ac.uk/utils/pylib and add to python path')
