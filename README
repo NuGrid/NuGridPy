@@ -42,7 +42,7 @@ INSTALLATION
 Required packages
 -----------------
 * standard:
-  - xrld
+  - xlrd
   - numpy
   - matplotlib
   - h5py
@@ -52,7 +52,7 @@ Required packages
 
 Some of the packages are standard.  But you may need:
 
-> pip(3) install -U xrld future h5py
+> pip(3) install -U xlrd future h5py
 
 - on Fedora python2:
   > dnf install -y h5py python2-future
