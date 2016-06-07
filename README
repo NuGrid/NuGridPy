@@ -8,10 +8,10 @@ repository. All components present here have now been removed from
 the svn. Please checkout r6619 if you would like access to the
 most recent version in the svn prior to NuGridPy's removal.
 
-Nugridpy is a set of Python tools to access and analyse (e.g. plot)
-the various output formats (including the hdf5-based se format) from
-NuGrid codes (mppnp and ppn) and from the MESA stellar evolution
-code. In principle the NuGridpy tools can be used on any stellar
+NuGridPy is a Python package containing tools to access and analyse 
+(e.g. plot) various output formats (including the hdf5-based se format) 
+from NuGrid codes (mppnp and ppn) and from the MESA stellar evolution
+code. In principle the NuGridPy package can be used on any stellar
 evolution code output if the tools to write se hdf5 files available on
 the NuGrid web page are used.  The mesa.py module will work with MESA
 ASCII output in the 'LOGS' directory. These modules were written with an
@@ -22,7 +22,7 @@ interactive ipython session that we usually start with 'ipython
 Once your session starts import the mesa or nugridse or ppn module
 (depending on which type of data you are working with):
 
->>> import mesa as ms
+>>> from NuGridPy import mesa as ms
 
 and read the docstring:
 
