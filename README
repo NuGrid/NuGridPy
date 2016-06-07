@@ -52,7 +52,14 @@ Required packages
 
 Some of the packages are standard.  But you may need:
 
-> pip(3) install -U xlrd future h5py
+  > sudo pip(3) install -U xlrd future h5py
+
+or, if you want to install in the user home directory,
+
+  > pip(3) install --user -U xlrd future h5py
 
 - on Fedora python2:
   > dnf install -y h5py python2-future
+
+If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
+  > sudo apt-get install libhdf5-dev
