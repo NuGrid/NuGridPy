@@ -1052,8 +1052,8 @@ class se(DataPlot, Utils):
         # defining before isotopes and abundances. Marco 13 Jannuary 2011
         for i in range(len(self.se.isotopes)):
             if str(self.se.isotopes[i].split('-')[1][-2:]).upper() != 'M1':
-            	string = 'D '+str(self.se.isotopes[i].split('-')[0]).upper()+'   '+str(self.se.isotopes[i].split('-')[1]).upper()+'    '+str(abunds[i])
-            	f.write(string+"\n")
+                string = 'D '+str(self.se.isotopes[i].split('-')[0]).upper()+'   '+str(self.se.isotopes[i].split('-')[1]).upper()+'    '+str(abunds[i])
+                f.write(string+"\n")
         f.close()
         if online:
             return FileLink(filename)
