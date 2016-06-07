@@ -63,3 +63,23 @@ or, if you want to install in the user home directory,
 
 If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
   > sudo apt-get install libhdf5-dev
+
+
+Mac installation with `macports`
+---------------------------------
+
+1. Install ipython and pip:
+  > port install py34-ipython py34-pip
+  > port select --set ipython py34-ipython
+  > port select --set pip py34-pip
+
+2. Install standard prerequisites with pip:
+  > pip install -U --user numpy scipy xlrd matplotlib future 
+
+3. Install h5py:
+  > port install openmpi-gcc5
+  > port install hdf5 +hl +openmpi +cxx +fortran +gcc5
+  > HDF5_DIR=~/macports CFLAGS="-I$HOME/macports/include/openmpi-gcc5" pip install -U --user h5py
+
+Errors about failure to rebuild netcdf package can be ignored.
+
