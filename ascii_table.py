@@ -6,7 +6,7 @@
 # All rights reserved. See LICENSE.
 #
 
-""" 
+"""
 Ascii_table.py: read and write simple ascii tables
 
 By Daniel Alexander Bertolino Conti
@@ -38,17 +38,19 @@ Assumptions for Trajectory Files:
 
 """
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import input
 from builtins import str
 from builtins import range
 from numpy import *
-from data_plot import *
+from .data_plot import *
 import matplotlib.pylab as pyl
 import matplotlib.pyplot as pl
 import os
 
 class ascii_table(DataPlot):
-    ''' 
+    '''
     Data structure to read simple data tables and trajectory data
     tables.
 
@@ -110,7 +112,7 @@ class ascii_table(DataPlot):
     Where Dcols is a list of data attributes, data is a list of lists
     of data and headers is a list of strings that are each a header
     attribute.
-    
+
     See Also
     --------
     write()
@@ -120,7 +122,7 @@ class ascii_table(DataPlot):
     def __init__(self, filename, sldir='.', sep='  ', datatype='normal',
                  headers=[], dcols=[], data=[], header_char='H',
                  read=True, headerlines=[]):
-        ''' 
+        '''
         Init method that reads in ascii type files and trajectory type
         files.  By default this method reads ascii type files.  If the
         user wants a trajectory file read, either the file must have
@@ -183,16 +185,16 @@ class ascii_table(DataPlot):
         self.dcols=list(self.data.keys())
 
     def get(self, attri):
-        ''' 
+        '''
         Method that dynamically determines the type of attribute that is
         passed into this method. Also it then returns that attribute's
         associated data.
-        
+
         Parameters
         ----------
-        attri : string 
+        attri : string
             The attribute we are looking for.
-        
+
         '''
         isCol=False
         isHead=False
@@ -211,7 +213,7 @@ class ascii_table(DataPlot):
             return hattrs
 
     def getColData(self, attri):
-        ''' 
+        '''
         Method that returns column data
 
         Parameters
@@ -223,7 +225,7 @@ class ascii_table(DataPlot):
         return self.data[attri]
 
     def _readFile(self, sldir, fileName, sep):
-        ''' 
+        '''
         Private method that reads in the header and column data.
 
         '''
@@ -316,7 +318,7 @@ class ascii_table(DataPlot):
 #Global methods
 def writeTraj(filename='trajectory.input', data=[], ageunit=0, tunit=0,
               rhounit=0, idNum=0):
-    ''' 
+    '''
     Method for writeing Trajectory type ascii files files.
 
     Parameters
@@ -366,14 +368,14 @@ def writeTraj(filename='trajectory.input', data=[], ageunit=0, tunit=0,
 def write(filename, headers, dcols, data, headerlines=[],
           header_char='H', sldir='.', sep='  ', trajectory=False,
           download=False):
-    ''' 
+    '''
     Method for writeing Ascii files.
-    
+
     Note the attribute name at position i in dcols will be associated
     with the column data at index i in data.  Also the number of data
     columns(in data) must equal the number of data attributes (in dcols)
     Also all the lengths of that columns must all be the same.
-    
+
     Parameters
     ----------
     filename : string
@@ -403,7 +405,7 @@ def write(filename, headers, dcols, data, headerlines=[],
         If using iPython notebook, do you want a download link for
         the file you write?
         The default is False.
-        
+
     '''
     if sldir.endswith(os.sep):
         filename = str(sldir)+str(filename)
@@ -499,292 +501,286 @@ def write(filename, headers, dcols, data, headerlines=[],
         return None
 
 def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],header_char='H',sldir='.',sep='&'):
-		'''
-		Method for writeing data in GCE format in Ascii files.
-		Reads either elements or isotopes
-		dcols[0] needs to contain either isotopes or elements
+    '''
+    Method for writeing data in GCE format in Ascii files.
+    Reads either elements or isotopes
+    dcols[0] needs to contain either isotopes or elements
 
-		Note the attribute name at position i in dcols will be associated
-		with the column data at index i in data.
-		Also the number of data columns(in data) must equal the number
-		of data attributes (in dcols)
-		Also all the lengths of that columns must all be the same.
-		Input:
-		filename: The file where this data will be written.
-		Headers: A list of Header strings or if the file being written 
-			 is of type trajectory, this is a List of strings
-			 that contain header attributes and their associated 
-			 values which are seperated by a '='. 
-		dcols: A list of data attributes
-		data:  A list of lists (or of numpy arrays).
-		header_char  the character that indicates a header lines
-		sldir: Where this fill will be written.
-		sep: What seperatesa the data column attributes
-		trajectory: Boolean of if we are writeing a trajectory type file
-		'''
+    Note the attribute name at position i in dcols will be associated
+    with the column data at index i in data.
+    Also the number of data columns(in data) must equal the number
+    of data attributes (in dcols)
+    Also all the lengths of that columns must all be the same.
+    Input:
+    filename: The file where this data will be written.
+    Headers: A list of Header strings or if the file being written
+         is of type trajectory, this is a List of strings
+         that contain header attributes and their associated
+         values which are seperated by a '='.
+    dcols: A list of data attributes
+    data:  A list of lists (or of numpy arrays).
+    header_char  the character that indicates a header lines
+    sldir: Where this fill will be written.
+    sep: What seperatesa the data column attributes
+    trajectory: Boolean of if we are writeing a trajectory type file
+    '''
 
-		import re
-		import utils as u
+    import re
+    from . import utils as u
 
-		#check if input are elements or isotopes
-		if not '-' in data[0][0]:
-			iso_inp=False
-			dcols=dcols+['Z']
-		else:
-			iso_inp=True
-			dcols=dcols+['Z','A']
-		#Attach Z and A
-		if iso_inp==True:
-			data.append([])
-			data.append([])
-			u.convert_specie_naming_from_h5_to_ppn(data[0])
-			Z=u.znum_int
-			A=u.amass_int
-			for i in range(len(data[0])):
-				zz=str(int(Z[i]))
-				aa=str(int(A[i]))
-				data[1][i]='{:.3E}'.format(data[1][i])+' '
-				data[-2].append(zz)
-				data[-1].append(aa)
-
-
-		else:
-			#in order to get Z , create fake isotope from element
-			fake_iso=[]
-			for k in range(len(data[0])):
-				fake_iso.append(data[0][k]+'-99')
-			#print fake_iso
-                        data.append([])
-                        u.convert_specie_naming_from_h5_to_ppn(fake_iso)
-                        Z=u.znum_int
-			for i in range(len(data[0])):
-				zz=str(int(Z[i]))
-				data[1][i]='{:.3E}'.format(data[1][i])+' '
-				data[-1].append(zz)
+    #check if input are elements or isotopes
+    if not '-' in data[0][0]:
+        iso_inp=False
+        dcols=dcols+['Z']
+    else:
+        iso_inp=True
+        dcols=dcols+['Z','A']
+    #Attach Z and A
+    if iso_inp==True:
+        data.append([])
+        data.append([])
+        u.convert_specie_naming_from_h5_to_ppn(data[0])
+        Z=u.znum_int
+        A=u.amass_int
+        for i in range(len(data[0])):
+            zz=str(int(Z[i]))
+            aa=str(int(A[i]))
+            data[1][i]='{:.3E}'.format(data[1][i])+' '
+            data[-2].append(zz)
+            data[-1].append(aa)
 
 
-		if sldir.endswith(os.sep):
-			filename = str(sldir)+str(filename)
-		else:
-			filename = str(sldir)+os.sep+str(filename)
-		tmp=[] #temp variable
-		lines=[]#list of the data lines
-		lengthList=[]# list of the longest element (data or column name)
-			     # in each column
-			     
-		if os.path.exists(filename):
-			print('This method will add table to existing file '+ filename)
-		
-		if len(data)!=len(dcols):
-			print('The number of data columns does not equal the number of Data attributes')
-			print('returning none')
-			return None
-		for i in range(len(headers)):
-			tmp.append(header_char+' '+headers[i]+'\n')
-		headers=tmp
-		tmp=''
-		
-		for i in range(len(data)): #Line length stuff
-			length=len(dcols[i])+1
-			for j in range(len(data[i])):
-				tmp2=data[i][j]
-				if isinstance(data[i][j],float):
-					tmp2='{:.3E}'.format(data[i][j])+' '
-					data[i][j] = tmp2
-				if len(str(tmp2))>length:
-					length=len(str(tmp2))
-			lengthList.append(length)
-		
-		tmp=''
-		tmp1=''
-		for i in range(len(dcols)):
-			tmp1=dcols[i]
-			if len(dcols[i]) < lengthList[i]:
-				j=lengthList[i]-len(dcols[i])
-				for k in range(j):
-					tmp1+=' '
-			tmp+=sep+tmp1
-		tmp+='\n'
-		dcols=tmp
-		tmp=''
-		for i in range(len(data[0])):
-			for j in range(len(data)):
-				if type(data[j][i]) == str:
-					#match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
-                                        #items = match.groups()
-                                        tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
-                                	if len(str(data[j][i])) < lengthList[j]:
-                                        	l=lengthList[j]-len(tmp1)
-                                        	for k in range(l):
-                                                	tmp1+=' '
-					extra=''	
-				#else:
-                                #        tmp1=data[j][i]
-                                #        if len(data[j][i]) < lengthList[j]:
-                                #                l=lengthList[j]-len(data[j][i]))
-                                #                for k in xrange(l):
-                                #                        tmp1+=' '
+    else:
+        #in order to get Z , create fake isotope from element
+        fake_iso=[]
+        for k in range(len(data[0])):
+            fake_iso.append(data[0][k]+'-99')
+        #print fake_iso
+            data.append([])
+            u.convert_specie_naming_from_h5_to_ppn(fake_iso)
+            Z=u.znum_int
+        for i in range(len(data[0])):
+            zz=str(int(Z[i]))
+            data[1][i]='{:.3E}'.format(data[1][i])+' '
+            data[-1].append(zz)
 
 
-				tmp+=sep+tmp1
-			lines.append(tmp+'\n')
-			tmp=''
-			
-		f=open(filename,'a')
-		for i in range(len(headers)):
-			f.write(headers[i])
-		f.write(dcols)
-		for i in range(len(lines)):
-			f.write(lines[i])
-		
-		f.close()
-		return None
+    if sldir.endswith(os.sep):
+        filename = str(sldir)+str(filename)
+    else:
+        filename = str(sldir)+os.sep+str(filename)
+    tmp=[] #temp variable
+    lines=[]#list of the data lines
+    lengthList=[]# list of the longest element (data or column name)
+             # in each column
+
+    if os.path.exists(filename):
+        print('This method will add table to existing file '+ filename)
+
+    if len(data)!=len(dcols):
+        print('The number of data columns does not equal the number of Data attributes')
+        print('returning none')
+        return None
+    for i in range(len(headers)):
+        tmp.append(header_char+' '+headers[i]+'\n')
+    headers=tmp
+    tmp=''
+
+    for i in range(len(data)): #Line length stuff
+        length=len(dcols[i])+1
+        for j in range(len(data[i])):
+            tmp2=data[i][j]
+            if isinstance(data[i][j],float):
+                tmp2='{:.3E}'.format(data[i][j])+' '
+                data[i][j] = tmp2
+            if len(str(tmp2))>length:
+                length=len(str(tmp2))
+        lengthList.append(length)
+
+    tmp=''
+    tmp1=''
+    for i in range(len(dcols)):
+        tmp1=dcols[i]
+        if len(dcols[i]) < lengthList[i]:
+            j=lengthList[i]-len(dcols[i])
+            for k in range(j):
+                tmp1+=' '
+        tmp+=sep+tmp1
+    tmp+='\n'
+    dcols=tmp
+    tmp=''
+    for i in range(len(data[0])):
+        for j in range(len(data)):
+            if type(data[j][i]) == str:
+                #match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
+                                    #items = match.groups()
+                tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
+                if len(str(data[j][i])) < lengthList[j]:
+                        l=lengthList[j]-len(tmp1)
+                        for k in range(l):
+                                tmp1+=' '
+                extra=''
+            #else:
+                            #        tmp1=data[j][i]
+                            #        if len(data[j][i]) < lengthList[j]:
+                            #                l=lengthList[j]-len(data[j][i]))
+                            #                for k in xrange(l):
+                            #                        tmp1+=' '
+
+
+            tmp+=sep+tmp1
+        lines.append(tmp+'\n')
+        tmp=''
+
+    f=open(filename,'a')
+    for i in range(len(headers)):
+        f.write(headers[i])
+    f.write(dcols)
+    for i in range(len(lines)):
+        f.write(lines[i])
+
+    f.close()
+    return None
 
 
 
 
 def writeGCE_table(filename,headers,data,dcols=['Isotopes','Yields','Z','A'],header_char='H',sldir='.',sep='&'):
-		'''
-		Method for writeing data in GCE format in Ascii files.
-		Reads either elements or isotopes
-		dcols[0] needs to contain either isotopes or elements
+    '''
+    Method for writeing data in GCE format in Ascii files.
+    Reads either elements or isotopes
+    dcols[0] needs to contain either isotopes or elements
 
-		Note the attribute name at position i in dcols will be associated
-		with the column data at index i in data.
-		Also the number of data columns(in data) must equal the number
-		of data attributes (in dcols)
-		Also all the lengths of that columns must all be the same.
-		Input:
-		filename: The file where this data will be written.
-		Headers: A list of Header strings or if the file being written 
-			 is of type trajectory, this is a List of strings
-			 that contain header attributes and their associated 
-			 values which are seperated by a '='. 
-		dcols: A list of data attributes
-		data:  A list of lists (or of numpy arrays).
-		header_char  the character that indicates a header lines
-		sldir: Where this fill will be written.
-		sep: What seperatesa the data column attributes
-		trajectory: Boolean of if we are writeing a trajectory type file
-		'''
+    Note the attribute name at position i in dcols will be associated
+    with the column data at index i in data.
+    Also the number of data columns(in data) must equal the number
+    of data attributes (in dcols)
+    Also all the lengths of that columns must all be the same.
+    Input:
+    filename: The file where this data will be written.
+    Headers: A list of Header strings or if the file being written
+         is of type trajectory, this is a List of strings
+         that contain header attributes and their associated
+         values which are seperated by a '='.
+    dcols: A list of data attributes
+    data:  A list of lists (or of numpy arrays).
+    header_char  the character that indicates a header lines
+    sldir: Where this fill will be written.
+    sep: What seperatesa the data column attributes
+    trajectory: Boolean of if we are writeing a trajectory type file
+    '''
 
-		import re
-		import utils as u
+    import re
+    from . import utils as u
 
-		#check if input are elements or isotopes
-		if not '-' in data[0][0]:
-			iso_inp=False
-			dcols=dcols+['Z']
-		else:
-			iso_inp=True
-			dcols=dcols+['Z','A']
-		#Attach Z and A
-		if iso_inp==True:
-			data.append([])
-			data.append([])
-			u.convert_specie_naming_from_h5_to_ppn(data[0])
-			Z=u.znum_int
-			A=u.amass_int
-			for i in range(len(data[0])):
-				zz=str(int(Z[i]))
-				aa=str(int(A[i]))
-				data[1][i]='{:.3E}'.format(data[1][i])+' '
-				data[-2].append(zz)
-				data[-1].append(aa)
-
-
-		else:
-			#in order to get Z , create fake isotope from element
-			fake_iso=[]
-			for k in range(len(data[0])):
-				fake_iso.append(data[0][k]+'-99')
-			#print fake_iso
-                        data.append([])
-                        u.convert_specie_naming_from_h5_to_ppn(fake_iso)
-                        Z=u.znum_int
-			for i in range(len(data[0])):
-				zz=str(int(Z[i]))
-				data[1][i]='{:.3E}'.format(data[1][i])+' '
-				data[-1].append(zz)
+    #check if input are elements or isotopes
+    if not '-' in data[0][0]:
+        iso_inp=False
+        dcols=dcols+['Z']
+    else:
+        iso_inp=True
+        dcols=dcols+['Z','A']
+    #Attach Z and A
+    if iso_inp==True:
+        data.append([])
+        data.append([])
+        u.convert_specie_naming_from_h5_to_ppn(data[0])
+        Z=u.znum_int
+        A=u.amass_int
+        for i in range(len(data[0])):
+            zz=str(int(Z[i]))
+            aa=str(int(A[i]))
+            data[1][i]='{:.3E}'.format(data[1][i])+' '
+            data[-2].append(zz)
+            data[-1].append(aa)
 
 
-		if sldir.endswith(os.sep):
-			filename = str(sldir)+str(filename)
-		else:
-			filename = str(sldir)+os.sep+str(filename)
-		tmp=[] #temp variable
-		lines=[]#list of the data lines
-		lengthList=[]# list of the longest element (data or column name)
-			     # in each column
-			     
-		if os.path.exists(filename):
-			print('This method will add table to existing file '+ filename)
-		
-		if len(data)!=len(dcols):
-			print('The number of data columns does not equal the number of Data attributes')
-			print('returning none')
-			return None
-		for i in range(len(headers)):
-			tmp.append(header_char+' '+headers[i]+'\n')
-		headers=tmp
-		tmp=''
-		
-		for i in range(len(data)): #Line length stuff
-			length=len(dcols[i])+1
-			for j in range(len(data[i])):
-				tmp2=data[i][j]
-				if isinstance(data[i][j],float):
-					tmp2='{:.3E}'.format(data[i][j])+' '
-					data[i][j] = tmp2
-				if len(str(tmp2))>length:
-					length=len(str(tmp2))
-			lengthList.append(length)
-		
-		tmp=''
-		tmp1=''
-		for i in range(len(dcols)):
-			tmp1=dcols[i]
-			if len(dcols[i]) < lengthList[i]:
-				j=lengthList[i]-len(dcols[i])
-				for k in range(j):
-					tmp1+=' '
-			tmp+=sep+tmp1
-		tmp+='\n'
-		dcols=tmp
-		tmp=''
-		for i in range(len(data[0])):
-			for j in range(len(data)):
-				if type(data[j][i]) == str:
-					#match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
-                                        #items = match.groups()
-                                        tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
-                                	if len(str(data[j][i])) < lengthList[j]:
-                                        	l=lengthList[j]-len(tmp1)
-                                        	for k in range(l):
-                                                	tmp1+=' '
-					extra=''	
-				#else:
-                                #        tmp1=data[j][i]
-                                #        if len(data[j][i]) < lengthList[j]:
-                                #                l=lengthList[j]-len(data[j][i]))
-                                #                for k in xrange(l):
-                                #                        tmp1+=' '
+    else:
+        #in order to get Z , create fake isotope from element
+        fake_iso=[]
+        for k in range(len(data[0])):
+            fake_iso.append(data[0][k]+'-99')
+        #print fake_iso
+            data.append([])
+            u.convert_specie_naming_from_h5_to_ppn(fake_iso)
+            Z=u.znum_int
+        for i in range(len(data[0])):
+            zz=str(int(Z[i]))
+            data[1][i]='{:.3E}'.format(data[1][i])+' '
+            data[-1].append(zz)
 
 
-				tmp+=sep+tmp1
-			lines.append(tmp+'\n')
-			tmp=''
-			
-		f=open(filename,'a')
-		for i in range(len(headers)):
-			f.write(headers[i])
-		f.write(dcols)
-		for i in range(len(lines)):
-			f.write(lines[i])
-		
-		f.close()
-		return None
+    if sldir.endswith(os.sep):
+        filename = str(sldir)+str(filename)
+    else:
+        filename = str(sldir)+os.sep+str(filename)
+    tmp=[] #temp variable
+    lines=[]#list of the data lines
+    lengthList=[]# list of the longest element (data or column name)
+             # in each column
 
+    if os.path.exists(filename):
+        print('This method will add table to existing file '+ filename)
 
+    if len(data)!=len(dcols):
+        print('The number of data columns does not equal the number of Data attributes')
+        print('returning none')
+        return None
+    for i in range(len(headers)):
+        tmp.append(header_char+' '+headers[i]+'\n')
+    headers=tmp
+    tmp=''
 
+    for i in range(len(data)): #Line length stuff
+        length=len(dcols[i])+1
+        for j in range(len(data[i])):
+            tmp2=data[i][j]
+            if isinstance(data[i][j],float):
+                tmp2='{:.3E}'.format(data[i][j])+' '
+                data[i][j] = tmp2
+            if len(str(tmp2))>length:
+                length=len(str(tmp2))
+        lengthList.append(length)
 
+    tmp=''
+    tmp1=''
+    for i in range(len(dcols)):
+        tmp1=dcols[i]
+        if len(dcols[i]) < lengthList[i]:
+            j=lengthList[i]-len(dcols[i])
+            for k in range(j):
+                tmp1+=' '
+        tmp+=sep+tmp1
+    tmp+='\n'
+    dcols=tmp
+    tmp=''
+    for i in range(len(data[0])):
+        for j in range(len(data)):
+            if type(data[j][i]) == str:
+                #match = re.match(r"([a-z]+)([0-9]+)",data[j][i], re.I)
+                                    #items = match.groups()
+                tmp1=data[j][i]#items[0].capitalize()+'-'+items[1]
+                if len(str(data[j][i])) < lengthList[j]:
+                        l=lengthList[j]-len(tmp1)
+                        for k in range(l):
+                                tmp1+=' '
+                extra=''
+            #else:
+                            #        tmp1=data[j][i]
+                            #        if len(data[j][i]) < lengthList[j]:
+                            #                l=lengthList[j]-len(data[j][i]))
+                            #                for k in xrange(l):
+                            #                        tmp1+=' '
+            tmp+=sep+tmp1
+        lines.append(tmp+'\n')
+        tmp=''
+
+    f=open(filename,'a')
+    for i in range(len(headers)):
+        f.write(headers[i])
+    f.write(dcols)
+    for i in range(len(lines)):
+        f.write(lines[i])
+
+    f.close()
+    return None

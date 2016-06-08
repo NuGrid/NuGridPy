@@ -1,4 +1,4 @@
-''' 
+'''
 utils.py
 
 Utility class for holding extra methods from mesa.py, nuh5p.py
@@ -6,6 +6,8 @@ Utility class for holding extra methods from mesa.py, nuh5p.py
 '''
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -14,13 +16,14 @@ from builtins import object
 
 import numpy as np
 import scipy as sc
-import ascii_table as att
+from . import ascii_table as att
+
 from scipy import optimize
 import matplotlib.pyplot as pl
 import os
 
 class data_fitting(object):
-    ''' 
+    '''
     Wrapper for the scipy method optimize.leastsq
 
     Parameters
@@ -50,7 +53,7 @@ class data_fitting(object):
     Feel free to add more, or provide your custom function as an
     argument.  For example, in order to provide an exponential fit
     function, first define the function.
-    
+
     >>> def ff(coef,x):
     >>>     return coef[0]*sc.exp(coef[1]*x)+coef[2]
 
@@ -60,7 +63,7 @@ class data_fitting(object):
 
     Once you have initialized this class, the instance provides two
     methods; fit and plot to check the fit.
-    
+
     >>> f.fit(x,y)
     >>> f.plot()
     >>> plot(f.x,(y-f.func(f.fcoef,f.x))/(0.5*(y[-1]-y[0])),'o')
@@ -71,7 +74,7 @@ class data_fitting(object):
     '''
 
     def __init__(self, func='linear', coef=(1, 1)):
-        ''' 
+        '''
         Parameters
         ----------
         func : string or function, optional
@@ -84,7 +87,7 @@ class data_fitting(object):
             enries.  If you provide your own function, then provide as
             many coef entries as your function needs.  The default is
             (1, 1).
-            
+
         '''
         if func is 'linear':
             print("Information: 'linear' fit needs coef list with 2 entries")
@@ -132,7 +135,7 @@ class data_fitting(object):
         self.func     = ff
 
     def fit(self, x, y, dcoef='none'):
-        ''' 
+        '''
         performs the fit
 
         x, y : list
@@ -167,7 +170,7 @@ class data_fitting(object):
 
     def plot(self, ifig=1, data_label='data', fit_label='fit',
              data_shape='o', fit_shape='-'):
-        ''' 
+        '''
         plot the data and the fitted function.
 
         Parameters
@@ -183,7 +186,7 @@ class data_fitting(object):
             Shape for data.  The default is 'o'.
         fit_shape : character
             Shape for fit.  The default is '-'.
-        
+
         '''
 
         if len(self.coef) is not len(self.fcoef):
@@ -205,13 +208,13 @@ class constants(object):
     avogadro_unit='mol^-1'
 
 class Utils(object):
-    ''' 
+    '''
     This private class contains utilities that are used by methods,
     mostly in the ppn and mppnp classes.  Users whould normally not use
     these methods directly.  Things go here when it can be imagined that
     they may be used not in immediate conjunction with plotting.
     Otherwise they would go into the superclass data_plot.
-    
+
     '''
 
     #elements_names is marked for deletion (FH, Oct2011) and
@@ -254,7 +257,7 @@ class Utils(object):
 
 
     def _stable_names(self):
-        ''' 
+        '''
         This private method extracts the element names from stable_el.
         Note that stable_names is a misnomer as stable_el also contains
         unstable element names with a number 999 for the *stable* mass
@@ -267,13 +270,13 @@ class Utils(object):
         self.stable_names=stable_names
 
     def _process_abundance_vector(self, a, z, isomers, yps):
-        ''' 
+        '''
         This private method takes as input one vector definition and
         processes it, including sorting by charge number and
         mass number. It returns the processed input variables
         plus an element and isotope vector and a list of
         isomers.
-        
+
         '''
 
         tmp=[]
@@ -303,7 +306,7 @@ class Utils(object):
         return a_iso_to_plot,z_iso_to_plot,abunds,isotope_to_plot,el_iso_to_plot,isom
 
     def compar(self, x, y):
-        ''' 
+        '''
         simple comparator method
 
         '''
@@ -324,7 +327,7 @@ class Utils(object):
             return -1
 
     def comparator(self, x, y):
-        ''' 
+        '''
         simple comparator method
 
         '''
@@ -345,13 +348,13 @@ class Utils(object):
             return -1
 
     def _read_isotopedatabase(self, ffname='isotopedatabase.txt'):
-        ''' 
+        '''
         This private method reads the isotopedatabase.txt file in sldir
         run dictory and returns z, a, elements, the cutoff mass for each
         species that delineate beta+ and beta- decay and the logical in
         the last column. Also provides charge_from_element dictionary
         according to isotopedatabase.txt.
-        
+
         '''
         name=self.sldir+ffname
         z_db, a_db, el_db, stable_a_db,logic_db=\
@@ -373,7 +376,7 @@ class Utils(object):
         return z_db, a_db, el_db, stable_a_db,logic_db,charge_from_element_name
 
     def decay_indexpointer(self):
-        ''' 
+        '''
         This private method provides decay indexpointers which allow to
         instantaneously decay an abundance vector. These are attributes
         are.
@@ -471,17 +474,17 @@ class Utils(object):
         self.idp_to_stables_in_isostoplot=ind_tmp
 
     def is_stable(self,species):
-        ''' 
+        '''
         This routine accepts input formatted like 'He-3' and checks with
         stable_el list if occurs in there.  If it does, the routine
         returns True, otherwise False.
-        
+
         Notes
         -----
         this method is designed to work with an se instance from
         nugridse.py. In order to make it work with ppn.py some
         additional work is required.
-        
+
         FH, April 20, 2013.
 
         '''
@@ -502,21 +505,21 @@ class Utils(object):
             return False
 
 class iniabu(Utils):
-    ''' 
+    '''
     This class in the utils package reads an abundance distribution file
     of the type iniab.dat. It then provides you with methods to change
     some abundances, modify, normalise and eventually write out the
     final distribution in a format that can be used as an initial
     abundance file for ppn. This class also contains a method to write
     initial abundance files for a MESA run, for a given MESA netowrk.
-    
+
     '''
     # clean variables that we will use in this class
 
     filename = ''
 
     def __init__(self,filename):
-        ''' 
+        '''
         Init method will read file of type iniab.dat, as they are for
         example found in the frames/mppnp/USEPP directory.
 
@@ -548,7 +551,7 @@ class iniabu(Utils):
 
         Example - generate modified input file ppn calculations:
 
-        >>> import utils
+        >>> from NuGridPy import utils
         >>> p=utils.iniabu('iniab1.0E-02.ppn_asplund05')
         >>> sp={}
         >>> sp['h   1']=0.2
@@ -603,7 +606,7 @@ class iniabu(Utils):
 
     def write(self, outfile='initial_abundance.dat',
               header_string='initial abundances for a PPN run'):
-        ''' 
+        '''
         Write initial abundance file (intended for use with ppn)
 
         Parameters
@@ -625,7 +628,7 @@ class iniabu(Utils):
                    add_excess_iso='fe56', outfile='xa_iniabu.dat',
                    header_string='initial abundances for a MESA run',
                    header_char='!'):
-        ''' 
+        '''
         Write initial abundance file, returns written abundances and
         mesa names.
 
@@ -647,8 +650,8 @@ class iniabu(Utils):
 
         Examples
         --------
-        
-        >>> import utils
+
+        >>> from NuGridPy import utils
         >>> !ls ~/PPN/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/   # find ppn initial abundance file
         >>> !cat ~/mesa/data/net_data/nets/agb.net                   # find isos needed in mesa net
         >>> !cat > isos.txt                                          # paste needed isos into file
@@ -695,7 +698,7 @@ class iniabu(Utils):
         return mesa_names,abus
 
     def set_and_normalize(self,species_hash):
-        ''' 
+        '''
         species_hash is a hash array in which you provide abundances
         referenced by species names that you want to set to some
         particular value; all other species are then normalised so that
@@ -703,10 +706,10 @@ class iniabu(Utils):
 
         Examples
         --------
-        
+
         You can set up the argument array for this method for example
         in the following way.
-        
+
         >>> sp={}
         >>> sp['he  4']=0.2
         >>> sp['h   1']=0.5
@@ -725,12 +728,12 @@ class iniabu(Utils):
             self.habu[name]=self.abu[self.hindex[name]]
 
     def isoratio_init(self,isos):
-        ''' 
+        '''
         This file returns the isotopic ratio of two isotopes specified
         as iso1 and iso2. The isotopes are given as, e.g.,
         ['Fe',56,'Fe',58] or ['Fe-56','Fe-58'] (for compatibility)
         -> list.
-        
+
         '''
         if len(isos) == 2:
             dumb = []
@@ -742,7 +745,7 @@ class iniabu(Utils):
         return ssratio
 
     def iso_abundance(self,isos):
-        ''' 
+        '''
         This routine returns the abundance of a specific isotope.
         Isotope given as, e.g., 'Si-28' or as list
         ['Si-28','Si-29','Si-30']
@@ -763,7 +766,7 @@ class iniabu(Utils):
 
 
 def trajectory_SgConst(Sg=0.1, delta_logt_dex=-0.01):
-    ''' 
+    '''
     setup trajectories for constant radiation entropy.
 
     S_gamma/R where the radiation constant R = N_A*k
@@ -779,7 +782,7 @@ def trajectory_SgConst(Sg=0.1, delta_logt_dex=-0.01):
     delta_logt_dex : float
         Sets interval between time steps in dex of logtimerev.  The
         default is -0.01.
-        
+
     '''
 
     # reverse logarithmic time
@@ -818,7 +821,7 @@ def _xlimrev(self):
     pyl.xlim(xmin,xmax)
 
 def close_wins(win_min,win_max):
-    ''' 
+    '''
     close all windows in a certain window number range
 
     win_min/max  minumum and maximum window number to close
@@ -833,15 +836,15 @@ def _xlimrev():
     pl.xlim(xmin,xmax)
 
 def species_list(what_list):
-    ''' 
+    '''
     provide default lists of elements to plot.
-    
+
     what_list : string
         String name of species lists provided.
-        
+
         If what_list is "CNONe", then C, N, O and some other light
         elements.
-        
+
         If what_list is "s-process", then s-process indicators.
 
     '''
@@ -857,7 +860,7 @@ def species_list(what_list):
     return list_to_print
 
 def linestyle(i,a=5,b=3):
-    ''' 
+    '''
     provide one out of 25 unique combinations of style, color and mark
 
     use in combination with markevery=a+mod(i,b) to add spaced points,
@@ -876,7 +879,7 @@ def linestyle(i,a=5,b=3):
 
     Examples
     --------
-    
+
     >>> plot(x,sin(x),linestyle(7)[0], markevery=linestyle(7)[1])
 
 
@@ -894,7 +897,7 @@ def colourblind(i):
     '''
         colour pallete from http://tableaufriction.blogspot.ro/
         allegedly suitable for colour-blind folk
-        
+
         SJ
     '''
 
@@ -920,21 +923,21 @@ def colourblind2(i):
     '''
         another colour pallete from http://www.sron.nl/~pault/
         allegedly suitable for colour-blind folk
-        
+
         SJ
     '''
-    
+
     hexcols = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77',
-               '#CC6677', '#882255', '#AA4499']    
+               '#CC6677', '#882255', '#AA4499']
     idx = sc.mod(i,len(hexcols))
     return hexcols[idx]
 
 def linestylecb(i,a=5,b=3):
     '''
         version of linestyle function with colourblind colour scheme
-        
+
         returns linetyle, marker, color (see example)
-        
+
         Parameters
         ----------
         i : integer
@@ -944,17 +947,17 @@ def linestylecb(i,a=5,b=3):
         b : integer
         Modulation in case of plotting many nearby lines.  The default
         is 3.
-        
+
         Examples
         --------
-        
+
         >>> plot(x,sin(x),ls=linestyle(7)[0], marker=linestyle(7)[1], \
                  color=linestyle(7)[2],markevery=linestyle(7)[3])
-        
-        
+
+
         (c) 2014 FH
         '''
-    
+
     lines=['-','--','-.',':']
     points=['v','^','<','>','1','2','3','4','s','p','*','h','H','+','x','D','d','o']
     colors=['b','g','r','c','m','k']
@@ -966,15 +969,15 @@ def linestylecb(i,a=5,b=3):
 
 
 def symbol_list(what_list):
-    ''' 
+    '''
     provide default symbol lists
-    
+
     Parameters
     ----------
     what_list : string
         String name of symbol lists provided; "list1", "list2",
         "lines1" or "lines2".
-        
+
     '''
     if what_list is "list1":
         symbol=['ro','bo','ko','go','mo'\
@@ -991,17 +994,17 @@ def symbol_list(what_list):
     return symbol
 
 def make_list(default_symbol_list, len_list_to_print):
-    ''' 
+    '''
     provide the list of symbols to use according for the list of
     species/arrays to plot.
-    
+
     Parameters
     ----------
     default_symbol_list : list
         Symbols that the user choose to use.
     len_list_to_print : integer
         len of list of species/arrays to print.
-        
+
     '''
 
     symbol_used = []
@@ -1011,7 +1014,7 @@ def make_list(default_symbol_list, len_list_to_print):
     return symbol_used
 
 def strictly_monotonic(bb):
-    ''' 
+    '''
     bb is an index array which may have numerous double or triple
     occurrences of indices, such as for example the decay_index_pointer.
     This method removes all entries <= -, then all dublicates and
@@ -1026,9 +1029,9 @@ def strictly_monotonic(bb):
     return np.ma.array(cc,mask=dc_mask.mask).compressed()
 
 def solar(filename_solar, solar_factor):
-    ''' 
+    '''
     read solar abundances from filename_solar.
-    
+
     Parameters
     ----------
     filename_solar : string
@@ -1041,7 +1044,7 @@ def solar(filename_solar, solar_factor):
         not properly considered.  Only H and He4 are not multiplied. So,
         for publications PLEASE use proper filename_solar at...solar,
         and use solar_factor = 1. Marco
-    
+
     '''
 
     f0=open(filename_solar)
@@ -1099,7 +1102,7 @@ def solar(filename_solar, solar_factor):
 
 
 def convert_specie_naming_from_h5_to_ppn(isotope_names):
-    ''' 
+    '''
     read isotopes names from h5 files, and convert them
     according to standard scheme used inside ppn and mppnp.  Also
     Z and A are recalculated, for these species. Isomers are
@@ -1107,7 +1110,7 @@ def convert_specie_naming_from_h5_to_ppn(isotope_names):
     name. As soon as the isomers names are settled, than Z and A
     provided here will be obsolete, and can be changed by usual Z
     and A.
-    
+
     '''
 
     spe_rude1 = []
@@ -1164,205 +1167,204 @@ def convert_specie_naming_from_h5_to_ppn(isotope_names):
     znum_int=np.zeros(len(spe))
 
     for i in range(len(spe)):
-        if str(spe[i][0:2]) == 'H ':
-            znum_int[i] = 1
-        elif str(spe[i][0:2]) == 'He':
-            znum_int[i] = 2
-        elif str(spe[i][0:2]) == 'Li':
-            znum_int[i] = 3
-        elif str(spe[i][0:2]) == 'Be':
-            znum_int[i] = 4
-        elif str(spe[i][0:2]) == 'B ':
-            znum_int[i] = 5
-        elif str(spe[i][0:2]) == 'C ':
-            znum_int[i] = 6
-        elif str(spe[i][0:2]) == 'N ':
-            znum_int[i] = 7
-        elif str(spe[i][0:2]) == 'O ':
-            znum_int[i] = 8
-        elif str(spe[i][0:2]) == 'F ':
-            znum_int[i] = 9
-        elif str(spe[i][0:2]) == 'Ne':
-            znum_int[i] = 10
-        elif str(spe[i][0:2]) == 'Na':
-            znum_int[i] = 11
-        elif str(spe[i][0:2]) == 'Mg':
-            znum_int[i] = 12
-        elif str(spe[i][0:2]) == 'Al':
-            znum_int[i] = 13
-        elif str(spe[i][0:2]) == 'Si':
-            znum_int[i] = 14
-        elif str(spe[i][0:2]) == 'P ':
-            znum_int[i] = 15
-        elif str(spe[i][0:2]) == 'S ':
-            znum_int[i] = 16
-        elif str(spe[i][0:2]) == 'Cl':
-            znum_int[i] = 17
-        elif str(spe[i][0:2]) == 'Ar':
-            znum_int[i] = 18
-        elif str(spe[i][0:2]) == 'K ':
-            znum_int[i] = 19
-        elif str(spe[i][0:2]) == 'Ca':
-            znum_int[i] = 20
-        elif str(spe[i][0:2]) == 'Sc':
-            znum_int[i] = 21
-        elif str(spe[i][0:2]) == 'Ti':
-            znum_int[i] = 22
-        elif str(spe[i][0:2]) == 'V ':
-            znum_int[i] = 23
-        elif str(spe[i][0:2]) == 'Cr':
-            znum_int[i] = 24
-        elif str(spe[i][0:2]) == 'Mn':
-            znum_int[i] = 25
-        elif str(spe[i][0:2]) == 'Fe':
-            znum_int[i] = 26
-        elif str(spe[i][0:2]) == 'Co':
-            znum_int[i] = 27
-        elif str(spe[i][0:2]) == 'Ni':
-            znum_int[i] = 28
-        elif str(spe[i][0:2]) == 'Cu':
-            znum_int[i] = 29
-        elif str(spe[i][0:2]) == 'Zn':
-            znum_int[i] = 30
-        elif str(spe[i][0:2]) == 'Ga':
-            znum_int[i] = 31
-        elif str(spe[i][0:2]) == 'Ge':
-            znum_int[i] = 32
-        elif str(spe[i][0:2]) == 'As':
-            znum_int[i] = 33
-        elif str(spe[i][0:2]) == 'Se':
-            znum_int[i] = 34
-        elif str(spe[i][0:2]) == 'Br':
-            znum_int[i] = 35
-        elif str(spe[i][0:2]) == 'Kr':
-            znum_int[i] = 36
-        elif str(spe[i][0:2]) == 'Rb':
-            znum_int[i] = 37
-        elif str(spe[i][0:2]) == 'Sr':
-            znum_int[i] = 38
-        elif str(spe[i][0:2]) == 'Y ':
-            znum_int[i] = 39
-        elif str(spe[i][0:2]) == 'Zr':
-            znum_int[i] = 40
-        elif str(spe[i][0:2]) == 'Nb':
-            znum_int[i] = 41
-        elif str(spe[i][0:2]) == 'Mo':
-            znum_int[i] = 42
-        elif str(spe[i][0:2]) == 'Tc':
-            znum_int[i] = 43
-        elif str(spe[i][0:2]) == 'Ru':
-            znum_int[i] = 44
-        elif str(spe[i][0:2]) == 'Rh':
-            znum_int[i] = 45
-        elif str(spe[i][0:2]) == 'Pd':
-            znum_int[i] = 46
-        elif str(spe[i][0:2]) == 'Ag':
-            znum_int[i] = 47
-        elif str(spe[i][0:2]) == 'Cd':
-            znum_int[i] = 48
-        elif str(spe[i][0:2]) == 'In':
-            znum_int[i] = 49
-        elif str(spe[i][0:2]) == 'Sn':
-            znum_int[i] = 50
-        elif str(spe[i][0:2]) == 'Sb':
-            znum_int[i] = 51
-        elif str(spe[i][0:2]) == 'Te':
-            znum_int[i] = 52
-        elif str(spe[i][0:2]) == 'I ':
-            znum_int[i] = 53
-        elif str(spe[i][0:2]) == 'Xe':
-            znum_int[i] = 54
-        elif str(spe[i][0:2]) == 'Cs':
-            znum_int[i] = 55
-        elif str(spe[i][0:2]) == 'Ba':
-            znum_int[i] = 56
-        elif str(spe[i][0:2]) == 'La':
-            znum_int[i] = 57
-        elif str(spe[i][0:2]) == 'Ce':
-            znum_int[i] = 58
-        elif str(spe[i][0:2]) == 'Pr':
-            znum_int[i] = 59
-        elif str(spe[i][0:2]) == 'Nd':
-            znum_int[i] = 60
-        elif str(spe[i][0:2]) == 'Pm':
-            znum_int[i] = 61
-        elif str(spe[i][0:2]) == 'Sm':
-            znum_int[i] = 62
-        elif str(spe[i][0:2]) == 'Eu':
-            znum_int[i] = 63
-        elif str(spe[i][0:2]) == 'Gd':
-            znum_int[i] = 64
-        elif str(spe[i][0:2]) == 'Tb':
-            znum_int[i] = 65
-        elif str(spe[i][0:2]) == 'Dy':
-            znum_int[i] = 66
-        elif str(spe[i][0:2]) == 'Ho':
-            znum_int[i] = 67
-        elif str(spe[i][0:2]) == 'Er':
-            znum_int[i] = 68
-        elif str(spe[i][0:2]) == 'Tm':
-            znum_int[i] = 69
-        elif str(spe[i][0:2]) == 'Yb':
-            znum_int[i] = 70
-        elif str(spe[i][0:2]) == 'Lu':
-            znum_int[i] = 71
-        elif str(spe[i][0:2]) == 'Hf':
-            znum_int[i] = 72
-        elif str(spe[i][0:2]) == 'Ta':
-            znum_int[i] = 73
-        elif str(spe[i][0:2]) == 'W ':
-            znum_int[i] = 74
-        elif str(spe[i][0:2]) == 'Re':
-            znum_int[i] = 75
-        elif str(spe[i][0:2]) == 'Os':
-            znum_int[i] = 76
-        elif str(spe[i][0:2]) == 'Ir':
-            znum_int[i] = 77
-        elif str(spe[i][0:2]) == 'Pt':
-            znum_int[i] = 78
-        elif str(spe[i][0:2]) == 'Au':
-            znum_int[i] = 79
-        elif str(spe[i][0:2]) == 'Hg':
-            znum_int[i] = 80
-        elif str(spe[i][0:2]) == 'Tl':
-            znum_int[i] = 81
-        elif str(spe[i][0:2]) == 'Pb':
-            znum_int[i] = 82
-        elif str(spe[i][0:2]) == 'Bi':
-            znum_int[i] = 83
-        elif str(spe[i][0:2]) == 'Po':
-            znum_int[i] = 84
-        elif str(spe[i][0:2]) == 'At':
-            znum_int[i] = 85
-        elif str(spe[i][0:2]) == 'Rn':
-            znum_int[i] = 86
-        elif str(spe[i][0:2]) == 'Fr':
-            znum_int[i] = 87
-        elif str(spe[i][0:2]) == 'Ra':
-            znum_int[i] = 88
-        elif str(spe[i][0:2]) == 'Ac':
-            znum_int[i] = 89
-        elif str(spe[i][0:2]) == 'Th':
-            znum_int[i] = 90
-        elif str(spe[i][0:2]) == 'Pa':
-            znum_int[i] = 91
-        elif str(spe[i][0:2]) == 'U ':
-            znum_int[i] = 92
-        elif str(spe[i][0:2]) == 'Np':
-            znum_int[i] = 93
-        elif str(spe[i][0:2]) == 'Pu':
-            znum_int[i] = 94
-        elif str(spe[i][0:2]) == 'Am':
-            znum_int[i] = 95
-        elif str(spe[i][0:2]) == 'Cm':
-            znum_int[i] = 96
-        elif str(spe[i][0:2]) == 'Bk':
-            znum_int[i] = 97
-        elif str(spe[i][0:2]) == 'Cf':
-            znum_int[i] = 98
-
-
-
+        znum_int[i] = Utils.elements_names.index(str(spe[i][0:2]).strip())
+        # changed by alex
+        # if str(spe[i][0:2]) == 'H ':
+        #     znum_int[i] = 1
+        # elif str(spe[i][0:2]) == 'He':
+        #     znum_int[i] = 2
+        # elif str(spe[i][0:2]) == 'Li':
+        #     znum_int[i] = 3
+        # elif str(spe[i][0:2]) == 'Be':
+        #     znum_int[i] = 4
+        # elif str(spe[i][0:2]) == 'B ':
+        #     znum_int[i] = 5
+        # elif str(spe[i][0:2]) == 'C ':
+        #     znum_int[i] = 6
+        # elif str(spe[i][0:2]) == 'N ':
+        #     znum_int[i] = 7
+        # elif str(spe[i][0:2]) == 'O ':
+        #     znum_int[i] = 8
+        # elif str(spe[i][0:2]) == 'F ':
+        #     znum_int[i] = 9
+        # elif str(spe[i][0:2]) == 'Ne':
+        #     znum_int[i] = 10
+        # elif str(spe[i][0:2]) == 'Na':
+        #     znum_int[i] = 11
+        # elif str(spe[i][0:2]) == 'Mg':
+        #     znum_int[i] = 12
+        # elif str(spe[i][0:2]) == 'Al':
+        #     znum_int[i] = 13
+        # elif str(spe[i][0:2]) == 'Si':
+        #     znum_int[i] = 14
+        # elif str(spe[i][0:2]) == 'P ':
+        #     znum_int[i] = 15
+        # elif str(spe[i][0:2]) == 'S ':
+        #     znum_int[i] = 16
+        # elif str(spe[i][0:2]) == 'Cl':
+        #     znum_int[i] = 17
+        # elif str(spe[i][0:2]) == 'Ar':
+        #     znum_int[i] = 18
+        # elif str(spe[i][0:2]) == 'K ':
+        #     znum_int[i] = 19
+        # elif str(spe[i][0:2]) == 'Ca':
+        #     znum_int[i] = 20
+        # elif str(spe[i][0:2]) == 'Sc':
+        #     znum_int[i] = 21
+        # elif str(spe[i][0:2]) == 'Ti':
+        #     znum_int[i] = 22
+        # elif str(spe[i][0:2]) == 'V ':
+        #     znum_int[i] = 23
+        # elif str(spe[i][0:2]) == 'Cr':
+        #     znum_int[i] = 24
+        # elif str(spe[i][0:2]) == 'Mn':
+        #     znum_int[i] = 25
+        # elif str(spe[i][0:2]) == 'Fe':
+        #     znum_int[i] = 26
+        # elif str(spe[i][0:2]) == 'Co':
+        #     znum_int[i] = 27
+        # elif str(spe[i][0:2]) == 'Ni':
+        #     znum_int[i] = 28
+        # elif str(spe[i][0:2]) == 'Cu':
+        #     znum_int[i] = 29
+        # elif str(spe[i][0:2]) == 'Zn':
+        #     znum_int[i] = 30
+        # elif str(spe[i][0:2]) == 'Ga':
+        #     znum_int[i] = 31
+        # elif str(spe[i][0:2]) == 'Ge':
+        #     znum_int[i] = 32
+        # elif str(spe[i][0:2]) == 'As':
+        #     znum_int[i] = 33
+        # elif str(spe[i][0:2]) == 'Se':
+        #     znum_int[i] = 34
+        # elif str(spe[i][0:2]) == 'Br':
+        #     znum_int[i] = 35
+        # elif str(spe[i][0:2]) == 'Kr':
+        #     znum_int[i] = 36
+        # elif str(spe[i][0:2]) == 'Rb':
+        #     znum_int[i] = 37
+        # elif str(spe[i][0:2]) == 'Sr':
+        #     znum_int[i] = 38
+        # elif str(spe[i][0:2]) == 'Y ':
+        #     znum_int[i] = 39
+        # elif str(spe[i][0:2]) == 'Zr':
+        #     znum_int[i] = 40
+        # elif str(spe[i][0:2]) == 'Nb':
+        #     znum_int[i] = 41
+        # elif str(spe[i][0:2]) == 'Mo':
+        #     znum_int[i] = 42
+        # elif str(spe[i][0:2]) == 'Tc':
+        #     znum_int[i] = 43
+        # elif str(spe[i][0:2]) == 'Ru':
+        #     znum_int[i] = 44
+        # elif str(spe[i][0:2]) == 'Rh':
+        #     znum_int[i] = 45
+        # elif str(spe[i][0:2]) == 'Pd':
+        #     znum_int[i] = 46
+        # elif str(spe[i][0:2]) == 'Ag':
+        #     znum_int[i] = 47
+        # elif str(spe[i][0:2]) == 'Cd':
+        #     znum_int[i] = 48
+        # elif str(spe[i][0:2]) == 'In':
+        #     znum_int[i] = 49
+        # elif str(spe[i][0:2]) == 'Sn':
+        #     znum_int[i] = 50
+        # elif str(spe[i][0:2]) == 'Sb':
+        #     znum_int[i] = 51
+        # elif str(spe[i][0:2]) == 'Te':
+        #     znum_int[i] = 52
+        # elif str(spe[i][0:2]) == 'I ':
+        #     znum_int[i] = 53
+        # elif str(spe[i][0:2]) == 'Xe':
+        #     znum_int[i] = 54
+        # elif str(spe[i][0:2]) == 'Cs':
+        #     znum_int[i] = 55
+        # elif str(spe[i][0:2]) == 'Ba':
+        #     znum_int[i] = 56
+        # elif str(spe[i][0:2]) == 'La':
+        #     znum_int[i] = 57
+        # elif str(spe[i][0:2]) == 'Ce':
+        #     znum_int[i] = 58
+        # elif str(spe[i][0:2]) == 'Pr':
+        #     znum_int[i] = 59
+        # elif str(spe[i][0:2]) == 'Nd':
+        #     znum_int[i] = 60
+        # elif str(spe[i][0:2]) == 'Pm':
+        #     znum_int[i] = 61
+        # elif str(spe[i][0:2]) == 'Sm':
+        #     znum_int[i] = 62
+        # elif str(spe[i][0:2]) == 'Eu':
+        #     znum_int[i] = 63
+        # elif str(spe[i][0:2]) == 'Gd':
+        #     znum_int[i] = 64
+        # elif str(spe[i][0:2]) == 'Tb':
+        #     znum_int[i] = 65
+        # elif str(spe[i][0:2]) == 'Dy':
+        #     znum_int[i] = 66
+        # elif str(spe[i][0:2]) == 'Ho':
+        #     znum_int[i] = 67
+        # elif str(spe[i][0:2]) == 'Er':
+        #     znum_int[i] = 68
+        # elif str(spe[i][0:2]) == 'Tm':
+        #     znum_int[i] = 69
+        # elif str(spe[i][0:2]) == 'Yb':
+        #     znum_int[i] = 70
+        # elif str(spe[i][0:2]) == 'Lu':
+        #     znum_int[i] = 71
+        # elif str(spe[i][0:2]) == 'Hf':
+        #     znum_int[i] = 72
+        # elif str(spe[i][0:2]) == 'Ta':
+        #     znum_int[i] = 73
+        # elif str(spe[i][0:2]) == 'W ':
+        #     znum_int[i] = 74
+        # elif str(spe[i][0:2]) == 'Re':
+        #     znum_int[i] = 75
+        # elif str(spe[i][0:2]) == 'Os':
+        #     znum_int[i] = 76
+        # elif str(spe[i][0:2]) == 'Ir':
+        #     znum_int[i] = 77
+        # elif str(spe[i][0:2]) == 'Pt':
+        #     znum_int[i] = 78
+        # elif str(spe[i][0:2]) == 'Au':
+        #     znum_int[i] = 79
+        # elif str(spe[i][0:2]) == 'Hg':
+        #     znum_int[i] = 80
+        # elif str(spe[i][0:2]) == 'Tl':
+        #     znum_int[i] = 81
+        # elif str(spe[i][0:2]) == 'Pb':
+        #     znum_int[i] = 82
+        # elif str(spe[i][0:2]) == 'Bi':
+        #     znum_int[i] = 83
+        # elif str(spe[i][0:2]) == 'Po':
+        #     znum_int[i] = 84
+        # elif str(spe[i][0:2]) == 'At':
+        #     znum_int[i] = 85
+        # elif str(spe[i][0:2]) == 'Rn':
+        #     znum_int[i] = 86
+        # elif str(spe[i][0:2]) == 'Fr':
+        #     znum_int[i] = 87
+        # elif str(spe[i][0:2]) == 'Ra':
+        #     znum_int[i] = 88
+        # elif str(spe[i][0:2]) == 'Ac':
+        #     znum_int[i] = 89
+        # elif str(spe[i][0:2]) == 'Th':
+        #     znum_int[i] = 90
+        # elif str(spe[i][0:2]) == 'Pa':
+        #     znum_int[i] = 91
+        # elif str(spe[i][0:2]) == 'U ':
+        #     znum_int[i] = 92
+        # elif str(spe[i][0:2]) == 'Np':
+        #     znum_int[i] = 93
+        # elif str(spe[i][0:2]) == 'Pu':
+        #     znum_int[i] = 94
+        # elif str(spe[i][0:2]) == 'Am':
+        #     znum_int[i] = 95
+        # elif str(spe[i][0:2]) == 'Cm':
+        #     znum_int[i] = 96
+        # elif str(spe[i][0:2]) == 'Bk':
+        #     znum_int[i] = 97
+        # elif str(spe[i][0:2]) == 'Cf':
+        #     znum_int[i] = 98
 
     if spe[0] == 'N   1':
         znum_int[0] = 0
@@ -1390,19 +1392,19 @@ def element_abund_marco(i_decay, stable_isotope_list,
                         stable_isotope_identifier,
                         mass_fractions_array_not_decayed,
                         mass_fractions_array_decayed):
-    ''' 
+    '''
     Given an array of isotopic abundances not decayed and a similar
     array of isotopic abundances not decayed, here elements abundances,
     and production factors for elements are calculated
-    
+
     '''
 
 
     # this way is done in a really simple way. May be done better for sure, in a couple of loops.
     # I keep this, since I have only to copy over old script. Falk will probably redo it.
 
-    import numpy as np
-    #import utils as u
+    #import numpy as np
+    #from NuGridPy import utils as u
 
     global elem_abund
     elem_abund = np.zeros(z_bismuth)
@@ -1452,7 +1454,7 @@ def stable_specie():
     ''' provide the list of stable species, and decay path feeding stables '''
 
 
-    import numpy as np
+    #import numpy as np
 
 
     stable_raw=[]
@@ -1858,11 +1860,10 @@ def stable_specie():
     ['U 238','PA238','TH238','AC238','RA238','FR238','RN238']]
     #print decay_raw
 
-
 def give_zip_element_z_and_names(element_name):
     ''' create 2 indexes that, given the name of the element/specie, give the atomic number.'''
 
-    import numpy as np
+    #import numpy as np
 
     global z_bismuth
     z_bismuth = 83
@@ -2086,9 +2087,8 @@ def get_el_from_z(z):
     For the other way, see get_z_from_el
     '''
     if(type(z)==float):
-	z=int(z)
+        z=int(z)
     if(type(z)==int):
         z=str(z)
     dict_z={'24': 'Cr', '25': 'Mn', '26': 'Fe', '27': 'Co', '20': 'Ca', '21': 'Sc', '22': 'Ti', '23': 'V', '28': 'Ni', '29': 'Cu', '4': 'Be', '8': 'O', '59': 'Pr', '58': 'Ce', '55': 'Cs', '54': 'Xe', '57': 'La', '56': 'Ba', '51': 'Sb', '50': 'Sn', '53': 'I', '52': 'Te', '88': 'Ra', '89': 'Ac', '82': 'Pb', '83': 'Bi', '80': 'Hg', '81': 'Tl', '86': 'Rn', '87': 'Fr', '84': 'Po', '85': 'At', '3': 'Li', '7': 'N', '39': 'Y', '38': 'Sr', '33': 'As', '32': 'Ge', '31': 'Ga', '30': 'Zn', '37': 'Rb', '36': 'Kr', '35': 'Br', '34': 'Se', '60': 'Nd', '61': 'Pm', '62': 'Sm', '63': 'Eu', '64': 'Gd', '65': 'Tb', '66': 'Dy', '67': 'Ho', '68': 'Er', '69': 'Tm', '2': 'He', '6': 'C', '91': 'Pa', '90': 'Th', '92': 'U', '11': 'Na', '10': 'Ne', '13': 'Al', '12': 'Mg', '15': 'P', '14': 'Si', '17': 'Cl', '16': 'S', '19': 'K', '18': 'Ar', '48': 'Cd', '49': 'In', '46': 'Pd', '47': 'Ag', '44': 'Ru', '45': 'Rh', '42': 'Mo', '43': 'Tc', '40': 'Zr', '41': 'Nb', '1': 'H', '5': 'B', '9': 'F', '77': 'Ir', '76': 'Os', '75': 'Re', '74': 'W', '73': 'Ta', '72': 'Hf', '71': 'Lu', '70': 'Yb', '79': 'Au', '78': 'Pt'}
     return dict_z[z]
-

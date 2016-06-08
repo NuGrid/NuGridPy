@@ -456,11 +456,11 @@ def mu(X,Z,A):
     '''
     
     if not isinstance(Z,np.ndarray):
-    	Z = np.array(Z)
+        Z = np.array(Z)
     if not isinstance(A,np.ndarray):
-    	A = np.array(A)
+        A = np.array(A)
     if not isinstance(X,np.ndarray):
-    	X = np.array(X)
+        X = np.array(X)
     	
     try:
         mu = old_div(1.,sum(X*(1.+Z)/A))

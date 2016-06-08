@@ -1,4 +1,4 @@
-''' 
+'''
 grain.py is a collection of routines to analyze presolar grain data
 (and can probably be extended to observational data at a later stage).
 
@@ -30,6 +30,8 @@ again. if this does not work, good luck...
 '''
 from __future__ import division
 from __future__ import print_function
+from __future__ import absolute_import
+
 from builtins import input
 from builtins import zip
 from builtins import str
@@ -42,15 +44,16 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import xlrd
-from utils import *
-from data_plot import *
+
+from .utils import *
+from .data_plot import *
 
 ### find the path to the tree ###
 
 
 
-class gdb(DataPlot,Utils):
-    ''' 
+class gdb(DataPlot, Utils):
+    '''
     This class provides easy access to the presolar grain databse, as
     described in the header The databse is read in by default, however
     you can choose a private database and if you do so, if you want to
@@ -128,7 +131,7 @@ class gdb(DataPlot,Utils):
         print('Presolar grain database available at: http://presolar.wustl.edu/PGD/Presolar_Grain_Database.html')
 
     def reset_filter(self):
-        ''' 
+        '''
         Resets the filter and goes back to initialized value. This
         routine also resets the style if you have changed it.
 
@@ -145,7 +148,7 @@ class gdb(DataPlot,Utils):
 
     def info(self, graintype=True, group=True, reference=False,
              phase=True):
-        ''' 
+        '''
         This routine gives you informations what kind of grains are
         currently available in your filtered version.  It gives you
         the type of grains available.  More to be implemented upon need.
@@ -234,14 +237,14 @@ class gdb(DataPlot,Utils):
 
     def filter_desc(self, graintype=None, group=None, reference=None,
                     size=None, phase=None):
-        ''' 
+        '''
         This routine is to filter for description elements.  You can
         check what is available in the description by running,
 
         >>> i.header_desc()
 
         where i is the instance you loaded.
-        
+
         You can run the filter multiple times!  You can filter for the
         following types:
 
@@ -258,7 +261,7 @@ class gdb(DataPlot,Utils):
             Give the reference you want to filter for, try an i.info()
             to pick the right name!  You can select a single
             referennce as string or multiple references in as a list.
-        size : string 
+        size : string
             Filter for grain sizes, give '<5.0' or '>5.0' as a string
             for larger or smaller than a given grainsize in um.  Only
             data with known grainsizes are chosen.  Often grain sizes
@@ -267,7 +270,7 @@ class gdb(DataPlot,Utils):
             then grains with the smaller dimension >5um are taken into
             account.  If you want <5.0 then grains with the upper
             dimension <5um are taken into account.
-            
+
         '''
 
         # filter for graintype
@@ -367,7 +370,7 @@ class gdb(DataPlot,Utils):
 
 
     def _filter_desc(self, indexing):
-        ''' 
+        '''
         Private function to filter data, goes with filter_desc
 
         '''
@@ -393,14 +396,14 @@ class gdb(DataPlot,Utils):
 
 
     def filter_single_grain(self):
-        ''' 
+        '''
         This subroutine is to filter out single grains. It is kind of
         useless if you have tons of data still in the list. To work on
         there, you have other filters (filter_desc and filter_data)
         available!  This filter gives an index to every grain, plots
         the most important information, and then asks you to pick a
         filter.  No input necessary, input is given during the routine
-        
+
         '''
 
         my_index = 0
@@ -449,10 +452,10 @@ class gdb(DataPlot,Utils):
 
 
     def filter_data(self, isos, limit, delta=True):
-        ''' 
+        '''
         This subroutine filters isotopic values according to the limit
         you give.  You can filter in ratio or in delta space.
-        
+
         Parameters
         ----------
         isos : list
@@ -464,7 +467,7 @@ class gdb(DataPlot,Utils):
         delta : boolean, optional
             do you wanna filter in delta space, then set to True,
             otherwise to False.  The default is True.
-        
+
         '''
 
         # check availability
@@ -541,7 +544,7 @@ class gdb(DataPlot,Utils):
 
 
     def filter_uncertainty(self, isos, limit, delta=True):
-        ''' 
+        '''
         This subroutine filters isotopic values according to the limit
         you give.  You can filter in ratio or in delta space.  This
         routine is based on the uncertainties, e.g., if you want to
@@ -758,7 +761,7 @@ class gdb(DataPlot,Utils):
     ##### PLOTTING PREPARATOR #####
 
     def plot_ratio_return(self, isox, isoy, deltax=True, deltay=True):
-        ''' 
+        '''
         This routine returns data isotopic data to plot from the
         filtered list of data.
 
@@ -1001,15 +1004,15 @@ class gdb(DataPlot,Utils):
 
     ##### SMALL HELPER ROUTINES #####
     def check_availability(self, isos):
-        ''' 
+        '''
         This routine checks if the requested set of isotopes is
         available in the dataset.
-        
+
         Parameters
         ----------
         isos : list
             set of isotopes in format ['Si-28','Si-30'].
- 
+
         Returns
         -------
         list
@@ -1058,9 +1061,9 @@ class gdb(DataPlot,Utils):
 
 
     def ratio_to_delta(self, isos_ss, ratio, oneover=False):
-        ''' 
+        '''
         Transforms an isotope ratio into a delta value
- 
+
         Parameters
         ----------
         isos_ss: list or float
@@ -1097,7 +1100,7 @@ class gdb(DataPlot,Utils):
         return delta
 
     def delta_to_ratio(self, isos_ss, delta, oneover=False):
-        ''' 
+        '''
         Transforms a delta value into an isotopic ratio
 
         Parameters
@@ -1139,7 +1142,7 @@ class gdb(DataPlot,Utils):
 
 ##### SMALL SUBROUTINES THAT DO NOT NEED TO BE INSIDE THE CLASS, KIND OF GRAIN.PY SPECIFIC UTILS #####
 def iso_name_converter(iso):
-    ''' 
+    '''
     Converts the name of the given isotope (input), e.g., 'N-14' to
     14N as used later to compare w/ grain database.
 
@@ -1151,7 +1154,7 @@ def iso_name_converter(iso):
 
 
 def get_svnpath():
-    ''' 
+    '''
     This subroutine gives back the path of the whole svn tree
     installation, which is necessary for the script to run.
 
