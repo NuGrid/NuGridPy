@@ -84,38 +84,32 @@ def _padding_model_number(number, max_num):
 
 class DataPlot(object):
 
+    _classTest_data = {
+        'ppm.yprofile': 'YProfile',
+        'ascii_table.ascii_table': 'AsciiTable',
+        'nugridse.se': 'se',
+        'mesa.mesa_profile': 'mesa_profile',
+        'mesa.star_log': 'mesa.star_log',
+        'mesa.history_data': 'mesa.star_log',
+        'ppn.xtime': 'xtime',
+        'ppn.abu_vector': 'PPN',
+        'starobs.plot': 'starobs',
+        'grain.gdb': 'grain',
+        }
+
     def _classTest(self):
         '''
         Determines what the type of class instance the subclass is, so
         we can dynamically determine the behaviour of methods.
 
-        This method NEEDS to be modified if any names of files or
-        classes are changed.
+        The data this method uses (_classTest_data) NEEDS to be
+        modified if any names of files or classes are changed.
 
+        TODO - The entire use of this class needs to be refactored to use
+        derived classes instead.
         '''
-
-        c=str(self.__class__)
-        tmp=''
-        if 'ppm.yprofile' == c:
-            tmp='YProfile'
-        elif 'ascii_table.ascii_table' == c:
-            tmp='AsciiTable'
-        elif 'nugridse.se' == c:
-            tmp='se'
-        elif 'mesa.mesa_profile' == c:
-            tmp='mesa_profile'
-        elif 'mesa.star_log' == c or 'mesa.history_data' == c:
-            tmp='mesa.star_log'
-        elif 'ppn.xtime' == c:
-            tmp='xtime'
-        elif 'ppn.abu_vector' == c:
-            tmp='PPN'
-        elif 'starobs.plot' == c:
-            tmp='starobs'
-        elif 'grain.gdb' == c:
-            tmp='grain'
-
-        return tmp
+        c = '.'.join(str(self.__class__).rsplit('.', 2)[-2])
+        return self._classTest_data.get(c, '')
 
     def _which(self, program):
         '''
