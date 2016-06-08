@@ -108,7 +108,7 @@ class DataPlot(object):
         TODO - The entire use of this class needs to be refactored to use
         derived classes instead.
         '''
-        c = '.'.join(str(self.__class__).rsplit('.', 2)[-2])
+        c = '.'.join(str(self.__class__)[:-2].rsplit('.', 2)[-2:])
         return self._classTest_data.get(c, '')
 
     def _which(self, program):
