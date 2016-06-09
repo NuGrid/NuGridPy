@@ -8,8 +8,8 @@ repository. All components present here have now been removed from
 the svn. Please checkout r6619 if you would like access to the
 most recent version in the svn prior to NuGridPy's removal.
 
-NuGridPy is a Python package containing tools to access and analyse 
-(e.g. plot) various output formats (including the hdf5-based se format) 
+NuGridPy is a Python package containing tools to access and analyse
+(e.g. plot) various output formats (including the hdf5-based se format)
 from NuGrid codes (mppnp and ppn) and from the MESA stellar evolution
 code. In principle the NuGridPy package can be used on any stellar
 evolution code output if the tools to write se hdf5 files available on
@@ -49,7 +49,7 @@ Required packages
   - unittest
 
 * python2/3 compatibility
-  - future (provides 'past' module)
+  - future (provides 'past' and 'builtin' modules)
 
 Some of the packages are standard.  But you may need:
 
@@ -84,7 +84,7 @@ Mac installation with `macports`
 
 Errors about failure to rebuild netcdf package can be ignored.
 
-4. Set up PYTHONPATH environment variable to point to the 
+4. Set up PYTHONPATH environment variable to point to the
    parent directory of NuGridPy, e.g.:
   > export PYTHONPATH="$HOME/NuGrid"
 
@@ -93,8 +93,5 @@ TESTING
 =======
 
 The following command runs a suite of test cases for the NuGridPy package:
-   
+
    > python -m NuGridPy.selftest
-
-
-
