@@ -92,8 +92,9 @@ Errors about failure to rebuild netcdf package can be ignored.
 TESTING
 =======
 
-The following command runs a sequence of test cases:
-   > cd $PYTHONPATH/NuGridPy
-   > python -m testcases
+The following command runs a suite of test cases for the NuGridPy package:
+   
+   > python -m NuGridPy.testcases
+
 
 
