@@ -66,6 +66,7 @@ class TestAbuChart(unittest.TestCase):
     def test_abu_evolution(self):
         from NuGridPy import ppn, utils
         import matplotlib.pylab as mpy
+        import os
 
         symbs=utils.symbol_list('lines2')
         x=ppn.xtime('.')
@@ -78,7 +79,9 @@ class TestAbuChart(unittest.TestCase):
         mpy.legend(loc=0)
         mpy.xlabel('$\log t / \mathrm{min}$')
         mpy.ylabel('$\log X \mathrm{[mass fraction]}$')
-        mpy.savefig('abu_evolution.png')
+        abu_evol_file = 'abu_evolution.png'
+        mpy.savefig(abu_evol_file)
+        self.assertTrue(os.path.exists(abu_evol_file))
 
 if __name__ == '__main__':
     unittest.main()
