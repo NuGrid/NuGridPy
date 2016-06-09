@@ -751,10 +751,10 @@ class abu_vector(DataPlot, Utils):
         isom: list of isomers with their abundances.
 
         '''
-        if isinstance(attri,int):
+        if type(attri) is type(1):
             print("Calling get method in cycle mode, adding a_iso_to_plot, z.. el.. isotope.. isotope... to instance")
             self._getcycle(attri,decayed)
-        elif isinstance(attri,str):
+        elif type(attri) is type("string"):
             data=self._getattr(attri,fname,numtype)
             return data
 
