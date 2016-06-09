@@ -94,7 +94,7 @@ TESTING
 
 The following command runs a suite of test cases for the NuGridPy package:
    
-   > python -m NuGridPy.testcases
+   > python -m NuGridPy.selftest
 
 
 
