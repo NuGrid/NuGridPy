@@ -46,6 +46,7 @@ Required packages
   - numpy
   - matplotlib
   - h5py
+  - unittest
 
 * python2/3 compatibility
   - future (provides 'past' module)
@@ -74,7 +75,7 @@ Mac installation with `macports`
   > port select --set pip py34-pip
 
 2. Install standard prerequisites with pip:
-  > pip install -U --user numpy scipy xlrd matplotlib future 
+  > pip install -U --user numpy scipy xlrd matplotlib future unittest
 
 3. Install h5py:
   > port install openmpi-gcc5
@@ -82,4 +83,17 @@ Mac installation with `macports`
   > HDF5_DIR=~/macports CFLAGS="-I$HOME/macports/include/openmpi-gcc5" pip install -U --user h5py
 
 Errors about failure to rebuild netcdf package can be ignored.
+
+4. Set up PYTHONPATH environment variable to point to the 
+   parent directory of NuGridPy, e.g.:
+  > export PYTHONPATH="$HOME/NuGrid"
+
+
+TESTING
+=======
+
+The following command runs a sequence of test cases:
+   > cd $PYTHONPATH/NuGridPy
+   > python -m testcases
+
 
