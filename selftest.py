@@ -37,9 +37,10 @@ class TestAbuChart(unittest.TestCase):
         import os
 
         # test_data_dir should point to the correct location of a set of abundances data file
-        #test_data_dir= os.path.dirname(data_plot.__file__) + "/test_data"
-        test_data_dir= '.'
-        p=ppn.abu_vector(test_data_dir)
+        nugrid_dir= os.path.dirname(os.path.dirname(ppn.__file__))
+        NuPPN_dir= nugrid_dir + "/NuPPN"
+        test_data_dir= NuPPN_dir + "/examples/ppn_C13_pocket/master_results"
+        p=ppn.abu_vector(test_data_dir) # TODO: this function fails to raise an exception if path is not found!
         mp=p.get('mod')
         if len(mp) == 0:
             raise IOError("Cannot locate a set of abundance data files")
@@ -61,6 +62,7 @@ class TestAbuChart(unittest.TestCase):
             png_file='abu_chart_'+str(cyc).zfill(len(str(max(mp))))+'.png'
             mpy.savefig(png_file)
             self.assertTrue(os.path.exists(png_file))
+            os.remove(png_file)
 
 
     def test_abu_evolution(self):
@@ -68,8 +70,12 @@ class TestAbuChart(unittest.TestCase):
         import matplotlib.pylab as mpy
         import os
 
+        nugrid_dir= os.path.dirname(os.path.dirname(ppn.__file__))
+        NuPPN_dir= nugrid_dir + "/NuPPN"
+        test_data_dir= NuPPN_dir + "/examples/ppn_Hburn_simple/RUN_MASTER"
+
         symbs=utils.symbol_list('lines2')
-        x=ppn.xtime('.')
+        x=ppn.xtime(test_data_dir)
         specs=['PROT','HE  4','C  12','N  14','O  16']
         i=0
         for spec in specs:
