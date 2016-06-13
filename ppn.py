@@ -417,7 +417,7 @@ class abu_vector(DataPlot, Utils):
             for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
             print(str(len(self.files))+' cycle numbers found in '+sldir)
-            print('Ranging from 0 to '+str(len(self.files)-1))
+            print('Ranging from '+str(self.files[0])[-9:-4].lstrip("0")+' to '+str(self.files[len(self.files)-1])[-9:-4].lstrip("0"))
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
         def iso_massfmode():
@@ -448,7 +448,7 @@ class abu_vector(DataPlot, Utils):
             for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
             print(str(len(self.files))+' cycle numbers found in '+sldir)
-            print('Ranging from 0 to '+str(len(self.files)-1))
+            print('Ranging from '+str(self.files[0])[-9:-4].lstrip("0")+' to '+str(self.files[len(self.files)-1])[-9:-4].lstrip("0"))
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
 
