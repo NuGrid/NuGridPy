@@ -1,0 +1,10 @@
+sudo: required
+language: python
+python:
+  - "2.7"
+script:
+  - export NGPDIR=../
+  - export PYTHONPATH=$PYTHONPATH:$NGPDIR
+  - python -m NuGridPy.selftest
+notifications:
+  email: false
