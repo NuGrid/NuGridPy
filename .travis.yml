@@ -2,8 +2,9 @@ sudo: required
 language: python
 python:
   - "2.7"
+  - "3.5"
 install:
-  - pip install future
+  - pip install future numpy scipy matplotlib
 script:
   - export NGPDIR=../
   - export PYTHONPATH=$PYTHONPATH:$NGPDIR
