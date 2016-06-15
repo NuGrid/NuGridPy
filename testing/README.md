@@ -8,13 +8,12 @@ This testing branch to sketch the following capabilities:
 
 ## Useage
 ```
-export PYTHONPATH=$PYTHONPATH:"/path/to/NuGridPy"
-python abu_chart.py 
-python compare_image_entropy.py 
+export PYTHONPATH=$PYTHONPATH:"/path/to/NuGridPy-parent-directory"
+python3 -m NuGridPy.testing.test1
 ```
 
 ## Limitations
-This has been tested on the Nubuntu16 VM and on the UVic scandium server using python 2.7. No VOspace authentication is needed. 
+This has been tested on python 3.5.1
 
 ## Further steps
 Please consider how this comparison technique of images can be used in the NuGridPy test suite.
