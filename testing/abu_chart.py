@@ -3,7 +3,7 @@ import os
 import os.path
 
 def load_chart_files(path = '.'):
-    n = 39
+    n = 3
     for cycle in range(0,n):
         cycle_str = str(cycle).zfill(2)
         os.system("wget --content-disposition --directory '" + path + "' "
