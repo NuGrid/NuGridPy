@@ -38,8 +38,10 @@ class TestAbuChart(unittest.TestCase):
 
     def test_abu_chart(self):
         from NuGridPy import utils,ppn,data_plot
+        import matplotlib
         import matplotlib.pylab as mpy
         import os
+        matplotlib.use('Agg')
 
         # Perform tests within temporary directory
         with TemporaryDirectory() as tdir:
@@ -85,8 +87,10 @@ class TestAbuChart(unittest.TestCase):
 
     def test_abu_evolution(self):
         from NuGridPy import ppn, utils
+        import matplotlib
         import matplotlib.pylab as mpy
         import os
+        matplotlib.use('Agg')
 
         # Perform tests within temporary directory
         with TemporaryDirectory() as tdir:
