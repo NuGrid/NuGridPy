@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('agg')
 import unittest
 
 try:
@@ -39,14 +41,14 @@ class TestAbuChart(unittest.TestCase):
     def test_abu_chart(self):
         from NuGridPy import utils,ppn,data_plot
         import matplotlib
-        matplotlib.use('Agg')
+        matplotlib.use('agg')
         import matplotlib.pylab as mpy
         import os
 
         # Perform tests within temporary directory
         with TemporaryDirectory() as tdir:
             # wget the data for a ppn run from the CADC VOspace
-            n = 39
+            n = 3
             for cycle in range(0,n):
                 cycle_str = str(cycle).zfill(2)
                 os.system("wget --content-disposition --directory '" + tdir + "' "
@@ -88,7 +90,7 @@ class TestAbuChart(unittest.TestCase):
     def test_abu_evolution(self):
         from NuGridPy import ppn, utils
         import matplotlib
-        matplotlib.use('Agg')
+        matplotlib.use('agg')
         import matplotlib.pylab as mpy
         import os
 
