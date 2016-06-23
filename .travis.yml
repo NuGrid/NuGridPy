@@ -19,6 +19,6 @@ install:
 script:
   - export NGPDIR=../
   - export PYTHONPATH=$PYTHONPATH:$NGPDIR
-  - python -m NuGridPy.selftest
+  - python -m NuGridPy.testing.selftest
 notifications:
   email: false
