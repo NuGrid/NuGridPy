@@ -5,7 +5,7 @@ import unittest
 try:
     from tempfile import TemporaryDirectory
 except:
-    from ..tempdir.tempfile_ import TemporaryDirectory
+    from tempdir.tempfile_ import TemporaryDirectory
 
 class TestModuleImports(unittest.TestCase):
 
