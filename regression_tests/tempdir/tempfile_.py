@@ -1,3 +1,10 @@
+"""
+A replacement for python3 class tempfile.TemporaryDirectory() in python2.7
+
+The following code has been taken from
+http://stackoverflow.com/questions/19296146/tempfile-temporarydirectory-context-manager-in-python-2-7
+"""
+
 from __future__ import print_function
 
 import warnings as _warnings
@@ -53,10 +60,10 @@ class TemporaryDirectory(object):
         # Issue a ResourceWarning if implicit cleanup needed
         self.cleanup(_warn=True)
 
-    # XXX (ncoghlan): The following code attempts to make
-    # this class tolerant of the module nulling out process
-    # that happens during CPython interpreter shutdown
-    # Alas, it doesn't actually manage it. See issue #10188
+    # The following code attempts to make this class tolerant of the
+    # module nulling out process that happens during CPython
+    # interpreter shutdown Alas, it doesn't actually manage it. See
+    # issue #10188
     _listdir = staticmethod(_os.listdir)
     _path_join = staticmethod(_os.path.join)
     _isdir = staticmethod(_os.path.isdir)
