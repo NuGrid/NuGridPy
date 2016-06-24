@@ -98,15 +98,10 @@ class TestAbuChart(unittest.TestCase):
         with TemporaryDirectory() as tdir:
             # wget the data for a ppn run from the CADC VOspace
             os.system("wget --content-disposition --directory '" + tdir +  "' "\
-                      +"'http://uvic.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/transfer/"\
-                      +"bmVpZ2g9VVZJQyZzaWdleHA9MjAxNjA2MjQwMjQ0MzYmYXJjPVZPU3BhYyZpZD0yMzExM"\
-                      +"DYyMzUmdXNlcj1hbm9uVXNlciZucz1udWdyaWQlMkZkYXRhJTJGcHJvamVjdHMlMkZwcG"\
-                      +"4lMkZleGFtcGxlcyUyRnBwbl9IYnVybl9zaW1wbGUmbWV0aD1nZXQmYXV0aENvZGU9MCZ"\
-                      +"ydW5JRD1keXluejdia2p5MnhwbmNxJnVybD1odHRwJTNBJTJGJTJGYWRzdG9yMjQlM0E4"\
-                      +"ODg4JTJGYXJjaGl2ZSUyRmQyNCUyRjg0OCUyRnZvc3BhYyUyRmRlZmF1bHQlMkYwMCUyR"\
-                      +"jAxJTJGODQlMkYyMzExMDYyMzUlMjUzQiUyNTNCMjQzNzk5MTIz-ZmlkPXgtdGltZS5kY"\
-                      +"XQmY2xuPTI5Mjc4JmNtZD01NzFkOGE5Y2EwMGE4ZGEzN2JkOTI0NGZlMDkxMjJiMCZsbWQ9MTQ2NTY2NTk5MjA1Nw"\
-                      +"==-f54816660cf2d37bb56bba773aca1518/x-time.dat'")
+                          + "'http://www.canfar.phys.uvic.ca/vospace/synctrans?TARGET="\
+                          + "vos%3A%2F%2Fcadc.nrc.ca%21vospace%2Fnugrid%2Fdata%2Fprojects%2Fppn%2Fexamples%2F"\
+                          + "ppn_Hburn_simple%2Fx-time.dat&DIRECTION=pullFromVoSpace&PROTOCOL"\
+                          + "=ivo%3A%2F%2Fivoa.net%2Fvospace%2Fcore%23httpget'")
 
             #nugrid_dir= os.path.dirname(os.path.dirname(ppn.__file__))
             #NuPPN_dir= nugrid_dir + "/NuPPN"
