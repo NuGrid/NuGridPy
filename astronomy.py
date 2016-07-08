@@ -178,7 +178,7 @@ def core_mass_L(MH):
 
     Parameters
     ----------
-    MH
+    MH : float
         Core mass in Msun.
 
     Returns
