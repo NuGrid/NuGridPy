@@ -6,7 +6,12 @@ This testing branch to sketch the following capabilities:
 * demonstrate how to pull test data from the VOspace
 * demonstrate how images in png format can be compared quantitatively
 
-## Useage
+Specifically this test does the followiung
+* pull master images and data from CADC VOspace
+* create new images from master data
+* compare master images with new images
+
+## Usage
 ```
 export PYTHONPATH=$PYTHONPATH:"/path/to/NuGridPy-parent-directory"
 python3 -m NuGridPy.testing.test1

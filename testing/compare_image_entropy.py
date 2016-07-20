@@ -5,8 +5,10 @@ import sys
 from scipy import stats
 import glob
 import os.path
+import warnings
+import time
 
-def compare_entropy(name_img1,name_img2,method="KL-div"):
+def compare_entropy(name_img1,name_img2,method="rms"):
      '''Compare two images by the Kullback-Leibler divergence
 
      Parameters
@@ -41,24 +43,28 @@ def compare_entropy(name_img1,name_img2,method="KL-div"):
 
      return S,fimg1, fimg2
 
-import time
 
-def compare_images(path = None):
-     S_limit = -3.
+def compare_images(path = '.'):
+     S_limit = 1.
      file_list = glob.glob(os.path.join(path, 'Abu*'))
-     print(file_list, path)
+     file_list_master = glob.glob(os.path.join(path, 'MasterAbu*'))
+     #print(file_list, path)
      S=[]
      print("Identifying images with modified log KL-divergence > "+'%3.1f'%S_limit)
+     ierr_count = 0
      for i in range(len(file_list)):
-         this_S,fimg1,fimg2 = compare_entropy(file_list[i-1],file_list[i])
+         this_S,fimg1,fimg2 = compare_entropy(file_list[i],file_list_master[i])
          if this_S > S_limit:
-              print(file_list[i-1]+" and "+file_list[i]+" differ by "+'%6.3f'%this_S)
-         S.append(this_S)
-
-     plb.plot(S,'o')
-     plb.xlabel("image number")
-     plb.ylabel("modified log KL-divergence to previous image")
-     plb.show()
+              warnings.warn(file_list[i-1]+" and "+file_list[i]+" differ by "+'%6.3f'%this_S)
+              ierr_count += 1
+              S.append(this_S)
+     if ierr_count > 0:
+          sys.exit(1)
+     #print ("S: ",S)
+     #plb.plot(S,'o')
+     #plb.xlabel("image number")
+     #plb.ylabel("modified log KL-divergence to previous image")
+     #plb.show()
 
 
 if __name__ == "__main__":
