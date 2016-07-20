@@ -37,6 +37,8 @@ class TestModuleImports(unittest.TestCase):
         import NuGridPy.utils
 
 class TestAbuChart(unittest.TestCase):
+    from .abu_chart import load_chart_files
+    from .compare_image_entropy import compare_images
 
     def test_abu_chart(self):
         from NuGridPy import utils,ppn,data_plot
@@ -61,7 +63,7 @@ class TestAbuChart(unittest.TestCase):
             #nugrid_dir= os.path.dirname(os.path.dirname(ppn.__file__))
             #NuPPN_dir= nugrid_dir + "/NuPPN"
             #test_data_dir= NuPPN_dir + "/examples/ppn_C13_pocket/master_results"
-            
+
             p=ppn.abu_vector(tdir) # TODO: this function fails to raise an exception if path is not found!
             mp=p.get('mod')
             if len(mp) == 0:
@@ -121,6 +123,12 @@ class TestAbuChart(unittest.TestCase):
             abu_evol_file = 'abu_evolution.png'
             mpy.savefig(abu_evol_file)
             self.assertTrue(os.path.exists(abu_evol_file))
+
+    def test_ppnHburn_abucharts():
+        with TemporaryDirectory() as tdir:
+            load_chart_files(tdir)
+            compare_images(tdir)
+
 
 if __name__ == '__main__':
     unittest.main()
