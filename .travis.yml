@@ -22,3 +22,4 @@ script:
   - python -m NuGridPy.regression_tests.selftest
 notifications:
   slack: nugrid:wTgGR31cFsNUqfytUDZ5ZLug
+  email: false
