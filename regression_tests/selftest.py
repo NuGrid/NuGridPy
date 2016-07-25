@@ -2,10 +2,7 @@ import matplotlib
 matplotlib.use('agg')
 import unittest
 
-try:
-    from tempfile import TemporaryDirectory
-except:
-    from tempdir.tempfile_ import TemporaryDirectory
+from tempdir.tempfile_ import TemporaryDirectory
 
 class TestModuleImports(unittest.TestCase):
 
@@ -37,8 +34,6 @@ class TestModuleImports(unittest.TestCase):
         import NuGridPy.utils
 
 class TestAbuChart(unittest.TestCase):
-    from .abu_chart import load_chart_files
-    from .compare_image_entropy import compare_images
 
     def test_abu_chart(self):
         from NuGridPy import utils,ppn,data_plot
@@ -53,7 +48,7 @@ class TestAbuChart(unittest.TestCase):
             n = 3
             for cycle in range(0,n):
                 cycle_str = str(cycle).zfill(2)
-                os.system("wget --content-disposition --directory '" + tdir + "' "
+                os.system("wget -q --content-disposition --directory '" + tdir + "' "
                           + "'http://www.canfar.phys.uvic.ca/vospace/synctrans?TARGET="\
                           + "vos%3A%2F%2Fcadc.nrc.ca%21vospace%2Fnugrid%2Fdata%2Fprojects%2Fppn%2Fexamples%2F"\
                           + "ppn_Hburn_simple%2Fiso_massf000" + cycle_str + ".DAT&DIRECTION=pullFromVoSpace&PROTOCOL"\
@@ -99,7 +94,7 @@ class TestAbuChart(unittest.TestCase):
         # Perform tests within temporary directory
         with TemporaryDirectory() as tdir:
             # wget the data for a ppn run from the CADC VOspace
-            os.system("wget --content-disposition --directory '" + tdir +  "' "\
+            os.system("wget -q --content-disposition --directory '" + tdir +  "' "\
                           + "'http://www.canfar.phys.uvic.ca/vospace/synctrans?TARGET="\
                           + "vos%3A%2F%2Fcadc.nrc.ca%21vospace%2Fnugrid%2Fdata%2Fprojects%2Fppn%2Fexamples%2F"\
                           + "ppn_Hburn_simple%2Fx-time.dat&DIRECTION=pullFromVoSpace&PROTOCOL"\
@@ -124,11 +119,15 @@ class TestAbuChart(unittest.TestCase):
             mpy.savefig(abu_evol_file)
             self.assertTrue(os.path.exists(abu_evol_file))
 
-    def test_ppnHburn_abucharts():
+
+class ImageCompare(unittest.TestCase):
+
+    def test_ppnHburn_abucharts(self):
+        from ImageCompare.abu_chart import load_chart_files
+        from ImageCompare.compare_image_entropy import compare_images
         with TemporaryDirectory() as tdir:
             load_chart_files(tdir)
             compare_images(tdir)
-
 
 if __name__ == '__main__':
     unittest.main()

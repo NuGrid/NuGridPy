@@ -1,4 +1,4 @@
-from .. import ppn as p
+from ... import ppn as p
 import os
 import os.path
 

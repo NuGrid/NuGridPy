@@ -48,7 +48,7 @@ def compare_images(path = '.'):
      S_limit = 1.
      file_list = glob.glob(os.path.join(path, 'Abu*'))
      file_list_master = glob.glob(os.path.join(path, 'MasterAbu*'))
-     #print(file_list, path)
+     print(file_list, file_list_master, path)
      S=[]
      print("Identifying images with modified log KL-divergence > "+'%3.1f'%S_limit)
      ierr_count = 0
