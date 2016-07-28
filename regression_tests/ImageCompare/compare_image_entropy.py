@@ -59,6 +59,7 @@ def compare_images(path = '.'):
               ierr_count += 1
               S.append(this_S)
      if ierr_count > 0:
+          print("Error: at least one image differs by more than S_limit"
           sys.exit(1)
      #print ("S: ",S)
      #plb.plot(S,'o')
