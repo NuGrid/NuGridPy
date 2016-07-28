@@ -8,7 +8,7 @@ import os.path
 import warnings
 import time
 
-def compare_entropy(name_img1,name_img2,method="rms"):
+def compare_entropy(name_img1,name_img2,method="rmq"):
      '''Compare two images by the Kullback-Leibler divergence
 
      Parameters
@@ -36,7 +36,7 @@ def compare_entropy(name_img1,name_img2,method="rms"):
           eps = 0.0001
           S = stats.entropy(fimg2+eps,fimg1+eps)
           S = numpy.log10(S)
-     elif method == "rms":
+     elif method == "rmq":
           fdiff=fimg1-fimg2
           fdiff_sqr = fdiff**4
           S = (fdiff_sqr.sum())**(1./4)
@@ -50,16 +50,16 @@ def compare_images(path = '.'):
      file_list_master = glob.glob(os.path.join(path, 'MasterAbu*'))
      print(file_list, file_list_master, path)
      S=[]
-     print("Identifying images with modified log KL-divergence > "+'%3.1f'%S_limit)
+     print("Identifying images with modified lo > "+'%3.1f'%S_limit)
      ierr_count = 0
      for i in range(len(file_list)):
          this_S,fimg1,fimg2 = compare_entropy(file_list[i],file_list_master[i])
          if this_S > S_limit:
-              warnings.warn(file_list[i-1]+" and "+file_list[i]+" differ by "+'%6.3f'%this_S)
+              warnings.warn(file_list[i]+" and "+file_list_master[i]+" differ by "+'%6.3f'%this_S)
               ierr_count += 1
               S.append(this_S)
      if ierr_count > 0:
-          print("Error: at least one image differs by more than S_limit"
+          print("Error: at least one image differs by more than S_limit")
           sys.exit(1)
      #print ("S: ",S)
      #plb.plot(S,'o')
