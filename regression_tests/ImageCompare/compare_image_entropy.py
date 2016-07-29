@@ -45,14 +45,13 @@ def compare_entropy(name_img1,name_img2,method="rmq"):
 
 
 def compare_images(path = '.'):
-     S_limit = 1.
+     S_limit = 10.
      file_list = glob.glob(os.path.join(path, 'Abu*'))
      file_list_master = glob.glob(os.path.join(path, 'MasterAbu*'))
      file_list.sort()
      file_list_master.sort()
-     print(file_list, file_list_master, path)
      S=[]
-     print("Identifying images with modified lo > "+'%3.1f'%S_limit)
+     print("Identifying images with rmq > "+'%3.1f'%S_limit)
      ierr_count = 0
      for i in range(len(file_list)):
          this_S,fimg1,fimg2 = compare_entropy(file_list[i],file_list_master[i])
