@@ -23,4 +23,6 @@ class Test_README_File(unittest.TestCase):
     def test_that_follows_a_failure(self):
         print('This is after the test_that_fails function.')
 
+if __name__ == '__main__':
+    unittest.main()
 
