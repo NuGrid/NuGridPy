@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import matplotlib.image as mpimg
 import matplotlib.pylab as plb
 import numpy
@@ -39,7 +43,7 @@ def compare_entropy(name_img1,name_img2,method="rmq"):
      elif method == "rmq":
           fdiff=fimg1-fimg2
           fdiff_sqr = fdiff**4
-          S = (fdiff_sqr.sum())**(1./4)
+          S = (fdiff_sqr.sum())**(old_div(1.,4))
 
      return S,fimg1, fimg2
 

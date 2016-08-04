@@ -1,8 +1,11 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 import matplotlib
 matplotlib.use('agg')
 import unittest
 
-from tempdir.tempfile_ import TemporaryDirectory
+from .tempdir.tempfile_ import TemporaryDirectory
 
 class TestModuleImports(unittest.TestCase):
 
@@ -123,8 +126,8 @@ class TestAbuChart(unittest.TestCase):
 class ImageCompare(unittest.TestCase):
 
     def test_ppnHburn_abucharts(self):
-        from ImageCompare.abu_chart import load_chart_files
-        from ImageCompare.compare_image_entropy import compare_images
+        from .ImageCompare.abu_chart import load_chart_files
+        from .ImageCompare.compare_image_entropy import compare_images
         with TemporaryDirectory() as tdir:
             load_chart_files(tdir)
             compare_images(tdir)
