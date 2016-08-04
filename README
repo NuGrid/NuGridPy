@@ -67,7 +67,7 @@ If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
 
 
 Mac installation with `macports`
----------------------------------
+--------------------------------
 
 1. Install ipython and pip:
   > port install py34-ipython py34-pip
