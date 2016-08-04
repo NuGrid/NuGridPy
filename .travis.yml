@@ -19,9 +19,7 @@ install:
 script:
   - export NGPDIR=../
   - export PYTHONPATH=$PYTHONPATH:$NGPDIR
-# This is the original one
-#  - python -m NuGridPy.regression_tests.selftest
-  - python -m NuGridPy.regression_tests.benoittest
+  - python -m NuGridPy.regression_tests.selftest
 notifications:
   slack: nugrid:wTgGR31cFsNUqfytUDZ5ZLug
   email: false
