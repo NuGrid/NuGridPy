@@ -51,6 +51,7 @@ from matplotlib.ticker import *
 from collections import OrderedDict
 import numpy as np
 import os
+import os.path
 import threading
 import time
 import sys
@@ -1469,7 +1470,7 @@ class DataPlot(object):
     def abu_chartMulti(self, cyclist, mass_range=None, ilabel=True,
                        imlabel=True, imlabel_fontsize=12, imagic=False,
                        boxstable=True, lbound=20, plotaxis=[0,0,0,0],
-                       color_map='jet', pdf=False, title=None):
+                       color_map='jet', pdf=False, title=None, path=None):
         '''
         Method that plots abundence chart and saves those figures to a
         .png file (by default). Plots a figure for each cycle in the
@@ -1526,6 +1527,8 @@ class DataPlot(object):
                 pl.title(title)
             else:
                 name='AbuChart'
+            if path is not None:
+                name = os.path.join(path, name)
             number_str=_padding_model_number(cyclist[i],max_num)
             if not pdf:
                 pl.savefig(name+number_str+'.png', dpi=100)
@@ -1541,7 +1544,8 @@ class DataPlot(object):
                   boxstable=True, lbound=(-12, 0),
                   plotaxis=[0, 0, 0, 0], show=True, color_map='jet',
                   ifig=None,data_provided=False,thedata=None,
-                  savefig=False,drawfig=None,drawax=None,mov=False):
+                  savefig=False,drawfig=None,drawax=None,mov=False,
+                  path=None):
         '''
         Plots an abundance chart
 
@@ -1594,15 +1598,16 @@ class DataPlot(object):
             The figure and axes containers to be drawn on, and whether or not a movie is
             being made (only True when se.movie is called, which sets mov to True
             automatically
+        path: path where to save figure
 
         '''
 
         if ifig == None and not mov:
             ifig=cycle
 
-        if str(cycle.__class__)=="<type 'list'>":
+        if type(cycle)==type([]):
             self.abu_chartMulti(cycle, mass_range,ilabel,imlabel,imlabel_fontsize,imagic,boxstable,\
-                                lbound,plotaxis,color_map)
+                                lbound,plotaxis,color_map, path=path)
             return
         plotType=self._classTest()
 
@@ -1917,6 +1922,8 @@ class DataPlot(object):
         if not mov:
             pl.title('Isotopic Chart for cycle '+str(int(cycle)))
         if savefig:
+            if path is not None:
+                graphname = os.path.join(path, graphname)
             fig.savefig(graphname)
             print(graphname,'is done')
         if show:
