@@ -949,7 +949,7 @@ class history_data(DataPlot):
             raise IOError("ixaxis not recognised")
 
         pl.figure(ifig)
-        pl.plot(xax,CO(self))
+        pl.plot(xax,C_O(self))
 
     def hrd(self,ifig=None,label=None,colour=None,s2ms=False,
             dashes=None,**kwargs):
