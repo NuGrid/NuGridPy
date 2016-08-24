@@ -12,10 +12,27 @@ ASCII output in the 'LOGS' directory.
 MOST RECENT SVN REVISION STILL CONTAINING NUGRIDPY: r6619
 
 NuGridPy has been migrated to this github repository from the svn
+<<<<<<< HEAD:README.md
 repository. All components present here have now been removed from
 the svn. Please checkout r6619 if you would like access to the
 most recent version in the svn prior to NuGridPy's removal.
 
+=======
+repository. All components present here have now been removed from the
+svn. Please checkout r6619 if you would like access to the most recent
+version in the svn prior to NuGridPy's removal.
+
+NuGridPy is a Python package containing tools to access and analyse
+(e.g. plot) various output formats (including the hdf5-based se
+format) from NuGrid codes (mppnp and ppn) and from the MESA stellar
+evolution code. In principle the NuGridPy package can be used on any
+stellar evolution code output if the tools to write se hdf5 files
+available on the NuGrid web page are used.  The mesa.py module will
+work with MESA ASCII output in the 'LOGS' directory. These modules
+were written with an interactive work mode in mind, in particular
+taking advantage of the interactive ipython session that we usually
+start with 'ipython --pylab' or inside an ipython notebook.
+>>>>>>> NuGrid/master:README
 
 Installation and Use
 ====================
@@ -51,9 +68,10 @@ Required packages
   - numpy
   - matplotlib
   - h5py
+  - unittest
 
 * python2/3 compatibility
-  - future (provides 'past' module)
+  - future (provides 'past' and 'builtin' modules)
 
 Most of these are standard. If necessary, you can install them with pip, e.g.
 `pip install future`
@@ -75,7 +93,12 @@ If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
   > sudo apt-get install libhdf5-dev
 
 
+<<<<<<< HEAD:README.md
 Required package installation if you use `macports`:
+=======
+Mac installation with `macports`
+--------------------------------
+>>>>>>> NuGrid/master:README
 
 1. Install ipython and pip:
 * port install py34-ipython py34-pip
@@ -83,7 +106,11 @@ Required package installation if you use `macports`:
 * port select --set pip py34-pip
 
 2. Install standard prerequisites with pip:
+<<<<<<< HEAD:README.md
 * pip install -U --user numpy scipy xlrd matplotlib future 
+=======
+  > pip install -U --user numpy scipy xlrd matplotlib future unittest
+>>>>>>> NuGrid/master:README
 
 3. Install h5py:
 * port install openmpi-gcc5
@@ -92,3 +119,14 @@ Required package installation if you use `macports`:
 
 Errors about failure to rebuild netcdf package can be ignored.
 
+4. Set up PYTHONPATH environment variable to point to the
+   parent directory of NuGridPy, e.g.:
+  > export PYTHONPATH="$HOME/NuGrid"
+
+
+TESTING
+=======
+
+The following command runs a suite of test cases for the NuGridPy package:
+
+   > python -m NuGridPy.selftest
