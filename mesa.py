@@ -3759,7 +3759,7 @@ def _read_mesafile(filename,data_rows=0,only='all'):
     old_percent = 0
     for i in range(data_rows):
         # writing reading status
-        percent = int(i*100/np.max(1, data_rows-1))
+        percent = int(i*100/np.max([1, data_rows-1]))
         if percent >= old_percent + 5:
             sys.stdout.flush()
             sys.stdout.write("\r reading " + "...%d%%" % percent)
