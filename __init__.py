@@ -7,4 +7,5 @@ __all__ = [
     "mesa",
     "nugridse",
     "ppn",
+    "selftest",
     ]
