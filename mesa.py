@@ -3154,7 +3154,7 @@ class history_data(DataPlot):
                                 activate=True
                                 lum_array.append(he_lumi[i])
                                 models.append(i)
-                                print(TP_bot[i],TP_top[i])
+                                #print(TP_bot[i],TP_top[i])
                 if (activate == True) and (he_lumi[i]<h_lumi[i]):
                         #if fake tp
                         if max(pdcz_size)<1e-5:
@@ -3431,13 +3431,13 @@ class history_data(DataPlot):
             return TPstart,TPmods,TP_max_env,TPend,min_m_TP,max_m_TP,DUPmods,DUPm_min_h
 
 
-    def find_TP_attributes(self, t0_model, fig=10, color='k', marker_type='*',
+    def find_TP_attributes(self, t0_model=0, fig=10, color='k', marker_type='*',
                            h_core_mass=False, no_fig=False):
-        """
+        '''
         Function which finds TPs and uses the calc_DUP_parameter
         function.  To calculate DUP parameter evolution dependent of
         the star or core mass.
-
+        
         Parameters
         ----------
         fig : integer
@@ -3453,53 +3453,54 @@ class history_data(DataPlot):
         The default is False.
         no_fig : boolean, optional
         The default is False.
-
-        """
-
+        
+        '''
+        
         #if len(t0_model)==0:
-
+        
         t0_idx=(t0_model-self.get("model_number")[0])
-        #for first TPi
+	#for first TPi
+	'''
+	peak_lum_save.append(10**(self.get("log_LHe")[t0_idx]))
+	peak_lum_model.append(t0_model)
 
-        # peak_lum_save.append(10**(self.get("log_LHe")[t0_idx]))
-        # peak_lum_model.append(t0_model)
 
 
+        he_lum=10**(self.get("log_LHe")[t0_idx:])
+        h_lum=10**(self.get("log_LH")[t0_idx:])
+        model=self.get("model_number")[t0_idx:]	
+	for k in range(len(he_lum)):
+		if he_lum[k]<h_lum[k]:
+			t0_idx=t0_idx+k 
+			break
 
-        # he_lum=10**(self.get("log_LHe")[t0_idx:])
-        # h_lum=10**(self.get("log_LH")[t0_idx:])
-        # model=self.get("model_number")[t0_idx:]
-        # for k in range(len(he_lum)):
-        #         if he_lum[k]<h_lum[k]:
-        #                 t0_idx=t0_idx+k
-        #                 break
-
-        # #find end of first TP
+	#find end of first TP
+	'''
 
         first_TP_he_lum=10**(self.get("log_LHe")[t0_idx])
         he_lum=10**(self.get("log_LHe")[t0_idx:])
         h_lum=10**(self.get("log_LH")[t0_idx:])
         model=self.get("model_number")[t0_idx:]
-        try:
+	try:
            h1_bndry=self.get("h1_boundary_mass")[t0_idx:]
-           he4_bdy=self.get("he4_boundary_mass")[t0_idx:]
-        except:
-            try:
-                h1_bndry=self.get('he_core_mass')[t0_idx:]
-                he4_bdy=self.get("c_core_mass")[t0_idx:]
-            except:
-                pass
-        TP_bot=np.array(self.get('conv_mx2_bot')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
-        TP_top=np.array(self.get('conv_mx2_top')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
+	   he4_bdy=self.get("he4_boundary_mass")[t0_idx:]
+	except:
+	   try:
+		h1_bndry=self.get('he_core_mass')[t0_idx:]	
+		he4_bdy=self.get("c_core_mass")[t0_idx:]	
+	   except:
+		pass
+	TP_bot=np.array(self.get('conv_mx2_bot')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
+	TP_top=np.array(self.get('conv_mx2_top')[t0_idx:])*np.array(self.get('star_mass')[t0_idx:])
 
-
+	
 
         #define label
         z=self.header_attr["initial_z"]
         mass=self.header_attr["initial_mass"]
         leg=str(mass)+"M$_{\odot}$ Z= "+str(z)
         peak_lum_model=[]
-        peak_lum_save=[]
+	peak_lum_save=[]
         h1_mass_tp=[]
         h1_mass_min_DUP_model=[]
         ##TP identification with he lum if within 1% of first TP luminosity
@@ -3513,10 +3514,10 @@ class history_data(DataPlot):
         TP_interpulse=False
         interpulse_counter=0
 
-        TP_size=TP_top[0]-TP_bot[0]
-        lastDUP=False
+	TP_size=TP_top[0]-TP_bot[0]
+	lastDUP=False
         for i in range(len(he_lum)):
-            #interpulse_counter+=1
+                #interpulse_counter+=1
             #if (h_lum[i]<he_lum[i]):
                 #interpulse_counter=0
                 #new_TP=True
@@ -3524,18 +3525,18 @@ class history_data(DataPlot):
                 #if i > 0:
                 #    h1_mass_1.append(h1_bndry[i])
                 #    h1_mass_model.append(model[i])
-            #in case when He-lum is dominating till the end of the calculation (He-burner?)
-            if (TP_interpulse == False) and (h_lum[i] < he_lum[i]):
-                if (len(he_lum)-1) == i:
-                        TP_interpulse=True
-                        #interpulse_counter=1000 #value higher than 200
+	    #in case when He-lum is dominating till the end of the calculation (He-burner?)
+	    if (TP_interpulse ==False) and (h_lum[i]<he_lum[i]):
+		if (len(he_lum)-1)==i:
+			TP_interpulse=True	
+			#interpulse_counter=1000 #value higher than 200
 
-            #if simulation stops during a TP
-            if (len(he_lum)-1)==i:
-                if (h_lum[i]<he_lum[i]):
-                    if (he4_bdy[i]<TP_bot[i]):
-                        lastDUP=True
-                        break
+	    #if simulation stops during a TP
+	    if (len(he_lum)-1)==i:
+		 if (h_lum[i]<he_lum[i]):
+                        if  (he4_bdy[i]<TP_bot[i]):
+				lastDUP=True
+				break 
 
             #print i
             if i ==0:
@@ -3546,103 +3547,104 @@ class history_data(DataPlot):
                  #h1_mass_1=[h1_bndry[0]]
                  #h1_mass_model=[t0_model]
             #else:
-            #         lum_1.append(he_lum[i])
-           #         model_1.append(model[i])
-                 #h1_mass_1.append(h1_bndry[i])
+	    #	 lum_1.append(he_lum[i])
+           #	 model_1.append(model[i])
+		 #h1_mass_1.append(h1_bndry[i])
+		
 
-
-            if True: #(TP_interpulse==False):
-                if (h_lum[i]<he_lum[i]):
-                    if  (he4_bdy[i]<TP_bot[i]) and ( (TP_top[i]-TP_bot[i]) > TP_size*0.1) :
-                        #if (len(he_lum)-1)==i:
-                        #if (he_lum[i]> (perc*first_TP_he_lum)) or (i == len(he_lum)-1):
-                        #if (model[i] - model_1[-1]     >min_TP_distance):
-                        #calculate maximum of peak lum of certain TP
-                        lum_1.append(he_lum[i])
-                        model_1.append(model[i])
-                        #print 'peak at model',model[i]
-                        TP_interpulse=True
-
-            if (((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
-                print('test for last DUP')
-                if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-                    print('last DUP after last TP')
-                    lastDUP=True
-                    break
-
+	    if True: #(TP_interpulse==False):
+		if (h_lum[i]<he_lum[i]):
+			if  (he4_bdy[i]<TP_bot[i]) and ( (TP_top[i]-TP_bot[i]) > TP_size*0.1) :
+				#if (len(he_lum)-1)==i:
+                #if (he_lum[i]> (perc*first_TP_he_lum)) or (i == len(he_lum)-1):
+                #if (model[i] - model_1[-1]     >min_TP_distance):
+                #calculate maximum of peak lum of certain TP
+                 		lum_1.append(he_lum[i])
+                 		model_1.append(model[i])
+		 		#print 'peak at model',model[i]
+				TP_interpulse=True	  	
+       
+	    if ( ((len(he_lum)-1)==i) and (h_lum[i]>he_lum[i])) and TP_interpulse==False:
+                        #print 'test for last DUP'
+                        if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
+                                #print 'last DUP after last TP'
+                                lastDUP=True
+       	                	break
+				
 
             if ((h_lum[i]>he_lum[i]) and (TP_interpulse==True)) or ( ((len(he_lum)-1)==i) and (TP_interpulse==True)):
-                #make sure that pulse is fully computed
-                if (len(he_lum)-1)<(i+2000):
-                    print('test for last DUP')
-                    if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
-                        print('last DUP after last TP')
-                        lastDUP=True
-                    break
-                #print 'model',model[i]
-                #print 'lum1',lum_1
-                TP_interpulse=True
+		#make sure that pulse is fully computed
+               	if (len(he_lum)-1)<(i+2000):
+			#print 'test for last DUP'
+			if min(h1_bndry[peak_lum_model[-1]-t0_idx:i])<h1_bndry[peak_lum_model[-1]-t0_idx]:
+				#print 'last DUP after last TP'
+				lastDUP=True	
+			break
+		#print 'model',model[i] 
+		#print 'lum1',lum_1
+		TP_interpulse=True
                 max_value1=np.array(lum_1).max()
-                if len(lum_1)<10:
-                    continue
-                if len(peak_lum_model)>2:
-                    if ( 10**(old_div((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1])),2.))  )  >max_value1:
-                        print('fake tp',model_1[lum_1.index(np.array(lum_1).max())])
-                        print(leg)
-                        continue
+		if len(lum_1)<10:
+			continue
+		if len(peak_lum_model)>2:
+			if ( 10**((np.log10(prev_he_lum_start)+np.log10(peak_lum_save[-1]))/2.)  )  >max_value1:
+				#print 'fake tp',model_1[lum_1.index(np.array(lum_1).max())]	
+				#print leg
+				continue
                 max_value=np.array(lum_1).max()
                 max_index = lum_1.index(max_value)
-                #print 'TP with models',model_1
-                #if its a fake TP, he lum higher than h lum, happens in M7 models sometimes
-                #if len(peak_lum_model)>0:
-                #        if max_value < 0.01*peak_lum_save[-1]:
-                #                continue
-                prev_he_lum_start=lum_1[0]
+		#print 'TP with models',model_1
+		#if its a fake TP, he lum higher than h lum, happens in M7 models sometimes
+		#if len(peak_lum_model)>0:
+		#	if max_value < 0.01*peak_lum_save[-1]:
+		#		continue
+		prev_he_lum_start=lum_1[0]
 
-                peak_lum_save.append(max_value)
+		peak_lum_save.append(max_value)
                 #print max_index,i
                 peak_lum_model.append(model_1[max_index])
                 #for DUP calc
-                #print 'peak model',(model_1[max_index])
-                #print 'current peak lum',peak_lum_model[-1]
+		#print 'peak model',(model_1[max_index])
+		#print 'current peak lum',peak_lum_model[-1]
                 #max_lum_idx=h1_mass_model.index(model_1[max_index])
                 #min_value=np.array(h1_mass_1[max_lum_idx:]).min()
                 #min_index = h1_mass_1.index(min_value)
-                #if interpulse_counter<1000:
-                #        h1_mass_min_DUP_model.append(h1_mass_model[min_index])
-                #else:
-                #        h1_mass_min_DUP_model.append(-1)
+		#if interpulse_counter<1000:
+                #	h1_mass_min_DUP_model.append(h1_mass_model[min_index])
+		#else:
+		#	h1_mass_min_DUP_model.append(-1)
                 #TP_counter+=1
                 lum_1=[]
                 model_1=[]
-                TP_interpulse = False
+		TP_interpulse=False
                 #h1_mass_1=[]i
                 #h1_mass_model=[]
                 #new_TP=False
         #TP_interpulse=False
-        #here check if h1_mass_min_DUP_model is really at the lowest point
-        for k in range(len(peak_lum_model)-1):
-            idx1=list(model).index(peak_lum_model[k])
-            idx2=list(model).index(peak_lum_model[k+1])
-            h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]        )
-        if lastDUP==True:
-            idx1=list(model).index(peak_lum_model[-1])
-            idx2=-1
-            h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
-        print(peak_lum_model)
-        print(h1_mass_min_DUP_model)
+	#here check if h1_mass_min_DUP_model is really at the lowest point
+	for k in range(len(peak_lum_model)-1):
+		idx1=list(model).index(peak_lum_model[k])
+		idx2=list(model).index(peak_lum_model[k+1])
+		h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]	)
+	if lastDUP==True:
+		idx1=list(model).index(peak_lum_model[-1])	
+		idx2=-1
+		h1_mass_min_DUP_model.append(model[list(h1_bndry).index(min(h1_bndry[idx1:idx2]))]      )
+	#print peak_lum_model
+	#print h1_mass_min_DUP_model
         #print peak_lum_model
         #print h1_mass_min_DUP_model
         #print h1_mass_tp
         modeln=[]
+	'''	
+        if no_fig==True:
+	    for i in range(len(peak_lum_model)):
+            	modeln.append(peak_lum_model[i])
+            	modeln.append(h1_mass_min_DUP_model[i])
+            self.calc_DUP_parameter(fig,modeln,leg,color,marker_type,h_core_mass)
+        '''
+	return peak_lum_model,h1_mass_min_DUP_model
 
-        # if no_fig==True:
-        #     for i in range(len(peak_lum_model)):
-        #             modeln.append(peak_lum_model[i])
-        #             modeln.append(h1_mass_min_DUP_model[i])
-        #     self.calc_DUP_parameter(fig,modeln,leg,color,marker_type,h_core_mass)
-
-        return peak_lum_model,h1_mass_min_DUP_model
 
 
     def calc_DUP_parameter(self, modeln, label, fig=10, color='r', marker_type='*',

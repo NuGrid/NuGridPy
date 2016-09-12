@@ -12041,7 +12041,11 @@ class model_set(se,history_data):
 						models.append(cycle)
 					if abu_source=='mesa':
 						#find closest cycle
+						import sys
+						import cStringIO
+						save_stdout = sys.stdout = cStringIO.StringIO()
 						pr=ms.mesa_profile(LOGS,cycle)
+						sys.stdout = save_stdout
 						mass=pr.get('mass')
 						if coord_choice == 1:
 							c12=pr.get('c12')
