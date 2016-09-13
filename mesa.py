@@ -313,10 +313,7 @@ class mesa_profile(DataPlot):
 
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
 
-            # try first data, then data-team:
-            mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
-            if not os.path.exists(mod_dir):
-                mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
+            mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
                 print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
@@ -325,7 +322,6 @@ class mesa_profile(DataPlot):
             list=[el for el in os.listdir(mod_dir) if el[0]=='M']
             if len(list) == 0:
                 raise IOError("Sorry. There is no data available for this set at present: "+mod_dir)
-
             setmasses=[el[1:el.index('Z')] for el in list]
             for i in range(len(setmasses)):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
@@ -825,17 +821,14 @@ class history_data(DataPlot):
 
             # which set? [find nearest]
             setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
-            setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
+            setsnames=['set1.2_m','set1.1_m','set1.3a','set1.4a','set1.5a']
             idx=np.abs(np.array(setsZs)-Z).argmin()
             setname=setsnames[idx]
             realZ=setsZs[idx]
 
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
 
-            # try first data, then data-team:
-            mod_dir = nugrid_path+'/data-team/Set1_extension/'+setname+'/see_wind/'
-            if not os.path.exists(mod_dir):
-                mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
+            mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
                 print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
