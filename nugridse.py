@@ -231,9 +231,9 @@ class se(DataPlot, Utils):
 
             # which set? [find nearest]
             setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
-	    if code_source == 'MES':
+            if code_source == 'MES':
                 setsnames=['set1.2_m','set1.1_m','set1.3a','set1.4a','set1.5a']
-	    elif code_source == 'GNV':
+            elif code_source == 'GNV':
                 setsnames=['set1.2','set1.1']  
             else:
                  raise IOError("Sorry. Wrong choice of code_source. Choose between MES and GNV")                  
@@ -255,7 +255,7 @@ class se(DataPlot, Utils):
                 raise IOError("Sorry. There is no data available for this set at present: "+sedir)
 
             setmasses=[el[1:el.index('Z')] for el in mlist]
-	    if code_source == 'GNV':
+            if code_source == 'GNV':
                 if setname == 'set1.2':
                     setmasses = [ '15.0','20.0','25.0','32.0','60.0']
                 else:
