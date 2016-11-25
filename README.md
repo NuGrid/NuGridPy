@@ -1,12 +1,4 @@
-NuGridPy
-========
-
-MOST RECENT SVN REVISION STILL CONTAINING NUGRIDPY: r6619
-
-NuGridPy has been migrated to this github repository from the svn
-repository. All components present here have now been removed from the
-svn. Please checkout r6619 if you would like access to the most recent
-version in the svn prior to NuGridPy's removal.
+# NuGridPy
 
 NuGridPy is a Python package containing tools to access and analyse
 (e.g. plot) various output formats (including the hdf5-based se
@@ -18,6 +10,16 @@ work with MESA ASCII output in the 'LOGS' directory. These modules
 were written with an interactive work mode in mind, in particular
 taking advantage of the interactive ipython session that we usually
 start with 'ipython --pylab' or inside an ipython notebook.
+
+
+### previus home NuGridPy elements
+MOST RECENT NuGrid SVN REVISION STILL CONTAINING NUGRIDPY: r6619
+
+NuGridPy has been migrated to this github repository from the svn
+repository. All components present here have now been removed from the
+svn. Please checkout r6619 if you would like access to the most recent
+version in the svn prior to NuGridPy's removal.
+
 
 Once your session starts import the mesa or nugridse or ppn module
 (depending on which type of data you are working with):
