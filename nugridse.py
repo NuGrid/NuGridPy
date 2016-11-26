@@ -202,6 +202,9 @@ class se(DataPlot, Utils):
     code_source : string, optional
         By default data based on MESA tracks is selected ('MES').
         Data based on the GENEVA tracks is selected with 'GNV'.
+    exp_type :
+        If type is 'see_exp' or 'ppd_exp' runs of exp_type are selected. For example
+        'delay' and 'rapid' would be choices for Set1.
     verbose : boolean, optional
         If True, print more output
 
@@ -220,7 +223,7 @@ class se(DataPlot, Utils):
     se = []         # main data dictionary
     pattern=''
 
-    def __init__(self, sedir='.', pattern='.h5', rewrite=False, mass=None, Z=None, type='ppd_wind', output='out', code_source='MES',verbose=False):
+    def __init__(self, sedir='.', pattern='.h5', rewrite=False, mass=None, Z=None, type='ppd_wind', output='out', code_source='MES',exp_type='delay',verbose=False):
 
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
@@ -264,10 +267,26 @@ class se(DataPlot, Utils):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
                 setmasses[i] = float(setmasses[i])
             idx2=np.abs(np.array(setmasses)-mass).argmin()
-            modname=mlist[idx2]
-            realmass=setmasses[idx2]
 
+
+            realmass=setmasses[idx2]
             print('closest mass is '+str(realmass))
+
+            if 'exp' in type:
+              #check if mass occurs twice, in case of ppd_exp runs
+              mlist_idx=[k for k in range(len(setmasses)) if realmass == setmasses[k]]
+              if (mlist_idx)>1:
+                   #loop over different explosion prescriptions
+                   found_exp_type=False
+                   for k in range(len(mlist_idx)):
+                     if exp_type in mlist[mlist_idx[k]]:
+                        idx2 = mlist_idx[k]
+                        found_exp_type=True
+                        break
+                   if not found_exp_type:
+                     raise IOError("Sorry. There is no match for the exp_type ",exp_type," in ",mlist)
+
+            modname=mlist[idx2]
 
             sedir+=modname
             if 'ppd' in type:
