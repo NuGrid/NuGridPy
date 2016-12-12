@@ -42,7 +42,7 @@ Pull requests and new issues are most welcome!
 
 ### Required packages
 
-All modules should work with the recommended [NuGridDic python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
+All modules should work with the recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
 
 If you prefer installing packages individually, here are the dependencies explicitely:
 
