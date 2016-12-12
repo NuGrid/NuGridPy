@@ -42,19 +42,18 @@ Pull requests and new issues are most welcome!
 
 ### Required packages
 
-All modules should work with the recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
+All modules should work with the recommended [NuGridDic python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
 
 If you prefer installing packages individually, here are the dependencies explicitely:
 
 * standard:
-  - xlrd
-  - numpy
-  - matplotlib
-  - h5py
-  - unittest
-
+ 	- xlrd
+  	- numpy
+  	- matplotlib
+  	- h5py
+  	- unittes
 * python2/3 compatibility
-  - future (provides 'past' and 'builtin' modules)
+  	- future (provides 'past' and 'builtin' modules)
 
 Some of the packages are standard.  But you may need:
 
@@ -79,21 +78,18 @@ If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
 ```
 
 ### Mac installation with `macports`
-1. Install ipython and pip:
 
+##### 1. Install ipython and pip:
 ```
 	port install py34-ipython py34-pip
 	port select --set ipython py34-ipython
 	port select --set pip py34-pip
 ```
-
-2. Install standard prerequisites with pip:
-
+##### 2. Install standard prerequisites with pip:
 ```
 	pip install -U --user numpy scipy xlrd matplotlib future unittest
 ```
-
-3. Install h5py:
+##### 3. Install h5py:
 
 ```
 	port install openmpi-gcc5	
@@ -102,7 +98,7 @@ If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
 ```
 Errors about failure to rebuild netcdf package can be ignored.
 
-4. Set up PYTHONPATH environment variable to point to the
+##### 4. Set up PYTHONPATH environment variable to point to the
    parent directory of NuGridPy, e.g.:
 
 ```
