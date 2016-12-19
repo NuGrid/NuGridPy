@@ -236,7 +236,7 @@ class mesa_profile(DataPlot):
     def __init__(self, sldir='./LOGS', num=1, num_type='nearest_model',
                  prof_ind_name='profiles.index',
                  profile_prefix='profile', data_suffix='.data', mass=None,
-                 Z=None,give_filename=None):
+                 Z=None,give_filename=None,data_set='set1ext'):
         """
         read a profile.data profile file
 
@@ -305,15 +305,21 @@ class mesa_profile(DataPlot):
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using mesa.set_nugrid_path('path')")
 
             # which set? [find nearest]
-            setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
-            setsnames=['set1.2_m','set1.1_m','set1.3a','set1.4a','set1.5a']
+
+	    if (data_set=='set1ext'):
+               setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
+               setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
+            elif (data_set=='set1'):
+               setsZs=[0.02,0.01]
+	       setsnames=['set1.2','set1.1']
+	       
             idx=np.abs(np.array(setsZs)-Z).argmin()
             setname=setsnames[idx]
             realZ=setsZs[idx]
 
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
 
-            mod_dir = nugrid_path+'/data/set1/'+setname+'/see_wind/'
+            mod_dir = nugrid_path+'/data/'+data_set+'/'+setname+'/see_wind/'
             if not os.path.exists(mod_dir):
                 print('mod_dir = ', mod_dir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using mesa.set_nugrid_path('path')'.")
