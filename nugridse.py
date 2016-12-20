@@ -199,9 +199,8 @@ class se(DataPlot, Utils):
         explicitly, then the type of data should also be given here.
         For example, out='restart', 'out' or 'surf'
         The default is 'out'.
-    code_source : string, optional
-        By default data based on MESA tracks is selected ('MES').
-        Data based on the GENEVA tracks is selected with 'GNV'.
+    data_set : string, optional
+            Coose your data  of 'set1' or 'set1ext'.  The default is 'set1ext'.
     exp_type :
         If type is 'see_exp' or 'ppd_exp' runs of exp_type are selected. For example
         'delay' and 'rapid' would be choices for Set1.
@@ -223,7 +222,7 @@ class se(DataPlot, Utils):
     se = []         # main data dictionary
     pattern=''
 
-    def __init__(self, sedir='.', pattern='.h5', rewrite=False, mass=None, Z=None, type='ppd_wind', output='out', code_source='MES',exp_type='delay',verbose=False):
+    def __init__(self, sedir='.', pattern='.h5', rewrite=False, mass=None, Z=None, type='ppd_wind', output='out', code_source='MES',exp_type='delay',data_set='set1ext',verbose=False):
 
         # seeker to find the data requested on VOspace:
         if mass is not None and Z is not None:
@@ -233,13 +232,15 @@ class se(DataPlot, Utils):
                 raise IOError("nugrid_path has not been set. This is the path to the NuGrid VOSpace, e.g. /tmp/NuGrid. Set this using nugridse.set_nugrid_path('path')")
 
             # which set? [find nearest]
-            setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
-            if code_source == 'MES':
-                setsnames=['set1.2_m','set1.1_m','set1.3a','set1.4a','set1.5a']
-            elif code_source == 'GNV':
-                setsnames=['set1.2','set1.1']  
+
+	    if (data_set=='set1ext'):
+               setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
+               setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
+            elif (data_set=='set1'):
+               setsZs=[0.02,0.01]
+	       setsnames=['set1.2','set1.1']
             else:
-                 raise IOError("Sorry. Wrong choice of code_source. Choose between MES and GNV")                  
+               raise IOError("Sorry. Requested data_set not available. Choose between set1ext and set1.")                  
             idx=np.abs(np.array(setsZs)-Z).argmin()
             setname=setsnames[idx]
             realZ=setsZs[idx]
@@ -247,7 +248,7 @@ class se(DataPlot, Utils):
             print('closest set is '+setname+' (Z = '+str(realZ)+')')
 
             # try first data, then data-team:
-            sedir = nugrid_path+'/data/set1/'+setname+'/'+type+'/'
+            sedir = nugrid_path+'/data/'+data_set+'/'+setname+'/'+type+'/'
             if not os.path.exists(sedir):
                 print('sedir = ', sedir)
                 raise IOError("The data does not seem to be here. Please check that the NuGrid VOSpace is mounted and nugrid_path has been set correctly using nugridse.set_nugrid_path('path')'.")
@@ -258,11 +259,12 @@ class se(DataPlot, Utils):
                 raise IOError("Sorry. There is no data available for this set at present: "+sedir)
 
             setmasses=[el[1:el.index('Z')] for el in mlist]
-            if code_source == 'GNV':
+            if (data_set=='set1'):
                 if setname == 'set1.2':
                     setmasses = [ '15.0','20.0','25.0','32.0','60.0']
                 else:
                     setmasses = [ '15.0','20.0','25.0']
+
             for i in range(len(setmasses)):
                 if setmasses[i][-1]=='.': setmasses[i]=setmasses[i][:-1]
                 setmasses[i] = float(setmasses[i])
