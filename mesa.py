@@ -356,13 +356,18 @@ class mesa_profile(DataPlot):
             self._profiles_index()
         if num_type is 'nearest_model':
             amods=array(self.model)
-            nearmods=[where(amods<=num)[0][-1],where(amods>=num)[0][0]]
-            sometable={}
-            for thing in nearmods:
-                sometable[abs(self.model[thing]-num)]=thing
-            nearest       = min(abs(self.model[nearmods[0]]-num),\
-                                    abs(self.model[nearmods[1]]-num))
-            num = self.model[sometable[nearest]]
+	    if amods[0]>num:
+                 num = amods[0]  
+            elif amods[-1]<num:
+                 num = amods[-1]
+            else:
+                 nearmods=[where(amods<=num)[0][-1],where(amods>=num)[0][0]]
+                 sometable={}
+                 for thing in nearmods:
+                     sometable[abs(self.model[thing]-num)]=thing
+                 nearest = min(abs(self.model[nearmods[0]]-num),\
+                   abs(self.model[nearmods[1]]-num))
+                 num = self.model[sometable[nearest]]
             print('Found and load nearest profile for cycle '+str(num))
             num_type = 'model'
         if num_type is 'model':
