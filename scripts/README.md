@@ -4,4 +4,6 @@ This directory contains scripts that use NuGridPy and may be useful. Some of the
 
 * `mesa` - plot and analyse mesa output
 	- `2Dmaps_mesa` - plot advanced Kippenhahn style (R. Hirschi, Samuel Jones and Jacqueline den Hartogh)
-* `set1data` - test integrety of set1 see and ppd data (C. Ritter and F. Herwig)
+* `set1data` - test integrety of set1 see and ppd data 
+  	- `DataTests.ipynb`  - ipython notebook, open and access all (M,Z) SEE (star_log adn profile) and PPD data sets available in set1ext
+	- `yields_data_tester.py` - make random plots of random (M,Z) pairs of see (MESA profiles, star_log) and ppd data; ipython script, use magic comand `%pylab` and then `ed` to edit and execute (Falk Herwig)
