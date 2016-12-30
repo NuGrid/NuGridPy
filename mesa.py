@@ -308,12 +308,12 @@ class mesa_profile(DataPlot):
 
             # which set? [find nearest]
 
-	    if (data_set=='set1ext'):
+            if (data_set=='set1ext'):
                setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
                setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
             elif (data_set=='set1'):
                setsZs=[0.02,0.01]
-	       setsnames=['set1.2','set1.1']
+               setsnames=['set1.2','set1.1']
             else:
                raise IOError("Sorry. Requested data_set not available. Choose between set1ext and set1.")                  
        
@@ -356,7 +356,7 @@ class mesa_profile(DataPlot):
             self._profiles_index()
         if num_type is 'nearest_model':
             amods=array(self.model)
-	    if amods[0]>num:
+            if amods[0]>num:
                  num = amods[0]  
             elif amods[-1]<num:
                  num = amods[-1]
@@ -838,12 +838,12 @@ class history_data(DataPlot):
 
             # which set? [find nearest]
 
-	    if (data_set=='set1ext'):
+            if (data_set=='set1ext'):
                setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
                setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
             elif (data_set=='set1'):
                setsZs=[0.02,0.01]
-	       setsnames=['set1.2','set1.1']
+               setsnames=['set1.2','set1.1']
             else:
                raise IOError("Sorry. Requested data_set not available. Choose between set1ext and set1.")                  
 
