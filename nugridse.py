@@ -233,12 +233,12 @@ class se(DataPlot, Utils):
 
             # which set? [find nearest]
 
-	    if (data_set=='set1ext'):
-               setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
-               setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
+            if (data_set=='set1ext'):
+                setsZs=[0.02,0.01,6.e-3,1.e-3,1.e-4]
+                setsnames=['set1.2','set1.1','set1.3a','set1.4a','set1.5a']
             elif (data_set=='set1'):
-               setsZs=[0.02,0.01]
-	       setsnames=['set1.2','set1.1']
+                setsZs=[0.02,0.01]
+                setsnames=['set1.2','set1.1']
             else:
                raise IOError("Sorry. Requested data_set not available. Choose between set1ext and set1.")                  
             idx=np.abs(np.array(setsZs)-Z).argmin()
