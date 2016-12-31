@@ -13,13 +13,13 @@ import os
 import numpy as np 
 from matplotlib.font_manager import fontManager, FontProperties
 from scipy import interpolate
-import mesa as ms
-
+#import mesa as ms
+from NuGridPy import mesa as ms
 
 format = '.png'
 ##----------------------------------plots--------------------------------------#
 ## set plotting parameters
-params = {'backend': 'png',
+params = {'backend': 'Qt4Agg',
           'axes.labelsize':  10,
           'text.fontsize':   10,
           'legend.fontsize': 9,
@@ -61,7 +61,7 @@ last_profile=ms.mesa_profile(path,modelnr_end,num_type='nearest_model')
 mini = last_profile.header_attr.get('initial_mass')
 #print 'mini= ', mini
 
-outfile = 'outputs/2Dmaps'+'mesa'+format
+outfile = '2Dmaps'+'mesa'+format
 fig1 = mpl.figure()
 ax=mpl.subplot(111)
 mpl.suptitle(ptitle)
@@ -407,7 +407,7 @@ elif  iyaxis == 2 or iyaxis == 4:
 
 mpl.suptitle(title)
 
-#fig1.savefig(outfile)
+fig1.savefig(outfile)
 print outfile,' is done'
 mpl.show()
 ######################################################################

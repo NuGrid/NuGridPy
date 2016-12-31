@@ -1,10 +1,12 @@
 #datadir='/tmp/orcinusB/NuGrid'
 datadir='/apod2/NuGrid'
+datadir='/nfs/rpod2/critter/CADC/NuGrid'
 znum = 10
 Mnum = 10
 from NuGridPy import mesa as ms    
 ms.__file__
 from NuGridPy import nugridse as mp
+import random
 mp.__file__
 
 ms.set_nugrid_path(datadir)

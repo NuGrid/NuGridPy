@@ -7,6 +7,7 @@
 
 nugrid_path = '/tmp/nugrid_fh'
 #nugrid_path = '/apod2/fherwig/cadc'
+nugrid_path='/nfs/rpod2/critter/CADC/NuGrid'
 use_seeker = False
 
 from NuGridPy import nugridse as ns
