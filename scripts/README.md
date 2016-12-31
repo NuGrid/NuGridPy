@@ -1,7 +1,7 @@
 # scripts directory
 
 This directory contains scripts that use NuGridPy and may be useful. Some of these scripts are candidates for integration into the NuGridPy modules.
-Some script might be only python2 or python3 compatible.
+Some script might be only python2 or python3 compatible. Scripts are not fully tested!
 
 * `mesa` - plot and analyse mesa output
 	- `2Dmaps_mesa` - plot advanced Kippenhahn style (R. Hirschi, Samuel Jones and Jacqueline den Hartogh)
