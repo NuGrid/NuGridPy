@@ -1,6 +1,0 @@
-pdflatex nupycee-chapter
-pdflatex nupycee-chapter
-makeindex nupycee-chapter
-bibtex nupycee-chapter
-pdflatex nupycee-chapter
-pdflatex nupycee-chapter
