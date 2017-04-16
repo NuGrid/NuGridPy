@@ -1109,8 +1109,7 @@ class DataPlot(object):
             xdata,xdataerr,ydata,ydataerr,style = self.plot_ratio_return(xiso,yiso,deltax,deltay)
             legend=True
             plt_sparse=1   # to avoid monkey input
-            plt_lw = ''
-
+            plt_lw = 0.
 
         ### PLOT ###
         # data is prepared now, make the plots. data must be in format
