@@ -9,13 +9,12 @@ available on the NuGrid web page are used.  The mesa.py module will
 work with MESA ASCII output in the 'LOGS' directory. 
 
 
-#### previus home NuGridPy elements
+#### Previous home of NuGridPy 
 MOST RECENT NuGrid SVN REVISION STILL CONTAINING NUGRIDPY: r6619
 
 NuGridPy has been migrated to this github repository from the svn
 repository. All components present here have now been removed from the
-svn. Please checkout r6619 if you would like access to the most recent
-version in the svn prior to NuGridPy's removal.
+svn. 
 
 ## Introduction
 The NuGridPy modules were written with an interactive work mode in mind, in particular
@@ -39,10 +38,11 @@ Pull requests and new issues are most welcome!
 
 ## Installation
 
+Clone this repo and point the `PYTHONPATH` variable to the directoy in which the NuGridPy repo is located. 
 
 ### Required packages
 
-All modules should work with the recommended [NuGridDic python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
+All modules should work with the recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
 
 If you prefer installing packages individually, here are the dependencies explicitely:
 
