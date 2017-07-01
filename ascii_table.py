@@ -62,7 +62,7 @@ class ascii_table(DataPlot):
     Parameters
     ----------
     filename : string
-        The name of the file we are looking at, or writeing to.
+        The name of the file we are looking at, or writeng to.
     sldir : string, optional
         Standard directory of filename. The default is '.'.
     sep : string, optional

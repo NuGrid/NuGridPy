@@ -352,7 +352,7 @@ class abu_vector(DataPlot, Utils):
     files=[]  # list of files
     isotopes=[]# list of isotopes
     def __init__(self, sldir='./', filenames='iso_massf',
-                 USEEPP='auto'):
+                 USEEPP='auto',verbose=False):
         '''
         initial method of this class
 
@@ -416,9 +416,10 @@ class abu_vector(DataPlot, Utils):
 
             for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
-            print(str(len(self.files))+' cycle numbers found in '+sldir)
-            print('Ranging from '+str(self.files[0])[-9:-4]+' to '+str(self.files[len(self.files)-1])[-9:-4])
-            print('Range may not be continuous. To display all available cycles, print <abu_vector_instance>.files')
+            if not verbose:
+                print(str(len(self.files))+' cycle numbers found in '+sldir)
+                print('Ranging from '+str(self.files[0])[-9:-4]+' to '+str(self.files[len(self.files)-1])[-9:-4])
+                print('Range may not be continuous. To display all available cycles, print <abu_vector_instance>.files')
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
         def iso_massfmode():
@@ -448,9 +449,10 @@ class abu_vector(DataPlot, Utils):
 
             for i in range(len(self.files)):
                 self.files[i]=self.sldir+self.files[i]
-            print(str(len(self.files))+' cycle numbers found in '+sldir)
-            print('Ranging from '+str(self.files[0])[-9:-4]+' to '+str(self.files[len(self.files)-1])[-9:-4])
-            print('Range may not be continuous. To display all available cycles, print <abu_vector_instance>.files')
+            if not verbose:
+                print(str(len(self.files))+' cycle numbers found in '+sldir)
+                print('Ranging from '+str(self.files[0])[-9:-4]+' to '+str(self.files[len(self.files)-1])[-9:-4])
+                print('Range may not be continuous. To display all available cycles, print <abu_vector_instance>.files')
             self.isotopes=self.get('ISOTP',self.files[0],numtype='file')
 
 
