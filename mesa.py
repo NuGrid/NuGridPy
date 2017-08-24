@@ -3799,7 +3799,7 @@ def _cleanstarlog(file_in):
     for j in nbremove:
         lignes.remove(lignes[j])
 
-    fout=file(file_out,'w')
+    fout = open(file_out,'w')
     for j in np.arange(len(lignes)):
         fout.write(lignes[j])
     fout.close()
