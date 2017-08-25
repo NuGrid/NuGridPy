@@ -6,9 +6,9 @@ python:
   - "3.5"
 install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-    -python3.5
+      -python3.5;
     else
-    -python2.7
+      -python2.7;
     fi
   - python-numpy
   - python-scipy python-matplotlib python-pip python-h5py python-xlrd
