@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/NuGrid/NuGridPy.svg?branch=master)](https://travis-ci.org/NuGrid/NuGridPy)
+
+
 # NuGridPy
 
 NuGridPy is a Python package containing tools to access and analyse
