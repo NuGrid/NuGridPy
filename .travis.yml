@@ -5,8 +5,7 @@ python:
   - "2.7"
   - "3.5"
 install:
-  - python-numpy
-  - python-scipy python-matplotlib python-pip python-h5py python-xlrd
+  - pip install numpy scipy matplotlib h5py xlrd
 script:
   - export NGPDIR=../
   - export PYTHONPATH=$PYTHONPATH:$NGPDIR
