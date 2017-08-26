@@ -10,36 +10,36 @@ from .tempdir.tempfile_ import TemporaryDirectory
 class TestModuleImports(unittest.TestCase):
 
     def test_import_ascii_table(self):
-        import NuGridPy.ascii_table
+        import nugridpy.ascii_table
 
     def test_import_astronomy(self):
-        import NuGridPy.astronomy
+        import nugridpy.astronomy
 
     def test_import_data_plot(self):
-        import NuGridPy.data_plot
+        import nugridpy.data_plot
 
     def test_import_grain(self):
-        import NuGridPy.grain
+        import nugridpy.grain
 
     def test_import_h5T(self):
-        import NuGridPy.h5T
+        import nugridpy.h5T
 
     def test_import_mesa(self):
-        import NuGridPy.mesa
+        import nugridpy.mesa
 
     def test_import_nugridse(self):
-        import NuGridPy.nugridse
+        import nugridpy.nugridse
 
     def test_import_ppn(self):
-        import NuGridPy.ppn
+        import nugridpy.ppn
 
     def test_import_utils(self):
-        import NuGridPy.utils
+        import nugridpy.utils
 
 class TestAbuChart(unittest.TestCase):
 
     def test_abu_chart(self):
-        from NuGridPy import utils,ppn,data_plot
+        from nugridpy import utils,ppn,data_plot
         import matplotlib
         matplotlib.use('agg')
         import matplotlib.pylab as mpy
@@ -88,7 +88,7 @@ class TestAbuChart(unittest.TestCase):
 
 
     def test_abu_evolution(self):
-        from NuGridPy import ppn, utils
+        from nugridpy import ppn, utils
         import matplotlib
         matplotlib.use('agg')
         import matplotlib.pylab as mpy
