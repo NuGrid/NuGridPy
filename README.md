@@ -41,7 +41,11 @@ Pull requests and new issues are most welcome!
 
 ## Installation
 
-Clone this repo and point the `PYTHONPATH` variable to the directoy in which the NuGridPy repo is located. 
+```
+pip install git+https://github.com/NuGrid/NuGridPy.git
+```
+
+Or clone this repo and point the `PYTHONPATH` variable to the NuGridPy repo directoy.
 
 ### Required packages
 
