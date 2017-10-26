@@ -277,7 +277,7 @@ class se(DataPlot, Utils):
             if 'exp' in type:
               #check if mass occurs twice, in case of ppd_exp runs
               mlist_idx=[k for k in range(len(setmasses)) if realmass == setmasses[k]]
-              if (mlist_idx)>1:
+              if (len(mlist_idx))>1:
                    #loop over different explosion prescriptions
                    found_exp_type=False
                    for k in range(len(mlist_idx)):
