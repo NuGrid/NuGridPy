@@ -891,7 +891,7 @@ def linestyle(i,a=5,b=3):
     colors=['b','g','r','c','m','k']
     ls_string = colors[sc.mod(i,6)]+lines[sc.mod(i,4)]+points[sc.mod(i,18)]
     mark_i    = a+sc.mod(i,b)
-    return ls_string,mark_i
+    return ls_string,int(mark_i)
 
 def colourblind(i):
     '''
