@@ -1,0 +1,583 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>nugridpy.grain &#8212; NuGridPy 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nugridpy.h5T" href="nugridpy.h5T.html" />
+    <link rel="prev" title="nugridpy.data_plot" href="nugridpy.data_plot.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-nugridpy.grain">
+<span id="nugridpy-grain"></span><h1>nugridpy.grain<a class="headerlink" href="#module-nugridpy.grain" title="Permalink to this headline">¶</a></h1>
+<p>grain.py is a collection of routines to analyze presolar grain data
+(and can probably be extended to observational data at a later stage).</p>
+<p>This class load the current version of the presolar grain database for
+further processing.  A private databse can be given as well as
+described later.  Several routines (see below and NuGrid book) can be
+used to filter, plot, and retrieve grain data.  The presolar grain
+database is supported by the group at Washington University, mainly
+Frank Gyngard.  The database can be found at
+<a class="reference external" href="http://presolar.wustl.edu/PGD/Presolar_Grain_Database.html">http://presolar.wustl.edu/PGD/Presolar_Grain_Database.html</a></p>
+<p>Important note: This script assumes that you have a full SVN tree
+checked out (or actually, that you have at least the utils folder and
+the validation folder on the same level checked out.</p>
+<div class="section" id="usage-of-these-tools">
+<h2>Usage of these tools<a class="headerlink" href="#usage-of-these-tools" title="Permalink to this headline">¶</a></h2>
+<p>For questions, bug reports, please contact <a class="reference external" href="mailto:trappitsch&#37;&#52;&#48;uchicago&#46;edu">trappitsch<span>&#64;</span>uchicago<span>&#46;</span>edu</a>
+Reto Trappitsch for the NuGrid collaboration</p>
+</div>
+<div class="section" id="developing-notes">
+<h2>Developing notes<a class="headerlink" href="#developing-notes" title="Permalink to this headline">¶</a></h2>
+<p>data header should be safed lowercase always -&gt; use .lower() argument
+also for comparison w/ user input therefore!
+if updating the database with new files creates a utf16 error while
+reading in the database, open it in excel, save the file, and try
+again. if this does not work, good luck…</p>
+<p class="rubric">Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.grain.get_svnpath" title="nugridpy.grain.get_svnpath"><code class="xref py py-obj docutils literal"><span class="pre">get_svnpath</span></code></a>()</td>
+<td>This subroutine gives back the path of the whole svn tree installation, which is necessary for the script to run.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.grain.iso_name_converter" title="nugridpy.grain.iso_name_converter"><code class="xref py py-obj docutils literal"><span class="pre">iso_name_converter</span></code></a>(iso)</td>
+<td>Converts the name of the given isotope (input), e.g., ‘N-14’ to 14N as used later to compare w/ grain database.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">preprocessor</span></code>(fname,&nbsp;gdbdir,&nbsp;gdbload[,&nbsp;wb_sic])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">style_creator</span></code>(desc,&nbsp;descdict)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.grain.gdb" title="nugridpy.grain.gdb"><code class="xref py py-obj docutils literal"><span class="pre">gdb</span></code></a>([fname,&nbsp;gdbdir,&nbsp;gdbload,&nbsp;iniabufile])</td>
+<td>This class provides easy access to the presolar grain databse, as described in the header The databse is read in by default, however you can choose a private database and if you do so, if you want to use the private database exclusively or together with the whole database.</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="nugridpy.grain.gdb">
+<em class="property">class </em><code class="descclassname">nugridpy.grain.</code><code class="descname">gdb</code><span class="sig-paren">(</span><em>fname=None</em>, <em>gdbdir=None</em>, <em>gdbload=True</em>, <em>iniabufile='frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn'</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class provides easy access to the presolar grain databse, as
+described in the header The databse is read in by default, however
+you can choose a private database and if you do so, if you want to
+use the private database exclusively or together with the whole
+database.</p>
+<p>If you use a private datafile, make sure it is in the same
+structure as the presolar grain database.  The most important
+thing is that you have a column named ‘Notes’ before the data
+start.  Everything on the right there is data, on the left
+description of the data.  You don’t have to have all the data
+columns if you don’t have data, but the header of the data columns
+needs to be exactly the same as the in the database.  Look at
+validation/grain_data xls files if you want to see an example of
+the formatting / or use it as a template.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fname</strong> (<em>string</em>) – filename to your private database, if not in the main tree
+structure with other databse, give full path.</li>
+<li><strong>gdbdir</strong> (<em>string</em>) – In case you have not a full svn tree installed, choose the correct
+path to all the data here</li>
+<li><strong>gdbload</strong> (<em>boolean</em><em>, </em><em>optional</em>) – True or False: Do you want to load the grain database or not?
+The default is True.</li>
+<li><strong>iniabufile</strong> (<em>string</em><em>, </em><em>optional</em>) – Which initial abundances should be used to calculate delta
+values.  Here we assume complete SVN tree (need USEEPP).  Give
+absolute path otherwise. The default is ‘frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="nugridpy.grain.gdb.check_availability">
+<code class="descname">check_availability</code><span class="sig-paren">(</span><em>isos</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.check_availability" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine checks if the requested set of isotopes is
+available in the dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>isos</strong> (<em>list</em>) – set of isotopes in format [‘Si-28’,’Si-30’].</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">[index, delta_b, ratio_b].
+index: where is it.
+delta_b: is it a delta value or not?
+ratio_ib:  True if ratio is inverted, false if not</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.delta_to_ratio">
+<code class="descname">delta_to_ratio</code><span class="sig-paren">(</span><em>isos_ss</em>, <em>delta</em>, <em>oneover=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.delta_to_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a delta value into an isotopic ratio</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>isos_ss</strong> (<em>list</em><em> or </em><em>float</em>) – list w/ isotopes, e.g., [‘N-14’,’N-15’] OR the solar
+system ratio.</li>
+<li><strong>delta</strong> (<em>float</em>) – delta value of the isotopes to transform.</li>
+<li><strong>oneover</strong> (<em>boolean</em>) – take the inverse of the ratio before returning it (never
+of the delta value!).  The default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">delta value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.filter_data">
+<code class="descname">filter_data</code><span class="sig-paren">(</span><em>isos</em>, <em>limit</em>, <em>delta=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.filter_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine filters isotopic values according to the limit
+you give.  You can filter in ratio or in delta space.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>isos</strong> (<em>list</em>) – isotopes you want to filter for, e.g., give as
+[‘Si-28’, ‘Si-30’] for the 28/30 ratio.</li>
+<li><strong>limit</strong> (<em>string</em>) – what do you want to filter for, e.g., ratio or delta &gt; 100,
+then give ‘&gt;100’.</li>
+<li><strong>delta</strong> (<em>boolean</em><em>, </em><em>optional</em>) – do you wanna filter in delta space, then set to True,
+otherwise to False.  The default is True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.filter_desc">
+<code class="descname">filter_desc</code><span class="sig-paren">(</span><em>graintype=None</em>, <em>group=None</em>, <em>reference=None</em>, <em>size=None</em>, <em>phase=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.filter_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine is to filter for description elements.  You can
+check what is available in the description by running,</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">i</span><span class="o">.</span><span class="n">header_desc</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>where i is the instance you loaded.</p>
+<p>You can run the filter multiple times!  You can filter for the
+following types:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>graintype</strong> (<em>string</em><em> or </em><em>list</em>) – Give graintypes as either ‘M’ for only mainstream or more
+than one [‘M’,’Z’].</li>
+<li><strong>group</strong> (<em>integer</em><em> or </em><em>list</em>) – Group of graintypes, important for oxides and silicates,
+since they are split into groups and not into types.
+Example 1, or give a list [1,3].</li>
+<li><strong>reference</strong> (<em>string</em><em> or </em><em>list</em>) – Give the reference you want to filter for, try an i.info()
+to pick the right name!  You can select a single
+referennce as string or multiple references in as a list.</li>
+<li><strong>size</strong> (<em>string</em>) – Filter for grain sizes, give ‘&lt;5.0’ or ‘&gt;5.0’ as a string
+for larger or smaller than a given grainsize in um.  Only
+data with known grainsizes are chosen.  Often grain sizes
+are given in a times b, where a and b are the minumum and
+maximum measurements from an image.  If you give a &gt;5.0
+then grains with the smaller dimension &gt;5um are taken into
+account.  If you want &lt;5.0 then grains with the upper
+dimension &lt;5um are taken into account.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.filter_single_grain">
+<code class="descname">filter_single_grain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.filter_single_grain" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine is to filter out single grains. It is kind of
+useless if you have tons of data still in the list. To work on
+there, you have other filters (filter_desc and filter_data)
+available!  This filter gives an index to every grain, plots
+the most important information, and then asks you to pick a
+filter.  No input necessary, input is given during the routine</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.filter_uncertainty">
+<code class="descname">filter_uncertainty</code><span class="sig-paren">(</span><em>isos</em>, <em>limit</em>, <em>delta=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.filter_uncertainty" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine filters isotopic values according to the limit
+you give.  You can filter in ratio or in delta space.  This
+routine is based on the uncertainties, e.g., if you want to
+select only high quality data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>isos</strong> (<em>list</em>) – Isotopes you want to filter for, e.g., give as
+[‘Si-28’, ‘Si-30’] for the 28/30 ratio.</li>
+<li><strong>limit</strong> (<em>string</em>) – What do you want to filter for, e.g., ratio or delta &gt; 100,
+then give ‘&gt;100’.</li>
+<li><strong>delta</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Do you wanna filter in delta space, then set to True,
+otherwise to False.  The default is True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>graintype=True</em>, <em>group=True</em>, <em>reference=False</em>, <em>phase=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine gives you informations what kind of grains are
+currently available in your filtered version.  It gives you
+the type of grains available.  More to be implemented upon need.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>group</strong><strong>, </strong><strong>references</strong><strong>, </strong><strong>phase</strong> (<em>graintype</em><em>,</em>) – What do you wanna print for information.  There can be a
+lot of references, hence references default is False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.plot_pattern_return">
+<code class="descname">plot_pattern_return</code><span class="sig-paren">(</span><em>isos</em>, <em>delta=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.plot_pattern_return" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine returns data isotopic data to plot from the
+filtered list of data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>isos</strong> (<em>list</em>) – Isotopes for x axis in standard format
+[[‘Si-30’,’Si-28’],[‘Si-29’,’Si-30’],…]</li>
+<li><strong>isoy</strong> (<em>list</em>) – Same as isox but for y axis.</li>
+<li><strong>deltay</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Same as for x-axis but for y-axis.  The default is True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>grpl_data</em> – grain plot x-axis data.</li>
+<li><em>grpl_err</em> – x-axis error bars.</li>
+<li><em>grpl_style</em> – style data for the different symbols.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.plot_ratio_return">
+<code class="descname">plot_ratio_return</code><span class="sig-paren">(</span><em>isox</em>, <em>isoy</em>, <em>deltax=True</em>, <em>deltay=True</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.plot_ratio_return" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine returns data isotopic data to plot from the
+filtered list of data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>isox</strong> (<em>list</em>) – Isotopes for x axis in standard format [‘Si-28’,’Si-30’].</li>
+<li><strong>isoy</strong> (<em>list</em>) – Same as isox but for y axis.</li>
+<li><strong>deltax</strong> (<em>boolean</em><em>, </em><em>optional</em>) – If true then x-axis values are in delta format.  The default
+is True.</li>
+<li><strong>deltay</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Same as for x-axis but for y-axis.  The default is True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>grpl_xdata</em> – grain plot x-axis data.</li>
+<li><em>grpl_xerr</em> – x-axis error bars.</li>
+<li><em>grpl_ydata</em> – grain plot y-axis data.</li>
+<li><em>grpl_yerr</em> – y-axis error bars.</li>
+<li><em>grpl_style</em> – style data for the different symbols.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.ratio_to_delta">
+<code class="descname">ratio_to_delta</code><span class="sig-paren">(</span><em>isos_ss</em>, <em>ratio</em>, <em>oneover=False</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.ratio_to_delta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms an isotope ratio into a delta value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>isos_ss</strong> (<em>list</em><em> or </em><em>float</em>) – list w/ isotopes, e.g., [‘N-14’,’N-15’] OR the solar
+system ratio.</li>
+<li><strong>ratio</strong> (<em>float</em>) – ratio of the isotopes to transform.</li>
+<li><strong>oneover</strong> (<em>boolean</em>) – take the inverse of the ratio before transforming (never
+inverse of delta value!).  The default is False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">delta value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.reset_filter">
+<code class="descname">reset_filter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.reset_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the filter and goes back to initialized value. This
+routine also resets the style if you have changed it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.style_chg_label">
+<code class="descname">style_chg_label</code><span class="sig-paren">(</span><em>type</em>, <em>symb=None</em>, <em>edc=None</em>, <em>fac=None</em>, <em>smbsz=None</em>, <em>edw=None</em>, <em>lab=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.style_chg_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine changes the plotting style that is set by default.
+The style is changed according the the label that you choose.
+Changing according to reference, use style_chg_ref() function!
+You can change it back to default by resetting the filter using
+g.reset_filter() routine, assuming that g is your instance. The
+format that is used here is:</p>
+<p>[‘Symbol’, ‘Edge color’, ‘Face color’, ‘Symbol size’, ‘Edge width’
+,’Label’]</p>
+<p>You can see the current styles by running</p>
+<p>Attention: You have to give values to all variables that are
+compatible with the python mathplotlib. If not, it’s your fault
+if nothing works.</p>
+<p>g.style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type</strong> (<em>string</em>) – Select the label of the grains you want to change.</li>
+<li><strong>symb</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new symbol. None for no change.</li>
+<li><strong>edc</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new edge color. None for no change.</li>
+<li><strong>fac</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new face color. None for no change.</li>
+<li><strong>smbsz</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new symbol size. None for no change.</li>
+<li><strong>edw</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new edge width. None for no change.</li>
+<li><strong>lab</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new label. None for no change. Watch out, if you
+want to do more specifications later, the type will
+have changed to the new label.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.grain.gdb.style_chg_ref">
+<code class="descname">style_chg_ref</code><span class="sig-paren">(</span><em>ref</em>, <em>symb=None</em>, <em>edc=None</em>, <em>fac=None</em>, <em>smbsz=None</em>, <em>edw=None</em>, <em>lab=None</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.gdb.style_chg_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine changes the plotting style that is set by default.
+The style is changed according the the reference of the paper
+as given in the grain database. For change according to type of
+grain, use the routine syle_chg_label().</p>
+<p>[‘Symbol’, ‘Edge color’, ‘Face color’, ‘Symbol size’, ‘Edge width’
+,’Label’]</p>
+<p>You can see the current styles by running</p>
+<p>Attention: You have to give values to all variables that are
+compatible with the python mathplotlib. If not, it’s your fault
+if nothing works.</p>
+<p>g.style</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ref</strong> (<em>string</em>) – Select the reference of the grains you want to change.</li>
+<li><strong>symb</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new symbol. None for no change.</li>
+<li><strong>edc</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new edge color. None for no change.</li>
+<li><strong>fac</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new face color. None for no change.</li>
+<li><strong>smbsz</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new symbol size. None for no change.</li>
+<li><strong>edw</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new edge width. None for no change.</li>
+<li><strong>lab</strong> (<em>string</em><em>, </em><em>optional</em>) – Select new label. None for no change.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.grain.get_svnpath">
+<code class="descclassname">nugridpy.grain.</code><code class="descname">get_svnpath</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.get_svnpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>This subroutine gives back the path of the whole svn tree
+installation, which is necessary for the script to run.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.grain.iso_name_converter">
+<code class="descclassname">nugridpy.grain.</code><code class="descname">iso_name_converter</code><span class="sig-paren">(</span><em>iso</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.grain.iso_name_converter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts the name of the given isotope (input), e.g., ‘N-14’ to
+14N as used later to compare w/ grain database.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../documentation.html">
+    <img class="logo" src="../_static/logo.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">NuGridPy</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=NuGrid&repo=NuGridPy&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/NuGrid/NuGridPy">
+    <img
+        alt="https://secure.travis-ci.org/NuGrid/NuGridPy.svg?branch=master"
+        src="https://secure.travis-ci.org/NuGrid/NuGridPy.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.astronomy.html">nugridpy.astronomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.ascii_table.html">nugridpy.ascii_table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.data_plot.html">nugridpy.data_plot</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">nugridpy.grain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage-of-these-tools">Usage of these tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#developing-notes">Developing notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.h5T.html">nugridpy.h5T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.mesa.html">nugridpy.mesa</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.nugridse.html">nugridpy.nugridse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.ppn.html">nugridpy.ppn</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.utils.html">nugridpy.utils</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://nugrid.github.io/NuGridPy/">Main website</a></li>
+    
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Nugrid.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/_autosummary/nugridpy.grain.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
