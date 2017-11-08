@@ -80,9 +80,9 @@ source_suffix = '.rst'
 master_doc = 'documentation'
 
 # General information about the project.
-project = 'PPMstar'
-copyright = '2017, PPMstar'
-author = 'PPMstar'
+project = 'NuGridPy'
+copyright = '2017, Nugrid'
+author = 'Nugrid'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -126,9 +126,6 @@ html_theme = 'alabaster'
 html_theme_options = {
     'logo': 'logo.png',
     'logo_name': True,
-    'github_repo': 'PyPPM',
-    'github_user': 'PPMstar',
-    'github_button': True,
     'show_related': True,
     'fixed_sidebar': True
 }
