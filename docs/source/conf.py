@@ -127,7 +127,13 @@ html_theme_options = {
     'logo': 'logo.png',
     'logo_name': True,
     'show_related': True,
-    'fixed_sidebar': True
+    'travis_button': True,
+    'github_user': 'NuGrid',
+    'github_repo': 'NuGridPy',
+}
+
+html_theme_options['extra_nav_links'] = {
+    "Main website": 'https://nugrid.github.io/NuGridPy/',
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
