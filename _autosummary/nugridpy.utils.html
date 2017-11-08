@@ -1,0 +1,729 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>nugridpy.utils &#8212; NuGridPy 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="nugridpy.ppn" href="nugridpy.ppn.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-nugridpy.utils">
+<span id="nugridpy-utils"></span><h1>nugridpy.utils<a class="headerlink" href="#module-nugridpy.utils" title="Permalink to this headline">¶</a></h1>
+<p>utils.py</p>
+<p>Utility class for holding extra methods from mesa.py, nuh5p.py</p>
+<p class="rubric">Functions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.close_wins" title="nugridpy.utils.close_wins"><code class="xref py py-obj docutils literal"><span class="pre">close_wins</span></code></a>(win_min,&nbsp;win_max)</td>
+<td>close all windows in a certain window number range</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.colourblind" title="nugridpy.utils.colourblind"><code class="xref py py-obj docutils literal"><span class="pre">colourblind</span></code></a>(i)</td>
+<td>colour pallete from <a class="reference external" href="http://tableaufriction.blogspot.ro/">http://tableaufriction.blogspot.ro/</a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.colourblind2" title="nugridpy.utils.colourblind2"><code class="xref py py-obj docutils literal"><span class="pre">colourblind2</span></code></a>(i)</td>
+<td>another colour pallete from <a class="reference external" href="http://www.sron.nl/~pault/">http://www.sron.nl/~pault/</a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.convert_specie_naming_from_h5_to_ppn" title="nugridpy.utils.convert_specie_naming_from_h5_to_ppn"><code class="xref py py-obj docutils literal"><span class="pre">convert_specie_naming_from_h5_to_ppn</span></code></a>(…)</td>
+<td>read isotopes names from h5 files, and convert them</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.define_zip_index_for_species" title="nugridpy.utils.define_zip_index_for_species"><code class="xref py py-obj docutils literal"><span class="pre">define_zip_index_for_species</span></code></a>(…)</td>
+<td>This just give back cl, that is the original index as it is read from files from a data file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.element_abund_marco" title="nugridpy.utils.element_abund_marco"><code class="xref py py-obj docutils literal"><span class="pre">element_abund_marco</span></code></a>(i_decay,&nbsp;…)</td>
+<td>Given an array of isotopic abundances not decayed and a similar</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.get_el_from_z" title="nugridpy.utils.get_el_from_z"><code class="xref py py-obj docutils literal"><span class="pre">get_el_from_z</span></code></a>(z)</td>
+<td>Very simple Vfunction that gives the atomic number AS A STRING when given the element symbol.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.get_z_from_el" title="nugridpy.utils.get_z_from_el"><code class="xref py py-obj docutils literal"><span class="pre">get_z_from_el</span></code></a>(element)</td>
+<td>Very simple function that gives the atomic number AS A STRING when given the element symbol.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.give_zip_element_z_and_names" title="nugridpy.utils.give_zip_element_z_and_names"><code class="xref py py-obj docutils literal"><span class="pre">give_zip_element_z_and_names</span></code></a>(element_name)</td>
+<td>create 2 indexes that, given the name of the element/specie, give the atomic number.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.linestyle" title="nugridpy.utils.linestyle"><code class="xref py py-obj docutils literal"><span class="pre">linestyle</span></code></a>(i[,&nbsp;a,&nbsp;b])</td>
+<td>provide one out of 25 unique combinations of style, color and mark</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.linestylecb" title="nugridpy.utils.linestylecb"><code class="xref py py-obj docutils literal"><span class="pre">linestylecb</span></code></a>(i[,&nbsp;a,&nbsp;b])</td>
+<td>version of linestyle function with colourblind colour scheme</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.make_list" title="nugridpy.utils.make_list"><code class="xref py py-obj docutils literal"><span class="pre">make_list</span></code></a>(default_symbol_list,&nbsp;len_list_to_print)</td>
+<td>provide the list of symbols to use according for the list of</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.solar" title="nugridpy.utils.solar"><code class="xref py py-obj docutils literal"><span class="pre">solar</span></code></a>(filename_solar,&nbsp;solar_factor)</td>
+<td>read solar abundances from filename_solar.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.species_list" title="nugridpy.utils.species_list"><code class="xref py py-obj docutils literal"><span class="pre">species_list</span></code></a>(what_list)</td>
+<td>provide default lists of elements to plot.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.stable_specie" title="nugridpy.utils.stable_specie"><code class="xref py py-obj docutils literal"><span class="pre">stable_specie</span></code></a>()</td>
+<td>provide the list of stable species, and decay path feeding stables</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.strictly_monotonic" title="nugridpy.utils.strictly_monotonic"><code class="xref py py-obj docutils literal"><span class="pre">strictly_monotonic</span></code></a>(bb)</td>
+<td>bb is an index array which may have numerous double or triple</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.symbol_list" title="nugridpy.utils.symbol_list"><code class="xref py py-obj docutils literal"><span class="pre">symbol_list</span></code></a>(what_list)</td>
+<td>provide default symbol lists</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.trajectory_SgConst" title="nugridpy.utils.trajectory_SgConst"><code class="xref py py-obj docutils literal"><span class="pre">trajectory_SgConst</span></code></a>([Sg,&nbsp;delta_logt_dex])</td>
+<td>setup trajectories for constant radiation entropy.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.Utils" title="nugridpy.utils.Utils"><code class="xref py py-obj docutils literal"><span class="pre">Utils</span></code></a></td>
+<td>This private class contains utilities that are used by methods, mostly in the ppn and mppnp classes.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">constants</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#nugridpy.utils.data_fitting" title="nugridpy.utils.data_fitting"><code class="xref py py-obj docutils literal"><span class="pre">data_fitting</span></code></a>([func,&nbsp;coef])</td>
+<td>Wrapper for the scipy method optimize.leastsq</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#nugridpy.utils.iniabu" title="nugridpy.utils.iniabu"><code class="xref py py-obj docutils literal"><span class="pre">iniabu</span></code></a>(filename)</td>
+<td>This class in the utils package reads an abundance distribution file of the type iniab.dat.</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="nugridpy.utils.Utils">
+<em class="property">class </em><code class="descclassname">nugridpy.utils.</code><code class="descname">Utils</code><a class="headerlink" href="#nugridpy.utils.Utils" title="Permalink to this definition">¶</a></dt>
+<dd><p>This private class contains utilities that are used by methods,
+mostly in the ppn and mppnp classes.  Users whould normally not use
+these methods directly.  Things go here when it can be imagined that
+they may be used not in immediate conjunction with plotting.
+Otherwise they would go into the superclass data_plot.</p>
+<dl class="method">
+<dt id="nugridpy.utils.Utils.compar">
+<code class="descname">compar</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.Utils.compar" title="Permalink to this definition">¶</a></dt>
+<dd><p>simple comparator method</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.Utils.comparator">
+<code class="descname">comparator</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.Utils.comparator" title="Permalink to this definition">¶</a></dt>
+<dd><p>simple comparator method</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.Utils.decay_indexpointer">
+<code class="descname">decay_indexpointer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.Utils.decay_indexpointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>This private method provides decay indexpointers which allow to
+instantaneously decay an abundance vector. These are attributes
+are.</p>
+<dl class="docutils">
+<dt>decay_idp <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>points in the iso_to_plot (i.e. the undecayed abundance
+vector index space) to the decay target.</dd>
+<dt>idp_to_stables_in_isostoplot <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>points to the stable isotopes in the undecayed abundance
+vector index space.</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>For an application example see ppn.py-abu_vector-_getcycle.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.Utils.is_stable">
+<code class="descname">is_stable</code><span class="sig-paren">(</span><em>species</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.Utils.is_stable" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine accepts input formatted like ‘He-3’ and checks with
+stable_el list if occurs in there.  If it does, the routine
+returns True, otherwise False.</p>
+<p class="rubric">Notes</p>
+<p>this method is designed to work with an se instance from
+nugridse.py. In order to make it work with ppn.py some
+additional work is required.</p>
+<p>FH, April 20, 2013.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.close_wins">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">close_wins</code><span class="sig-paren">(</span><em>win_min</em>, <em>win_max</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.close_wins" title="Permalink to this definition">¶</a></dt>
+<dd><p>close all windows in a certain window number range</p>
+<p>win_min/max  minumum and maximum window number to close</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.colourblind">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">colourblind</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.colourblind" title="Permalink to this definition">¶</a></dt>
+<dd><p>colour pallete from <a class="reference external" href="http://tableaufriction.blogspot.ro/">http://tableaufriction.blogspot.ro/</a>
+allegedly suitable for colour-blind folk</p>
+<p>SJ</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.colourblind2">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">colourblind2</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.colourblind2" title="Permalink to this definition">¶</a></dt>
+<dd><p>another colour pallete from <a class="reference external" href="http://www.sron.nl/~pault/">http://www.sron.nl/~pault/</a>
+allegedly suitable for colour-blind folk</p>
+<p>SJ</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.convert_specie_naming_from_h5_to_ppn">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">convert_specie_naming_from_h5_to_ppn</code><span class="sig-paren">(</span><em>isotope_names</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.convert_specie_naming_from_h5_to_ppn" title="Permalink to this definition">¶</a></dt>
+<dd><p>read isotopes names from h5 files, and convert them
+according to standard scheme used inside ppn and mppnp.  Also
+Z and A are recalculated, for these species. Isomers are
+excluded for now, since there were recent changes in isomers
+name. As soon as the isomers names are settled, than Z and A
+provided here will be obsolete, and can be changed by usual Z
+and A.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nugridpy.utils.data_fitting">
+<em class="property">class </em><code class="descclassname">nugridpy.utils.</code><code class="descname">data_fitting</code><span class="sig-paren">(</span><em>func='linear'</em>, <em>coef=(1</em>, <em>1)</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.data_fitting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for the scipy method optimize.leastsq</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>func</strong> (<em>string</em><em> or </em><em>function</em><em>, </em><em>optional</em>) – If func is a string, then it must be one of the two strings
+‘linear’ or ‘powerlaw’. If func is not a string it must be
+a custom function.  The default is “linear”.</li>
+<li><strong>coef</strong> (<em>tuple</em><em> or </em><em>list</em>) – A guess for the list of coeffiecients.  For ‘powerlaw’ coef
+must have three enries.  For ‘linear’ coef must have two
+enries.  If you provide your own function, then provide as
+many coef entries as your function needs.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Typically you have some data y(x) and you want to
+fit some function to this data.</p>
+<p>in order to test this create some sample data y(x)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">=</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span><span class="o">=</span><span class="p">(((</span><span class="n">random_sample</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="mf">50.</span><span class="p">)</span><span class="o">-</span><span class="mi">50</span><span class="p">)</span><span class="o">+</span><span class="n">x</span> <span class="c1"># this is the data to fit</span>
+</pre></div>
+</div>
+<p>This class provides two simple fit functions: linear and power law.</p>
+<p>Feel free to add more, or provide your custom function as an
+argument.  For example, in order to provide an exponential fit
+function, first define the function.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">ff</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">coef</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">sc</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="n">coef</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>and then call the data_fitting instance.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">=</span><span class="n">utils</span><span class="o">.</span><span class="n">data_fitting</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span><span class="n">coef</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Once you have initialized this class, the instance provides two
+methods; fit and plot to check the fit.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">x</span><span class="p">,(</span><span class="n">y</span><span class="o">-</span><span class="n">f</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">fcoef</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">x</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="go">The fit coefficients are stored in self.fcoef.</span>
+</pre></div>
+</div>
+<p>(FH)</p>
+<dl class="method">
+<dt id="nugridpy.utils.data_fitting.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>dcoef='none'</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.data_fitting.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>performs the fit</p>
+<dl class="docutils">
+<dt>x, y <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
+<dd>Matching data arrays that define a numerical function y(x),
+this is the data to be fitted.</dd>
+<dt>dcoef <span class="classifier-delimiter">:</span> <span class="classifier">list or string</span></dt>
+<dd>You can provide a different guess for the coefficients, or
+provide the string ‘none’ to use the inital guess.  The
+default is ‘none’.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Values between 1 and 4 signal success.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ierr</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>self.fcoef, contains the fitted coefficients.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.data_fitting.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ifig=1</em>, <em>data_label='data'</em>, <em>fit_label='fit'</em>, <em>data_shape='o'</em>, <em>fit_shape='-'</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.data_fitting.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>plot the data and the fitted function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ifig</strong> (<em>integer</em>) – Figure window number.  The default is 1.</li>
+<li><strong>data_label</strong> (<em>string</em>) – Legend for data.  The default is ‘data’.</li>
+<li><strong>fit_label</strong> (<em>string</em>) – Legend for fit.  If fit_lable is ‘fit’, then substitute fit
+function type self.func_name.  The default is ‘fit’.</li>
+<li><strong>data_shape</strong> (<em>character</em>) – Shape for data.  The default is ‘o’.</li>
+<li><strong>fit_shape</strong> (<em>character</em>) – Shape for fit.  The default is ‘-‘.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.define_zip_index_for_species">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">define_zip_index_for_species</code><span class="sig-paren">(</span><em>names_ppn_world</em>, <em>number_names_ppn_world</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.define_zip_index_for_species" title="Permalink to this definition">¶</a></dt>
+<dd><p>This just give back cl, that is the original index as it is read from files from a data file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.element_abund_marco">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">element_abund_marco</code><span class="sig-paren">(</span><em>i_decay</em>, <em>stable_isotope_list</em>, <em>stable_isotope_identifier</em>, <em>mass_fractions_array_not_decayed</em>, <em>mass_fractions_array_decayed</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.element_abund_marco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an array of isotopic abundances not decayed and a similar
+array of isotopic abundances not decayed, here elements abundances,
+and production factors for elements are calculated</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.get_el_from_z">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">get_el_from_z</code><span class="sig-paren">(</span><em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.get_el_from_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Very simple Vfunction that gives the atomic number AS A STRING when given the element symbol.
+Uses predefined a dictionnary.
+Parameter :
+z : string or number
+For the other way, see get_z_from_el</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.get_z_from_el">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">get_z_from_el</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.get_z_from_el" title="Permalink to this definition">¶</a></dt>
+<dd><p>Very simple function that gives the atomic number AS A STRING when given the element symbol.
+Uses predefined a dictionnary.
+Parameter :
+element : string
+For the other way, see get_el_from_z</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.give_zip_element_z_and_names">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">give_zip_element_z_and_names</code><span class="sig-paren">(</span><em>element_name</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.give_zip_element_z_and_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>create 2 indexes that, given the name of the element/specie, give the atomic number.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="nugridpy.utils.iniabu">
+<em class="property">class </em><code class="descclassname">nugridpy.utils.</code><code class="descname">iniabu</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class in the utils package reads an abundance distribution file
+of the type iniab.dat. It then provides you with methods to change
+some abundances, modify, normalise and eventually write out the
+final distribution in a format that can be used as an initial
+abundance file for ppn. This class also contains a method to write
+initial abundance files for a MESA run, for a given MESA netowrk.</p>
+<dl class="method">
+<dt id="nugridpy.utils.iniabu.iso_abundance">
+<code class="descname">iso_abundance</code><span class="sig-paren">(</span><em>isos</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu.iso_abundance" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine returns the abundance of a specific isotope.
+Isotope given as, e.g., ‘Si-28’ or as list
+[‘Si-28’,’Si-29’,’Si-30’]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.iniabu.isoratio_init">
+<code class="descname">isoratio_init</code><span class="sig-paren">(</span><em>isos</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu.isoratio_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>This file returns the isotopic ratio of two isotopes specified
+as iso1 and iso2. The isotopes are given as, e.g.,
+[‘Fe’,56,’Fe’,58] or [‘Fe-56’,’Fe-58’] (for compatibility)
+-&gt; list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.iniabu.set_and_normalize">
+<code class="descname">set_and_normalize</code><span class="sig-paren">(</span><em>species_hash</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu.set_and_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>species_hash is a hash array in which you provide abundances
+referenced by species names that you want to set to some
+particular value; all other species are then normalised so that
+the total sum is 1.</p>
+<p class="rubric">Examples</p>
+<p>You can set up the argument array for this method for example
+in the following way.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span><span class="o">=</span><span class="p">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span><span class="p">[</span><span class="s1">&#39;he  4&#39;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sp</span><span class="p">[</span><span class="s1">&#39;h   1&#39;</span><span class="p">]</span><span class="o">=</span><span class="mf">0.5</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.iniabu.write">
+<code class="descname">write</code><span class="sig-paren">(</span><em>outfile='initial_abundance.dat'</em>, <em>header_string='initial abundances for a PPN run'</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write initial abundance file (intended for use with ppn)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>outfile</strong> (<em>string</em>) – Name of output file.  The default is
+‘initial_abundance.dat’.</li>
+<li><strong>header_string</strong> (<em>string</em>) – A string with header line.  The default is
+‘initial abundances for a PPN run’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="nugridpy.utils.iniabu.write_mesa">
+<code class="descname">write_mesa</code><span class="sig-paren">(</span><em>mesa_isos_file='isos.txt'</em>, <em>add_excess_iso='fe56'</em>, <em>outfile='xa_iniabu.dat'</em>, <em>header_string='initial abundances for a MESA run'</em>, <em>header_char='!'</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.iniabu.write_mesa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write initial abundance file, returns written abundances and
+mesa names.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mesa_isos_file</strong> (<em>string</em><em>, </em><em>optional</em>) – List with isos copied from mesa network definition file in
+mesa/data/net_data/nets.  The default is ‘isos.txt’.</li>
+<li><strong>add_excess_iso</strong> (<em>string</em><em>, </em><em>optional</em>) – Add 1.-sum(isos in mesa net) to this isotope.  The defualt
+is ‘fe56’.</li>
+<li><strong>outfile</strong> (<em>string</em><em>, </em><em>optional</em>) – name of output file.  The default file is ‘xa_iniabu.dat’.</li>
+<li><strong>header_string</strong> (<em>string</em><em>, </em><em>optional</em>) – Srting with header line.  The default is
+‘initial abundances for a MESA run’.</li>
+<li><strong>header_char</strong> (<em>character</em><em>, </em><em>optional</em>) – The default is ‘!’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>&gt;&gt;&gt; from NuGridPy import utils
+&gt;&gt;&gt; !ls ~/PPN/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/   # find ppn initial abundance file
+&gt;&gt;&gt; !cat ~/mesa/data/net_data/nets/agb.net                   # find isos needed in mesa net
+&gt;&gt;&gt; !cat &gt; isos.txt                                          # paste needed isos into file
+&gt;&gt;&gt; help(utils.iniabu)                                       # check documentation of method
+&gt;&gt;&gt; x=utils.iniabu(&#39;path_to_here/forum.astro.keele.ac.uk/frames/mppnp/USEEPP/iniab2.0E-02GN93.ppn&#39;)
+&gt;&gt;&gt; x.write_mesa?
+&gt;&gt;&gt; mnames,mabus = x.write_mesa(add_excess_iso=&#39;ne22&#39;,
+...                header_string=&#39;mppnp/USEEPP/iniab2.0E-02GN93.ppn for mesa/agb.net&#39;,
+...                outfile=&#39;xa_2.0E-02GN93.mesa&#39;)
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.linestyle">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">linestyle</code><span class="sig-paren">(</span><em>i</em>, <em>a=5</em>, <em>b=3</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.linestyle" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide one out of 25 unique combinations of style, color and mark</p>
+<p>use in combination with markevery=a+mod(i,b) to add spaced points,
+here a would be the base spacing that would depend on the data
+density, modulated with the number of lines to be plotted (b)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>i</strong> (<em>integer</em>) – Number of linestyle combination - there are many….</li>
+<li><strong>a</strong> (<em>integer</em>) – Spacing of marks.  The default is 5.</li>
+<li><strong>b</strong> (<em>integer</em>) – Modulation in case of plotting many nearby lines.  The default
+is 3.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markevery</span><span class="o">=</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="3">
+<li>2014 FH</li>
+</ol>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.linestylecb">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">linestylecb</code><span class="sig-paren">(</span><em>i</em>, <em>a=5</em>, <em>b=3</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.linestylecb" title="Permalink to this definition">¶</a></dt>
+<dd><p>version of linestyle function with colourblind colour scheme</p>
+<p>returns linetyle, marker, color (see example)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>i</strong> (<em>integer</em>) – </li>
+<li><strong>of linestyle combination - there are many....</strong> (<em>Number</em>) – </li>
+<li><strong>a</strong> (<em>integer</em>) – </li>
+<li><strong>of marks.  The default is 5.</strong> (<em>Spacing</em>) – </li>
+<li><strong>b</strong> (<em>integer</em>) – </li>
+<li><strong>in case of plotting many nearby lines.  The default</strong> (<em>Modulation</em>) – </li>
+<li><strong>3.</strong> (<em>is</em>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">ls</span><span class="o">=</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>                  <span class="n">color</span><span class="o">=</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span><span class="n">markevery</span><span class="o">=</span><span class="n">linestyle</span><span class="p">(</span><span class="mi">7</span><span class="p">)[</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="3">
+<li>2014 FH</li>
+</ol>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.make_list">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">make_list</code><span class="sig-paren">(</span><em>default_symbol_list</em>, <em>len_list_to_print</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.make_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide the list of symbols to use according for the list of
+species/arrays to plot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>default_symbol_list</strong> (<em>list</em>) – Symbols that the user choose to use.</li>
+<li><strong>len_list_to_print</strong> (<em>integer</em>) – len of list of species/arrays to print.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.solar">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">solar</code><span class="sig-paren">(</span><em>filename_solar</em>, <em>solar_factor</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.solar" title="Permalink to this definition">¶</a></dt>
+<dd><p>read solar abundances from filename_solar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename_solar</strong> (<em>string</em>) – The file name.</li>
+<li><strong>solar_factor</strong> (<em>float</em>) – The correction factor to apply, in case filename_solar is not
+solar, but some file used to get initial abundances at
+metallicity lower than solar. However, notice that this is
+really rude, since alpha-enahncements and things like that are
+not properly considered.  Only H and He4 are not multiplied. So,
+for publications PLEASE use proper filename_solar at…solar,
+and use solar_factor = 1. Marco</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.species_list">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">species_list</code><span class="sig-paren">(</span><em>what_list</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.species_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide default lists of elements to plot.</p>
+<dl class="docutils">
+<dt>what_list <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd><p class="first">String name of species lists provided.</p>
+<p>If what_list is “CNONe”, then C, N, O and some other light
+elements.</p>
+<p class="last">If what_list is “s-process”, then s-process indicators.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.stable_specie">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">stable_specie</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.stable_specie" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide the list of stable species, and decay path feeding stables</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.strictly_monotonic">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">strictly_monotonic</code><span class="sig-paren">(</span><em>bb</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.strictly_monotonic" title="Permalink to this definition">¶</a></dt>
+<dd><p>bb is an index array which may have numerous double or triple
+occurrences of indices, such as for example the decay_index_pointer.
+This method removes all entries &lt;= -, then all dublicates and
+finally returns a sorted list of indices.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.symbol_list">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">symbol_list</code><span class="sig-paren">(</span><em>what_list</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.symbol_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>provide default symbol lists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>what_list</strong> (<em>string</em>) – String name of symbol lists provided; “list1”, “list2”,
+“lines1” or “lines2”.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="nugridpy.utils.trajectory_SgConst">
+<code class="descclassname">nugridpy.utils.</code><code class="descname">trajectory_SgConst</code><span class="sig-paren">(</span><em>Sg=0.1</em>, <em>delta_logt_dex=-0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#nugridpy.utils.trajectory_SgConst" title="Permalink to this definition">¶</a></dt>
+<dd><p>setup trajectories for constant radiation entropy.</p>
+<p>S_gamma/R where the radiation constant R = N_A*k
+(Dave Arnett, Supernova book, p. 212)
+This relates rho and T but the time scale for this
+is independent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>Sg</strong> (<em>float</em>) – S_gamma/R, values between 0.1 and 10. reflect conditions in
+massive stars.  The default is 0.1.</li>
+<li><strong>delta_logt_dex</strong> (<em>float</em>) – Sets interval between time steps in dex of logtimerev.  The
+default is -0.01.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../documentation.html">
+    <img class="logo" src="../_static/logo.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">NuGridPy</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=NuGrid&repo=NuGridPy&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a href="https://travis-ci.org/NuGrid/NuGridPy">
+    <img
+        alt="https://secure.travis-ci.org/NuGrid/NuGridPy.svg?branch=master"
+        src="https://secure.travis-ci.org/NuGrid/NuGridPy.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.astronomy.html">nugridpy.astronomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.ascii_table.html">nugridpy.ascii_table</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.data_plot.html">nugridpy.data_plot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.grain.html">nugridpy.grain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.h5T.html">nugridpy.h5T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.mesa.html">nugridpy.mesa</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.nugridse.html">nugridpy.nugridse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nugridpy.ppn.html">nugridpy.ppn</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">nugridpy.utils</a></li>
+</ul>
+
+
+<hr />
+<ul>
+    
+    <li class="toctree-l1"><a href="https://nugrid.github.io/NuGridPy/">Main website</a></li>
+    
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Nugrid.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/_autosummary/nugridpy.utils.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
