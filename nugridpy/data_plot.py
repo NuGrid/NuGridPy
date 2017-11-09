@@ -4001,7 +4001,6 @@ class DataPlot(object):
         '''
 
         pT=self._classTest()
-
         # Class-specific things:
         if pT is 'mesa_profile':
             x = self.get(ixaxis)
@@ -4041,16 +4040,14 @@ class DataPlot(object):
 
         if ifig is not None:
             pl.figure(ifig)
-
         from . import utils as u
         cb = u.colourblind
         lscb = u.linestylecb # colourblind linestyle function
-
         for i in range(len(risos)):
             if logy:
-                y = np.log10(abunds[i])
+                y = np.log10(abunds if len(risos) < 2 else abunds[i])
             else:
-                y = abunds[i]
+                y = abunds if len(risos) < 2 else abunds[i]
             if colourblind:
                 pl.plot(x,y,ls=lscb(i)[0],marker=lscb(i)[1],
                         color=lscb(i)[2],markevery=u.linestyle(i)[1]*20,
