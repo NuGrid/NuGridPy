@@ -134,6 +134,7 @@ html_theme_options = {
 
 html_theme_options['extra_nav_links'] = {
     "Main website": 'https://nugrid.github.io/NuGridPy/',
+    "Index" : "genindex.html"
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
