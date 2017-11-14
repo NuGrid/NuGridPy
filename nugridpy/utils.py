@@ -11,6 +11,7 @@ from __future__ import absolute_import
 from builtins import zip
 from builtins import str
 from builtins import range
+from builtins import list
 from past.utils import old_div
 from builtins import object
 
@@ -278,7 +279,25 @@ class Utils(object):
         isomers.
 
         '''
-
+        def cmp_to_key(mycmp):
+            'Convert a cmp= function into a key= function'
+            class K(object):
+                def __init__(self, obj, *args):
+                    self.obj = obj
+                def __lt__(self, other):
+                    return mycmp(self.obj, other.obj) < 0
+                def __gt__(self, other):
+                    return mycmp(self.obj, other.obj) > 0
+                def __eq__(self, other):
+                    return mycmp(self.obj, other.obj) == 0
+                def __le__(self, other):
+                    return mycmp(self.obj, other.obj) <= 0  
+                def __ge__(self, other):
+                    return mycmp(self.obj, other.obj) >= 0
+                def __ne__(self, other):
+                    return mycmp(self.obj, other.obj) != 0
+            return K
+        
         tmp=[]
         isom=[]
         for i in range(len(a)):
@@ -289,8 +308,8 @@ class Utils(object):
                     isom.append([self.stable_names[int(z[i])]+'-'+str(int(a[i]))+'-'+str(int(isomers[i]-1)),1e-99])
                 else:
                     isom.append([self.stable_names[int(z[i])]+'-'+str(int(a[i]))+'-'+str(int(isomers[i]-1)),yps[i]])
-        tmp.sort(self.compar)
-        tmp.sort(self.comparator)
+        tmp.sort(key = cmp_to_key(self.compar))
+        tmp.sort(key = cmp_to_key(self.comparator))
         abunds=[]
         isotope_to_plot=[]
         z_iso_to_plot=[]
@@ -304,7 +323,9 @@ class Utils(object):
             el_iso_to_plot.append(self.stable_names[int(tmp[i][2])])
 
         return a_iso_to_plot,z_iso_to_plot,abunds,isotope_to_plot,el_iso_to_plot,isom
+    
 
+    
     def compar(self, x, y):
         '''
         simple comparator method
