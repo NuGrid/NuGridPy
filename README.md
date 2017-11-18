@@ -3,53 +3,125 @@
 
 # NuGridPy
 
-NuGridPy is a Python package containing tools to access and analyse
-(e.g. plot) various output formats (including the hdf5-based se
-format) from NuGrid codes (mppnp and ppn) and from the MESA stellar
-evolution code. In principle the NuGridPy package can be used on any
-stellar evolution code output if the tools to write se hdf5 files
-available on the NuGrid web page are used.  The mesa.py module will
-work with MESA ASCII output in the 'LOGS' directory. 
+[NuGridPy](https://nugrid.github.io/NuGridPy) is the NuGrid Python package providing tools to access and analyse (e.g. plot) various output formats (including the [NuGrid hdf5-based se format](https://github.com/NuGrid/NuSE)) from NuGrid codes (mppnp and ppn) and from the MESA stellar evolution code using the [NuGrid mesa_h5 MESA extension](https://github.com/NuGrid/mesa_h5). In principle the NuGridPy package can be used on any stellar evolution code output if the [NuGrid se libraries](https://github.com/NuGrid/NuSE) are used for output.<br>
+The mesa.py module will work with MESA ASCII output in the `LOGS` directory.
 
 
-#### Previous home of NuGridPy 
-MOST RECENT NuGrid SVN REVISION STILL CONTAINING NUGRIDPY: r6619
+## Using NuGridPy
 
-NuGridPy has been migrated to this github repository from the svn
-repository. All components present here have now been removed from the
-svn. 
+The NuGridPy modules were written with an interactive work mode in mind, either
 
-## Introduction
-The NuGridPy modules were written with an interactive work mode in mind, in particular
-taking advantage of the interactive ipython session that we usually
-start with 'ipython --pylab' or inside a jupyter ipython notebook.
-Once your session starts import the mesa or nugridse or ppn module
-(depending on which type of data you are working with), for example:
+- taking advantage of the interactive ipython session, or
+- inside a jupyter ipython notebooks. Once your session starts import modules, such as `mesa`, `nugridse` or `ppn` (depending on which type of data you are working with) from the NuGridPy package, for example:
 
 ```
-	from NuGridPy import mesa as ms
+    from NuGridPy import mesa as ms
 ```
-and read the docstring:	`help(ms)`
 
-There are reasonable doc strings in the modules. If you have made tested and debugged improvements we are happy to know about them and we may
-add them to the release available on the web page. The tools provided
-here are useful to us, but of course there are still many things that
-need attention and improvement.  We have a good list of scheduled
-improvements, let us know if you want to help with these. 
-Pull requests and new issues are most welcome!
+### Examples session
+
+A typical example session in a jupyter notebook that can be performed at the [Web-Exploration of NuGrid Data Interactive (WENDI)](https://wendi.nugridstars.org) server would look like this:
+1. Go to https://wendi.nugridstars.org and sign-in with your github ID (sessions will be culled at regular intervals > a few hours, if you want to use this service beyond this trial period send a message to fherwig at uvic.ca)
+2. Start a Python 3 ipython notebooks
+3. Load NuGridPy packages and initialise data source:
+```
+%pylab
+# loading packages
+from nugridpy import nugridse as nuse
+from nugridpy import mesa
+#setting data path for mesa and nuse
+data_dir='/data/nugrid_vos'
+# data_dir='/data/nugrid_apod2/' # alternative data store
+# do ! ls /data/nug* to check for other alternative data stores
+mesa.set_nugrid_path(data_dir)
+nuse.set_nugrid_path(data_dir)
+```
+4. Creating see and ppd instances
+```
+# see: Stellar Evolution and Explosion data
+# ppd: Post-Processing Data
+m2z02_ppd=nuse.se(mass=2,Z=0.02)
+m2z02_see=mesa.history_data(mass=2,Z=0.02)
+```
+5. Plot Hertzsprung-Russel diagram or Kippenhahn diagram
+```
+m2z02_see.hrd_new()
+```
+```
+m2z02_see.kip_cont()
+```
+6. Inquire doc string, plot abundance profiles from ppd data_dir
+```
+m2z02_see.plot?
+```
+```
+figure(11)
+m2z02_ppd.plot('mass','Ba-138',fname=33500,logy=True,shape='-',\
+               linewidth=2,limits=[0.5882, 0.5889,-7.8, -3.2])
+```
+```
+species=['H-1','C-12','C-13','N-14','Fe-56','Sr-86','Ba-138','Pb-206']
+ifig=121;close(ifig);figure(ifig)
+m2z02_ppd.abu_profile(isos=species, ifig=ifig, fname=45500, logy=True, colourblind=True)
+ylim(-9,0)
+xlim(0.603,0.6033)
+title("Formation of the $^\mathsf{13}\mathsf{C}$ pocket: the partial H-$^\mathsf{12}\mathsf{C}$ zone")
+```
+
+## Documentation
+
+Each module, class, function has (or should have!) reasonable doc strings in the modules. Read the docstring: `help(ms)`, `m2z02_see.plot?`
+
+The docstrings are also available on the [Documentation web page](https://nugrid.github.io/NuGridPy/documentation.html).
+
+If you have made tested and debugged improvements we are happy to know about them. Make a pull request on github. Such improvements include the documentation.
+
+The tools provided here are useful to us, but of course there are still many things that need attention and improvement. Please add submit an _issue_ on the github repo for ideas of improvements and to report bugs. Let us know if you want to help with these. Pull requests and new issues are most welcome!
 
 
 ## Installation
 
+There are several ways you can install NuGridPy.
+
+### PyPI
+Major latest release from PyPI: `pip install nugridpy`.
+
+### Release from github:
+Sometimes you want to install a specific release. Go to the [NuGridPy Release page](https://github.com/NuGrid/NuGridPy/releases) and determine the tag of the release you want. If the tag is `v0.7.2` install that release with pip using the following (you could choose something else for the egg name):
+```
+pip install -e git://github.com/NuGrid/NuGridPy.git@0.7.2#egg=nugridpy_v0.7.2
+```
+
+If you just want to install whatever the latest commit is on github using github you can do:
 ```
 pip install git+https://github.com/NuGrid/NuGridPy.git
 ```
 
-Or clone this repo and point the `PYTHONPATH` variable to the NuGridPy repo directoy.
+### Clone and PYTHONPATH
+Especially for developing NuGridPy you may want to use pip but have more control of where the installation goes, to change the repo and commit back. In that case you can clone this repo, e.g.:
+```
+cd ; mkdir src; cd src
+git clone https://github.com/NuGrid/NuGridPy.git
+```
+and point the `PYTHONPATH` variable to the NuGridPy repo directory.
+
+Inside a jupyter notebook you can set the path the following way:
+```
+import sys
+sys.path.append('/home/user/src/NuGridPy')
+```
 
 ### Required packages
-
-All modules should work with the recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally. 
+#### Linux
+```
+curl, git
+```
+```
+setuptools-36.7.2
+numpy-1.13.3
+matplotlib-2.1.0
+```
+All modules should work with the python distribution recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally.
 
 If you prefer installing packages individually, here are the dependencies explicitely:
 
@@ -99,7 +171,7 @@ If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
 ##### 3. Install h5py:
 
 ```
-	port install openmpi-gcc5	
+	port install openmpi-gcc5
 	port install hdf5 +hl +openmpi +cxx +fortran +gcc5
 	HDF5_DIR=~/macports CFLAGS="-I$HOME/macports/include/openmpi-gcc5" pip install -U --user h5py
 ```
