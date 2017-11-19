@@ -206,7 +206,7 @@ class xtime(DataPlot):
             data_column[i]=self.data[i][self.col_num[col_str]]
         return data_column
 
-    def plot_xtime(self, y, x='t_y', label='default', labelx=None,
+    def plot_xtime(self, y, x='time', label='default', labelx=None,
                    labely=None ,title=None, shape='.', logx=False,
                    logy=True, base=10):
         '''
@@ -221,7 +221,7 @@ class xtime(DataPlot):
         Y : string
             Column on Y-axis.
         X : string, optional
-            Column on X-axis.  The default is "t_y".
+            Column on X-axis.  The default is "time".
         label : string, optional
             Legend label.  The default is "default".
         labelX : string, optional
