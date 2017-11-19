@@ -18,7 +18,7 @@ The NuGridPy modules were written with an interactive work mode in mind, either
     from NuGridPy import mesa as ms
 ```
 
-### Examples session
+### Example session
 
 A typical example session in a jupyter notebook that can be performed at the [Web-Exploration of NuGrid Data Interactive (WENDI)](https://wendi.nugridstars.org) server would look like this:
 1. Go to https://wendi.nugridstars.org and sign-in with your github ID (sessions will be culled at regular intervals > a few hours, if you want to use this service beyond this trial period send a message to fherwig at uvic.ca)
@@ -89,7 +89,7 @@ Major latest release from PyPI: `pip install nugridpy`.
 ### Release from github:
 Sometimes you want to install a specific release. Go to the [NuGridPy Release page](https://github.com/NuGrid/NuGridPy/releases) and determine the tag of the release you want. If the tag is `v0.7.2` install that release with pip using the following (you could choose something else for the egg name):
 ```
-pip install -e git://github.com/NuGrid/NuGridPy.git@0.7.2#egg=nugridpy_v0.7.2
+pip install -e git://github.com/NuGrid/NuGridPy.git@v0.7.2#egg=nugridpy_v0.7.2
 ```
 
 If you just want to install whatever the latest commit is on github using github you can do:
@@ -111,78 +111,16 @@ import sys
 sys.path.append('/home/user/src/NuGridPy')
 ```
 
+
 ### Required packages
-#### Linux
-```
-curl, git
-```
-```
-setuptools-36.7.2
-numpy-1.13.3
-matplotlib-2.1.0
-```
+
 All modules should work with the python distribution recommended [NuGridDoc python](https://github.com/NuGrid/NuGridDoc/blob/master/Resources/Python.md) distribution, with one additional package, the _future_ package that needs to be installed additionally.
 
-If you prefer installing packages individually, here are the dependencies explicitely:
+NuGridPy has the following python dependencies:
+`numpy scipy matplotlib h5py xlrd future`
 
-* standard:
- 	- xlrd
-  	- numpy
-  	- matplotlib
-  	- h5py
-  	- unittes
-* python2/3 compatibility
-  	- future (provides 'past' and 'builtin' modules)
+For additional details on required packages, dependencies and manual installation please consult the Wiki.
 
-Some of the packages are standard.  But you may need:
-
-```
-	sudo pip(3) install -U xlrd future h5py
-```
-or, if you want to install in the user home directory,
-
-```
-	pip(3) install --user -U xlrd future h5py
-```
-- on Fedora python2:
-
-```
-	dnf install -y h5py python2-future
-```
-
-If h5py complains about missing `hdf5.h` or `hdf5_hl.h`:
-
-```
-	sudo apt-get install libhdf5-dev
-```
-
-### Mac installation with `macports`
-
-##### 1. Install ipython and pip:
-```
-	port install py34-ipython py34-pip
-	port select --set ipython py34-ipython
-	port select --set pip py34-pip
-```
-##### 2. Install standard prerequisites with pip:
-```
-	pip install -U --user numpy scipy xlrd matplotlib future unittest
-```
-##### 3. Install h5py:
-
-```
-	port install openmpi-gcc5
-	port install hdf5 +hl +openmpi +cxx +fortran +gcc5
-	HDF5_DIR=~/macports CFLAGS="-I$HOME/macports/include/openmpi-gcc5" pip install -U --user h5py
-```
-Errors about failure to rebuild netcdf package can be ignored.
-
-##### 4. Set up PYTHONPATH environment variable to point to the
-   parent directory of NuGridPy, e.g.:
-
-```
-	export PYTHONPATH="$HOME/NuGrid"
-```
 
 ## TESTING
 
