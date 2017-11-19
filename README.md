@@ -23,6 +23,7 @@ The NuGridPy modules were written with an interactive work mode in mind, either
 * [More examples on Jupyter nbviewer](https://nbviewer.jupyter.org/github/NuGrid/wendi-examples/tree/master/Stellar%20evolution%20and%20nucleosynthesis%20data/Examples)
 
 A typical example session in a jupyter notebook that can be performed at the [Web-Exploration of NuGrid Data Interactive (WENDI)](https://wendi.nugridstars.org) server would look like this:
+
 1. Go to https://wendi.nugridstars.org and sign-in with your github ID (sessions will be culled at regular intervals > a few hours, if you want to use this service beyond this trial period send a message to fherwig at uvic.ca)
 2. Start a Python 3 ipython notebooks
 3. Load NuGridPy packages and initialise data source:
@@ -86,12 +87,15 @@ The tools provided here are useful to us, but of course there are still many thi
 There are several ways you can install NuGridPy.
 
 ### PyPI
-Major latest release from PyPI: `pip install nugridpy`.
+Major release from PyPI:
+```
+pip install nugridpy
+```
 
 ### Release from github:
 Sometimes you want to install a specific release. Go to the [NuGridPy Release page](https://github.com/NuGrid/NuGridPy/releases) and determine the tag of the release you want. If the tag is `v0.7.2` install that release with pip using the following (you could choose something else for the egg name):
 ```
-pip install -e git://github.com/NuGrid/NuGridPy.git@v0.7.2#egg=nugridpy_v0.7.2
+pip install -e git://github.com/NuGrid/NuGridPy.git@v0.7.2#egg=nugridpy
 ```
 
 If you just want to install whatever the latest commit is on github using github you can do:
@@ -123,11 +127,3 @@ NuGridPy has the following python dependencies:
 
 For additional details on required packages, dependencies and manual installation please consult the Wiki.
 
-
-## TESTING
-
-The following command runs a suite of test cases for the NuGridPy package:
-
-```
-	python -m NuGridPy.selftest
-```
