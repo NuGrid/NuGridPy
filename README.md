@@ -19,6 +19,7 @@ The NuGridPy modules were written with an interactive work mode in mind, either
 ```
 
 ### Example session
+[Examples on Jupyter nbviewer](https://nbviewer.jupyter.org/github/NuGrid/wendi-examples/tree/master/Stellar%20evolution%20and%20nucleosynthesis%20data/Examples)
 
 A typical example session in a jupyter notebook that can be performed at the [Web-Exploration of NuGrid Data Interactive (WENDI)](https://wendi.nugridstars.org) server would look like this:
 1. Go to https://wendi.nugridstars.org and sign-in with your github ID (sessions will be culled at regular intervals > a few hours, if you want to use this service beyond this trial period send a message to fherwig at uvic.ca)
