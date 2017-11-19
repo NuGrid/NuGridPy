@@ -3,17 +3,14 @@ from setuptools import setup, find_packages
 setup(name='NuGridpy',
       version='0.7.3', 
       description='Python tools for NuGrid',
-      long_description=open('README.rst', 'r').read(), # get discription from README
+#      long_description=open('README.rst', 'r').read(), # get discription from README
       author='NuGrid Team',
       author_email='fherwig@uvic.ca',
       install_requires = ["numpy", "setuptools","future", "matplotlib","scipy","matplotlib","h5py","xlrd"],
       url='https://nugrid.github.io/NuGridPy',
-        #download_url='http://www.nugridstars.org/', #must be uptodate if used
-        #py_modules=['ppn', 'ppm', 'nugridse', 'mesa', 'data_plot', 'utils',
-        #            'ascii_table', 'h5T','grain'],
       py_modules=['ppn', 'nugridse', 'mesa', 'data_plot', 'utils',
                   'ascii_table', 'h5T','grain','astronomy'],
-        # https://pypi.python.org/pypi?:action=list_classifiers : PyPI classifiers.
+      # https://pypi.python.org/pypi?:action=list_classifiers : PyPI classifiers.
       classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Console', 'Framework :: IPython',
                    'Intended Audience :: Science/Research',
