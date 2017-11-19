@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(name='NuGridpy',
-      version='0.7.3', 
+      version='0.7.4', 
       description='Python tools for NuGrid',
-#      long_description=open('README.rst', 'r').read(), # get discription from README
+      long_description=open('README.rst', 'r').read(), # get discription from README
+      # pandoc --from=markdown --to=rst --output=README.rst README.md
       author='NuGrid Team',
       author_email='fherwig@uvic.ca',
       install_requires = ["numpy", "setuptools","future", "matplotlib","scipy","matplotlib","h5py","xlrd"],
