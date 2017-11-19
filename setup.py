@@ -27,4 +27,4 @@ setup(name='NuGridpy',
       packages = find_packages(),
       license='BSD 3-clause',
       platforms=['Linux', 'Windows', 'OS X'],
-      data_files=[('./NuGridpy', ['LICENSE', 'README', 'AUTHORS'])])
+      data_files=[('./NuGridpy', ['LICENSE', 'README.md', 'AUTHORS'])])
