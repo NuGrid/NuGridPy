@@ -95,7 +95,7 @@ pip install nugridpy
 ### Release from github:
 Sometimes you want to install a specific release. Go to the [NuGridPy Release page](https://github.com/NuGrid/NuGridPy/releases) and determine the tag of the release you want. If the tag is `v0.7.2` install that release with pip using the following (you could choose something else for the egg name):
 ```
-pip install -e git://github.com/NuGrid/NuGridPy.git@v0.7.2#egg=nugridpy
+pip install -e git://github.com/NuGrid/NuGridPy.git@v0.7.4#egg=nugridpy
 ```
 
 If you just want to install whatever the latest commit is on github using github you can do:
