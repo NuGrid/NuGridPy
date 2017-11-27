@@ -1070,8 +1070,8 @@ class h5File(threading.Thread):
     def run(self):
 
         if self.deep_search:
-            #self.search_deep()
-            self.search_deep_sam()
+            self.search_deep()
+            #self.search_deep_sam()
         else:
             if not self.preprocExisted:
                 self.search_shallow()
