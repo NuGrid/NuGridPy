@@ -377,7 +377,16 @@ class Utils(object):
         according to isotopedatabase.txt.
 
         '''
-        name=self.sldir+ffname
+        if os.path.isfile(self.sldir+ffname):
+            name=self.sldir+ffname
+        else:
+            for root, dirs, files in os.walk('..'):
+                if ffname in files:
+                    name = os.path.join(root, ffname)
+          
+        if name not in locals():
+            print('Cannot find isotopedatabase.txt file in directory')
+            
         z_db, a_db, el_db, stable_a_db,logic_db=\
             np.loadtxt(name,unpack=True,dtype='str')
         z_db=np.array(z_db,dtype='int')
