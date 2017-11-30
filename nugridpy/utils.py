@@ -367,7 +367,15 @@ class Utils(object):
             return 0
         if indX<indY:
             return -1
-
+        
+    def set_idb_path(self,path):
+        '''
+        This is a method to specify the location of the file isotopedatabase.txt
+        path points to isotopedatabase.txt
+        '''
+        global idb_path
+        idb_path = path
+        
     def _read_isotopedatabase(self, ffname='isotopedatabase.txt'):
         '''
         This private method reads the isotopedatabase.txt file in sldir
@@ -385,7 +393,11 @@ class Utils(object):
                     name = os.path.join(root, ffname)
           
         if name not in locals():
-            print('Cannot find isotopedatabase.txt file in directory')
+            try:
+                name = idb_path +ffname
+            except Exception:
+                raise '''Cannot find isotopedatabase.txt file in directory,
+                         please specify abu_vector.set_idb_path'''
             
         z_db, a_db, el_db, stable_a_db,logic_db=\
             np.loadtxt(name,unpack=True,dtype='str')
