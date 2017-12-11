@@ -759,13 +759,13 @@ class iniabu(Utils):
         
         for i in range(len(species_hash)):
             self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
-        print(sum(self.abu))           
+                  
         for l in range(len(self.abu)):
             if self.abu[l] <= 1e-99:   #otherwise we might write e-100 which will be read as e-10 by ppn
                 self.abu[l] = 1.0e-99
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
-        print(sum(self.abu))
+        
         
     def isoratio_init(self,isos):
         '''
