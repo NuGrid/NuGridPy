@@ -528,7 +528,7 @@ class Utils(object):
 class iniabu(Utils):
     '''
     This class in the utils package reads an abundance distribution file
-    of the type iniab.dat. It then provides you with methods to change
+    of the types iniab.dat or iso_massf. It then provides you with methods to change
     some abundances, modify, normalise and eventually write out the
     final distribution in a format that can be used as an initial
     abundance file for ppn. This class also contains a method to write
@@ -537,94 +537,105 @@ class iniabu(Utils):
     '''
     # clean variables that we will use in this class
 
+
     filename = ''
-
-    def __init__(self,filename):
-        '''
-        Init method will read file of type iniab.dat, as they are for
-        example found in the frames/mppnp/USEPP directory.
-
-        Notes
-        -----
-
-        An instance of this class will have the following data arrays
-
-        z
-            charge number.
-        a
-            mass number.
-        abu
-            abundance.
-        names
-            name of species.
-        habu
-            a hash array of abundances, referenced by species name.
-        hindex
-            hash index returning index of species from name.
-
-        Examples
-        --------
-        E.g. if x is an instance then x.names[4] gives you the
-        name of species 4, and x.habu['c 12'] gives you the
-        abundance of C12, and x.hindex['c 12'] returns
-        4. Note, that you have to use the species names as
-        they are provided in the iniabu.dat file.
-
-        Example - generate modified input file ppn calculations:
-
-        >>> from NuGridPy import utils
-        >>> p=utils.iniabu('iniab1.0E-02.ppn_asplund05')
-        >>> sp={}
-        >>> sp['h   1']=0.2
-        >>> sp['c  12']=0.5
-        >>> sp['o  16']=0.2
-        >>> p.set_and_normalize(sp)
-        >>> p.write('p_ini.dat','header for this example')
-
-        p.write_mesa allows you to write this NuGrid initial abundance
-        file into a MESA readable initial abundance file.
-
-        '''
-        f0=open(filename)
-        sol=f0.readlines()
-        f0.close
+    
+    
+    def __init__(self,filename,filetype):
+        if filetype == 'iniabu.ppn':
+            f0=open(filename)
+            sol=f0.readlines()
+            f0.close
 
         # Now read in the whole file and create a hashed array:
-        names=[]
-        z=[]
-        yps=np.zeros(len(sol))
-        mass_number=np.zeros(len(sol))
-        for i in range(len(sol)):
-            z.append(int(sol[i][1:3]))
-            names.extend([sol[i].split("         ")[0][4:]])
-            yps[i]=float(sol[i].split("         ")[1])
-            try:
+            names=[]
+            z=[]
+            yps=np.zeros(len(sol))
+            mass_number=np.zeros(len(sol))
+            for i in range(len(sol)):
+                z.append(int(sol[i][1:3]))
+                names.extend([sol[i].split("         ")[0][4:]])
+                yps[i]=float(sol[i].split("         ")[1])
+               
+                try:
+                    mass_number[i]=int(names[i][2:5])
+                except ValueError:
+                    print("WARNING:")
+                    print("This initial abundance file uses an element name that does")
+                    print("not contain the mass number in the 3rd to 5th position.")
+                    print("It is assumed that this is the proton and we will change")
+                    print("the name to 'h   1' to be consistent with the notation used")
+                    print("in iniab.dat files")
+                    names[i]='h   1'
                 mass_number[i]=int(names[i][2:5])
-            except ValueError:
-                print("WARNING:")
-                print("This initial abundance file uses an element name that does")
-                print("not contain the mass number in the 3rd to 5th position.")
-                print("It is assumed that this is the proton and we will change")
-                print("the name to 'h   1' to be consistent with the notation used")
-                print("in iniab.dat files")
-                names[i]='h   1'
-            mass_number[i]=int(names[i][2:5])
-        # now zip them together:
-        hash_abu={}
-        hash_index={}
-        for a,b in zip(names,yps):
-            hash_abu[a] = b
+            # now zip them together:
+            hash_abu={}
+            hash_index={}
+            for a,b in zip(names,yps):
+                hash_abu[a] = b
 
-        for i in range(len(names)):
-            hash_index[names[i]] = i
+            for i in range(len(names)):
+                hash_index[names[i]] = i
 
-        self.z=z
-        self.abu=yps
-        self.a=mass_number
-        self.names=names
-        self.habu=hash_abu
-        self.hindex=hash_index
+            self.z=z
+            self.abu=yps
+            self.a=mass_number
+            self.names=names
+            self.habu=hash_abu
+            self.hindex=hash_index
 
+
+
+        if filetype == 'iso_massf':
+            
+            f0=open(filename)
+            ppn_out=f0.readlines()
+            f0.close
+
+        # Now read in the whole file and create a hashed array:
+            names1=[]
+            z1=[]
+            yps=np.zeros(len(ppn_out))
+            mass_number=np.zeros(len(ppn_out))
+            yps1=[]
+            
+            for i in range(7,len(ppn_out)): #skip the header and NEUT
+               # print(ppn_out[i])
+                z1.append(float(ppn_out[i][9:12]))
+                names1.extend([ppn_out[i].split("         ")[0][37:42]])
+                yps1.append(ppn_out[i].split("         ")[0][24:35])
+            
+            #convert data
+            yps=np.zeros(len(yps1))
+            z=np.zeros(len(z1),dtype=int)
+        
+            for j in range(len(z1)):
+                z[j]= int(z1[j])
+                yps[j]= float(yps1[j])
+
+            names=[k.lower() for k in names1]
+            names[0] = 'NEUT'
+            names[1] = 'h   1'
+
+            hash_abu={}
+            hash_index={}
+            for a,b in zip(names,yps):
+                hash_abu[a] = b
+
+            for i in range(len(names)):
+                hash_index[names[i]] = i
+            
+            self.z=z
+            self.abu=yps
+            self.a=mass_number
+            self.names=names
+            self.habu=hash_abu
+            self.hindex=hash_index
+
+
+
+
+           
     def write(self, outfile='initial_abundance.dat',
               header_string='initial abundances for a PPN run'):
         '''
@@ -640,6 +651,7 @@ class iniabu(Utils):
             'initial abundances for a PPN run'.
 
         '''
+
         dcols=['Z', 'species','mass fraction']
         data=[self.z,self.names,self.abu]
         hd=[header_string]
@@ -685,7 +697,7 @@ class iniabu(Utils):
 
         '''
 
-
+        
         f=open('isos.txt')
         a=f.readlines()
         isos=[]
@@ -717,7 +729,7 @@ class iniabu(Utils):
         hd=[header_string]
         att.write(outfile,hd,dcols,data,header_char=header_char)
         return mesa_names,abus
-
+        
     def set_and_normalize(self,species_hash):
         '''
         species_hash is a hash array in which you provide abundances
@@ -736,18 +748,25 @@ class iniabu(Utils):
         >>> sp['h   1']=0.5
 
         '''
+        
         sum_before = 1.
         for i in range(len(species_hash)):
             sum_before -=  self.abu[self.hindex[list(species_hash.keys())[i]]]
         print("sum_before = "+str(sum_before))
         normalization_factor=old_div((1.-sum(species_hash.values())),sum_before)
         print("normalizing the rest witih factor "+str(normalization_factor))
-        self.abu *= normalization_factor
+        self.abu *= normalization_factor 
+        
         for i in range(len(species_hash)):
             self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
+        print(sum(self.abu))           
+        for l in range(len(self.abu)):
+            if self.abu[l] <= 1e-99:   #otherwise we might write e-100 which will be read as e-10 by ppn
+                self.abu[l] = 1.0e-99
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
-
+        print(sum(self.abu))
+        
     def isoratio_init(self,isos):
         '''
         This file returns the isotopic ratio of two isotopes specified
