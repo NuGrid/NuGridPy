@@ -749,7 +749,7 @@ class iniabu(Utils):
 
         '''
         
-        sum_before = 1.
+        sum_before = sum(self.abu)
         for i in range(len(species_hash)):
             sum_before -=  self.abu[self.hindex[list(species_hash.keys())[i]]]
         print("sum_before = "+str(sum_before))
