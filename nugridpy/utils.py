@@ -757,11 +757,7 @@ class iniabu(Utils):
         >>> sp['h   1']=0.5
 
         '''
-<<<<<<< HEAD
-         
-=======
         
->>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
         sum_before = sum(self.abu)
         for i in range(len(species_hash)):
             sum_before -= self.abu[self.hindex[list(species_hash.keys())[i]]]
@@ -771,20 +767,16 @@ class iniabu(Utils):
         self.abu *= normalization_factor 
         for i in range(len(species_hash)):
             self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
-<<<<<<< HEAD
-=======
                   
->>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
         for l in range(len(self.abu)):
             if self.abu[l] <= 1e-99:   #otherwise we might write e-100 which will be read as e-10 by ppn
                 self.abu[l] = 1.0e-99
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
-<<<<<<< HEAD
-=======
-        
->>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
-        
+    
+
+
+    
     def isoratio_init(self,isos):
         '''
         This file returns the isotopic ratio of two isotopes specified
