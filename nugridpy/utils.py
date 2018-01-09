@@ -22,7 +22,7 @@ from . import ascii_table as att
 from scipy import optimize
 import matplotlib.pyplot as pl
 import os
-
+from decimal import *
 class data_fitting(object):
     '''
     Wrapper for the scipy method optimize.leastsq
@@ -586,7 +586,8 @@ class iniabu(Utils):
 
 
 
-        if filetype == 'iso_massf':
+        if filetype == 'iso_massf':  #this has only been tested with write and set_and_normalize functions within this class.
+                                     # If you have an issue contact Ondrea.
             
             f0=open(filename)
             ppn_out=f0.readlines()
@@ -598,13 +599,19 @@ class iniabu(Utils):
             yps=np.zeros(len(ppn_out))
             mass_number=np.zeros(len(ppn_out))
             yps1=[]
-            
+
+            isomers_to_remove = ['AL*26', 'KR*85', 'CD*15', 'LU*76', 'TAg80']            
             for i in range(7,len(ppn_out)): #skip the header and NEUT
-               # print(ppn_out[i])
+                element_name = ppn_out[i].split("         ")[0][37:42]
+                if element_name in isomers_to_remove:
+                    print('Skipped %s' % element_name)
+                    continue
+
                 z1.append(float(ppn_out[i][9:12]))
-                names1.extend([ppn_out[i].split("         ")[0][37:42]])
+                names1.extend([element_name])
                 yps1.append(ppn_out[i].split("         ")[0][24:35])
-            
+             
+
             #convert data
             yps=np.zeros(len(yps1))
             z=np.zeros(len(z1),dtype=int)
@@ -625,6 +632,8 @@ class iniabu(Utils):
             for i in range(len(names)):
                 hash_index[names[i]] = i
             
+
+          #  print(names)
             self.z=z
             self.abu=yps
             self.a=mass_number
@@ -748,24 +757,33 @@ class iniabu(Utils):
         >>> sp['h   1']=0.5
 
         '''
+<<<<<<< HEAD
+         
+=======
         
+>>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
         sum_before = sum(self.abu)
         for i in range(len(species_hash)):
-            sum_before -=  self.abu[self.hindex[list(species_hash.keys())[i]]]
+            sum_before -= self.abu[self.hindex[list(species_hash.keys())[i]]]
         print("sum_before = "+str(sum_before))
-        normalization_factor=old_div((1.-sum(species_hash.values())),sum_before)
+        normalization_factor=old_div(1.0-sum(species_hash.values()),sum_before)
         print("normalizing the rest witih factor "+str(normalization_factor))
         self.abu *= normalization_factor 
-        
         for i in range(len(species_hash)):
             self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
+<<<<<<< HEAD
+=======
                   
+>>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
         for l in range(len(self.abu)):
             if self.abu[l] <= 1e-99:   #otherwise we might write e-100 which will be read as e-10 by ppn
                 self.abu[l] = 1.0e-99
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
+<<<<<<< HEAD
+=======
         
+>>>>>>> 876326e5a6f2af37b6329cbc82528146b39b3042
         
     def isoratio_init(self,isos):
         '''
