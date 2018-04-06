@@ -2342,13 +2342,13 @@ class DataPlot(object):
         single_line = []
         for i in range(len(lines)):
             single_line.append(lines[i].split())
-            coord_y_1.append(float(single_line[i][1]))
-            coord_x_1.append(float(single_line[i][2])-coord_y_1[i])
-            coord_y_2.append(float(single_line[i][5]))
-            coord_x_2.append(float(single_line[i][6])-coord_y_2[i])
-            coord_y_3.append(float(single_line[i][7]))
-            coord_x_3.append(float(single_line[i][8])-coord_y_3[i])
-            try:
+            coord_y_1.append(int(single_line[i][1]))
+            coord_x_1.append(int(single_line[i][2])-coord_y_1[i])
+            coord_y_2.append(int(single_line[i][5]))
+            coord_x_2.append(int(single_line[i][6])-coord_y_2[i])
+            coord_y_3.append(int(single_line[i][7]))
+            coord_x_3.append(int(single_line[i][8])-coord_y_3[i])
+	    try:
                 flux_read.append(float(single_line[i][line_to_read]))
             except ValueError: # this is done to avoid format issues like 3.13725-181...
                 flux_read.append(1.0E-99)
@@ -2369,21 +2369,21 @@ class DataPlot(object):
                 I_am_in = 0
                 if coord_y_1[i] > plotaxis[2] and coord_y_1[i] < plotaxis[3] and coord_x_1[i] > plotaxis[0] and coord_x_1[i] < plotaxis[1]:
                     I_am_in = 1
-                    coord_y_1_small.append(coord_y_1[i])
-                    coord_x_1_small.append(coord_x_1[i])
-                    coord_y_2_small.append(coord_y_2[i])
-                    coord_x_2_small.append(coord_x_2[i])
-                    coord_y_3_small.append(coord_y_3[i])
-                    coord_x_3_small.append(coord_x_3[i])
+                    coord_y_1_small.append(int(coord_y_1[i]))
+                    coord_x_1_small.append(int(coord_x_1[i]))
+                    coord_y_2_small.append(int(coord_y_2[i]))
+                    coord_x_2_small.append(int(coord_x_2[i]))
+                    coord_y_3_small.append(int(coord_y_3[i]))
+                    coord_x_3_small.append(int(coord_x_3[i]))
                     flux_log10_small.append(flux_log10[i])
                 if coord_y_3[i] > plotaxis[2] and coord_y_3[i] < plotaxis[3] and coord_x_3[i] > plotaxis[0] and coord_x_3[i] < plotaxis[1] and I_am_in == 0:
                     I_am_in = 1
-                    coord_y_1_small.append(coord_y_1[i])
-                    coord_x_1_small.append(coord_x_1[i])
-                    coord_y_2_small.append(coord_y_2[i])
-                    coord_x_2_small.append(coord_x_2[i])
-                    coord_y_3_small.append(coord_y_3[i])
-                    coord_x_3_small.append(coord_x_3[i])
+                    coord_y_1_small.append(int(coord_y_1[i]))
+                    coord_x_1_small.append(int(coord_x_1[i]))
+                    coord_y_2_small.append(int(coord_y_2[i]))
+                    coord_x_2_small.append(int(coord_x_2[i]))
+                    coord_y_3_small.append(int(coord_y_3[i]))
+                    coord_x_3_small.append(int(coord_x_3[i]))
                     flux_log10_small.append(flux_log10[i])
 
 
@@ -2434,10 +2434,10 @@ class DataPlot(object):
 
 
         nzycheck = zeros([nnmax_plot,nzmax,3])
-        coord_x_out = zeros(len(coord_x_2_small))
-        coord_y_out = zeros(len(coord_y_2_small))
+        coord_x_out = zeros(len(coord_x_2_small), dtype='int')
+        coord_y_out = zeros(len(coord_y_2_small),dtype='int')
         for i in range(len(flux_log10_small)):
-            nzycheck[coord_x_1_small[i],coord_y_1_small[i],0] = 1
+	    nzycheck[coord_x_1_small[i],coord_y_1_small[i],0] = 1
             nzycheck[coord_x_1_small[i],coord_y_1_small[i],1] = flux_log10_small[i]
             if coord_x_2_small[i] >= coord_x_3_small[i]:
                 coord_x_out[i] = coord_x_2_small[i]
