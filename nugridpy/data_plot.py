@@ -2348,7 +2348,7 @@ class DataPlot(object):
             coord_x_2.append(int(single_line[i][6])-coord_y_2[i])
             coord_y_3.append(int(single_line[i][7]))
             coord_x_3.append(int(single_line[i][8])-coord_y_3[i])
-	    try:
+            try:
                 flux_read.append(float(single_line[i][line_to_read]))
             except ValueError: # this is done to avoid format issues like 3.13725-181...
                 flux_read.append(1.0E-99)
@@ -2437,7 +2437,7 @@ class DataPlot(object):
         coord_x_out = zeros(len(coord_x_2_small), dtype='int')
         coord_y_out = zeros(len(coord_y_2_small),dtype='int')
         for i in range(len(flux_log10_small)):
-	    nzycheck[coord_x_1_small[i],coord_y_1_small[i],0] = 1
+            nzycheck[coord_x_1_small[i],coord_y_1_small[i],0] = 1
             nzycheck[coord_x_1_small[i],coord_y_1_small[i],1] = flux_log10_small[i]
             if coord_x_2_small[i] >= coord_x_3_small[i]:
                 coord_x_out[i] = coord_x_2_small[i]
