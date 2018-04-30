@@ -3810,7 +3810,7 @@ a=15; b=5     # linestyle params
 xlm=(0,30)
 xaxis_type="Lagrangian"
 
-def abu_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(8,8)):
+def abu_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize1=(8,8)):
     '''Four panels of abundance plots
 
     Parameters
@@ -3832,10 +3832,11 @@ def abu_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(8,8)):
     '''
 
 
-    matplotlib.rc('figure',facecolor='white',figsize=figsize)
+    matplotlib.rc('figure',facecolor='white',figsize=figsize1)
    
     # create subplot structure
-    f, ([ax1,ax2],[ax3,ax4]) = pl.subplots(2, 2, sharex=False, sharey=False, figsize=figsize)
+    f, ([ax1,ax2],[ax3,ax4]) = pl.subplots(2, 2, sharex=False, sharey=True, figsize=figsize1)
+    
     
     # define 4 groups of elements, one for each of the 4 subplots
     abus = [['h1','h2','h3','he3','he4','li6','li7','b8','be7','be9'],\
@@ -3879,7 +3880,8 @@ def abu_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(8,8)):
         ax[i].set_xlim(xll)
         ax[i].legend(loc=1)
         ax[i].set_xlabel(xxlabel)
-        ax[i].set_ylabel('log X')
+        if i%2 == 0:
+            ax[i].set_ylabel('log X')
        # ax[i].set_aspect('equal')
    
     title_str = "Abundance plot: "+'t ='+str(title_format%p.header_attr['star_age'])\
@@ -3887,12 +3889,12 @@ def abu_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(8,8)):
               +'model number ='+str(int(p.header_attr['model_number']))
     f.suptitle(title_str, fontsize=12)
     f.tight_layout()
-    f.subplots_adjust(top=0.95)
+    f.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.9, wspace=0, hspace=0.1)
     f.savefig('abuprof'+str(int(p.header_attr['model_number'])).zfill(6)+'.png')
   
    # matplotlib.pyplot.close('all')
 
-def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
+def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
     '''Four panels of other profile plots
    
    Parameters
@@ -3910,7 +3912,7 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
       True   for interactive use
     '''
 
-    matplotlib.rc('figure',facecolor='white',figsize=figsize)
+    matplotlib.rc('figure',facecolor='white',figsize=figsize2)
 
     mass = p.get('mass')                      # in units of Msun
     radius = p.get('radius')#*at.rsun_cm/1.e8  # in units of Mm
@@ -3933,8 +3935,8 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
 
 
     # create subplot structure
-    t, ([ax1,ax2],[ax3, ax4],[ax5,ax6]) = matplotlib.pyplot.subplots(3, 2, sharex=False, sharey=False)
-
+    t, ([ax1,ax2],[ax3, ax4],[ax5,ax6]) = matplotlib.pyplot.subplots(3, 2, sharex=True, sharey=False)
+    
 # panel 1: burns: pp, cno, burn_c
 # panel 2: convection and mixing: entropy, Tgrad
 
@@ -3948,11 +3950,11 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
              marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
              markevery=50,label=thing)
     # set x and y lims and labels
-    ax.set_title('Nuclear Energy Production')
+    #ax.set_title('Nuclear Energy Production')
     ax.set_ylim(0,15)
     ax.set_xlim(xll)
-    ax.legend(loc=1)
-    ax.set_xlabel(xxlabel)
+    ax.legend(loc=3, ncol=2)
+    #ax.set_xlabel(xxlabel)
     ax.set_ylabel('$ \log \epsilon $')
 #--------------------------------------------------------------------------------------------#
 
@@ -3973,11 +3975,13 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
              markevery=50,label=thing)
     # set x and y lims and labels
     ax2.axhline(ls='dashed',color='black',label="")
-    ax2.set_title('Mixing Regions')
+    #ax2.set_title('Mixing Regions')
+    ax2.yaxis.tick_right()
+    ax2.yaxis.set_label_position("right")
     ax2.set_ylim(-.1,.1)
     ax2.set_xlim(xll)
     ax2.legend(labels='Mixing',loc=1)
-    ax2.set_xlabel(xxlabel)
+    #ax2.set_xlabel(xxlabel)
     ax2.set_ylabel('$\\tanh(\\log(\\frac{\\nabla_{rad}}{\\nabla_{ad}}))$')
 
 #--------------------------------------------------------------------------------------------#
@@ -3993,7 +3997,7 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
          marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
          markevery=50,label=thing)
     # set x and y lims and labels
-    ax.set_title('Specific Entropy (/A*kerg)')
+   # ax.set_title('Specific Entropy (/A*kerg)')
     ax.set_ylim(0,50)
     ax.set_xlim(xll)
     ax.legend(loc=1)
@@ -4013,7 +4017,7 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
          marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
          markevery=50,label=thing)
     # set x and y lims and labels                                                              
-    ax.set_title('Rho, mu, T')
+    #ax.set_title('Rho, mu, T')
     ax.set_ylim(0.,7.)
     ax.set_xlim(xll)
     ax.legend(loc=0)
@@ -4045,13 +4049,13 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
 
    
     # set x and y lims and labels
-    ax.set_title('Pgas fraction + opacity')
+   # ax.set_title('Pgas fraction + opacity')
    # ax.set_ylim(0,60)
     ax.set_xlim(xll)
     axo.set_xlim(xll)
     ax.legend(loc=0)
-    axo.legend(loc=(.65,.85))
-    ax.set_xlabel(xxlabel)
+    axo.legend(loc=(.15,.85))
+    #ax.set_xlabel(xxlabel)
     ax.set_ylabel('$ P_{gas} / P_{tot}$')
     axo.set_ylabel('$ log(Opacity)$')
 
@@ -4071,19 +4075,19 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize=(10,8)):
          markevery=50,label=thing)
 # set x and y lims and labels
     ax.axhline(16,ls='dashed',color='black',label="$0 for v_{conv}/c_s$")
-    ax.set_title('Mixing')
+   # ax.set_title('Mixing')
     ax.set_ylim(10,17)
     ax.set_xlim(xll)
     ax.legend(loc=0)
-    ax.set_xlabel(xxlabel)
+   # ax.set_xlabel(xxlabel)
     ax.set_ylabel('$\\log D / [cgs] \\log v_{\mathrm{conv}}/c_s + 16 $ ')
 
     title_str = "Other profiles: "+'t ='+str(title_format%p.header_attr['star_age'])\
               +', dt ='+str(title_format%p.header_attr['time_step'])\
               +', model number ='+str(int(p.header_attr['model_number']))
     t.suptitle(title_str, fontsize=12)
-    t.tight_layout()
-    t.subplots_adjust(top=0.95)
+   # t.tight_layout()
+    t.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.15, hspace=0.1)
     t.savefig('other'+str(int(p.header_attr['model_number'])).zfill(6)+'.png')
  # show(block=show)
     #pl.close('all')
