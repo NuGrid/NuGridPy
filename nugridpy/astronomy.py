@@ -11,35 +11,35 @@ from scipy import integrate
 
 
 # constants for astronomy
-rsun_cm = 6.955e10
+rsun_cm = 6.9598e10
 rsun_cm_s = 'cm'
-lsun_erg_s = 3.839e33
+lsun_erg_s = 3.8418e33
 lsun_erg_s_unit = 'erg/s'
-msun_g = 1.9891e33
+msun_g = 1.9892e33
 msun_unit = 'erg s^-1'
-mass_earth_g=5.9742e27
+mass_earth_g = 5.9764e27
 
 
-au_cm=1.49598e13
+au_cm = 1.495978921e13
 au_cm_unit='cm'
 
-radiation_constant = 7.566e-15
+radiation_constant = 7.5657e-15
 radiation_constant_unit = 'erg cm^-3 K^-4'
-speed_light = 2.998e10
+speed_light = 2.99792458e10
 speed_light_unit = 'cm s^-1'
-grav_const = 6.67259e-8
+grav_const = 6.67428e-8
 grav_const_unit = 'cm^3 g^-1 s^-2'
 
 # constants for physics
-mass_H_atom=1.674e-24
+mass_H_atom=1.6726231e-24
 mass_H_atom_unit='g'
-mass_electron=9.10938291E-28
+mass_electron=9.1093826e-28
 mass_electron_unit='g'
-planck_constant_h=6.62606957E-27
+planck_constant_h=6.62606896E-27
 planck_constant_h_unit='erg s'
-atomic_mass_unit=1.660538921e-24
+atomic_mass_unit=1.660538782e-24
 atomic_mass_unit_unit='g'
-boltzmann_constant=1.3806488e-16
+boltzmann_constant=1.3806504e-16
 boltzmann_constant_unit='erg K^-1'
 avogadro_constant=6.02214179e23
 avogadro_constant_unit='mol^-1'
