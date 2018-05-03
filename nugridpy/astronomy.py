@@ -23,7 +23,7 @@ mass_earth_g = 5.9764e27
 au_cm = 1.495978921e13
 au_cm_unit='cm'
 
-radiation_constant = 7.5657e-15
+radiation_constant = 4*boltzmann_sigma/speed_light
 radiation_constant_unit = 'erg cm^-3 K^-4'
 speed_light = 2.99792458e10
 speed_light_unit = 'cm s^-1'
@@ -31,6 +31,7 @@ grav_const = 6.67428e-8
 grav_const_unit = 'cm^3 g^-1 s^-2'
 
 # constants for physics
+boltzmann_sigma = 5.670400e-5
 mass_H_atom=1.6726231e-24
 mass_H_atom_unit='g'
 mass_electron=9.1093826e-28
