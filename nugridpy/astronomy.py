@@ -23,8 +23,6 @@ mass_earth_g = 5.9764e27
 au_cm = 1.495978921e13
 au_cm_unit='cm'
 
-radiation_constant = 4*boltzmann_sigma/speed_light
-radiation_constant_unit = 'erg cm^-3 K^-4'
 speed_light = 2.99792458e10
 speed_light_unit = 'cm s^-1'
 grav_const = 6.67428e-8
@@ -44,6 +42,8 @@ boltzmann_constant=1.3806504e-16
 boltzmann_constant_unit='erg K^-1'
 avogadro_constant=6.02214179e23
 avogadro_constant_unit='mol^-1'
+radiation_constant = 4*boltzmann_sigma/speed_light
+radiation_constant_unit = 'erg cm^-3 K^-4'
 
 def visc_mol_sol(T,rho,X):
     '''
