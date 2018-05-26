@@ -15,7 +15,7 @@ The NuGridPy modules were written with an interactive work mode in mind, either
 - inside a jupyter ipython notebooks. Once your session starts import modules, such as `mesa`, `nugridse` or `ppn` (depending on which type of data you are working with) from the NuGridPy package, for example:
 
 ```
-    from NuGridPy import mesa as ms
+    from nugridpy import mesa as ms
 ```
 
 ### Example session
