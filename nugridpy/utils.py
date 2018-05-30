@@ -443,7 +443,7 @@ class Utils(object):
                 stable_mass_numbers=self.stable_el[self.stable_names.index(element_name)][1:]
                 iso_db_index_range_el=np.where(el_db==element_name)
                 beta_for_this_species=\
-                    beta[iso_db_index_range_el][np.where(a_db[iso_db_index_range_el]==a_iso_to_plot[i])]
+                    int(beta[iso_db_index_range_el][np.where(a_db[iso_db_index_range_el]==a_iso_to_plot[i])])
                 if beta_for_this_species == 0:  # if there are no stable species for an element (Tc,Pm) the cutoff specifies
                     beta_for_this_species = -1  # the lowest mass beta- isotope
                 if a_iso_to_plot[i] in stable_mass_numbers:
