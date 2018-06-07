@@ -2067,14 +2067,14 @@ class history_data(DataPlot):
         pl.show()
 
     def kip_cont(self, ifig=110, modstart=0, modstop=-1,t0_model=0,
-                 outfile='out.png', xlims=[0.,0.], ylims=[0.,0.],
+                 outfile='out.png', xlims=None, ylims=None,
                  xres=1000, yres=1000, ixaxis='model_number',
                  mix_zones=20, burn_zones=20, plot_radius=False,
                  engenPlus=True, engenMinus=False,
                  landscape_plot=False, rad_lines=False, profiles=[],
                  showfig=True, outlines=True, boundaries=True,
                  c12_boundary=False, rasterise=False, yscale='1.',
-                 engenlevels=None,CBM=False):
+                 engenlevels=None,CBM=False,fsize=14):
         """
         This function creates a Kippenhahn plot with energy flux using
         contours.
@@ -2187,12 +2187,19 @@ class history_data(DataPlot):
         CBM : boolean, optional
             plot contours for where CBM is active?
 
+        fsize : integer
+            font size for labels
+
         Notes
         -----
         The parameter xlims is depricated.
 
         """
-
+        if ylims is None:
+            ylims=[0.,0.]
+        if xlims is None:
+            xlims=[0.,0.]
+        
         # Find correct modstart and modstop:
         mod=np.array([int(i) for i in self.get('model_number')])
         mod1=np.abs(mod-modstart).argmin()
@@ -2234,7 +2241,8 @@ class history_data(DataPlot):
         except:
             engenstyle = 'twozone'
         if engenstyle == 'full' and (engenPlus == True or engenMinus == True):
-            ulimit_array = np.array([self.get('burn_qtop_'+str(j))[modstart:modstop:dx]*self.get('star_mass')[modstart:modstop:dx] for j in range(1,burn_zones+1)])
+            ulimit_array = np.array([self.get('burn_qtop_'+str(j))[modstart:modstop:dx]*\
+                           self.get('star_mass')[modstart:modstop:dx] for j in range(1,burn_zones+1)])
             #ulimit_array = np.around(ulimit_array,decimals=len(str(dy))-2)
             llimit_array = np.delete(ulimit_array,-1,0)
             llimit_array = np.insert(ulimit_array,0,0.,0)
@@ -2366,19 +2374,20 @@ class history_data(DataPlot):
         ########################################################################
         #----------------------------------plot--------------------------------#
         fig = pyl.figure(ifig)
-#        fsize=20
+        #fsize=20
         if landscape_plot == True:
             fig.set_size_inches(9,4)
             pl.gcf().subplots_adjust(bottom=0.2)
             pl.gcf().subplots_adjust(right=0.85)
 
-#        params = {'axes.labelsize':  fsize,
-#          'text.fontsize':   fsize,
-#          'legend.fontsize': fsize,
-#          'xtick.labelsize': fsize*0.8,
-#          'ytick.labelsize': fsize*0.8,
-#          'text.usetex': False}
-#        pyl.rcParams.update(params)
+        params = {'axes.labelsize':  fsize,
+          'axes.labelsize': fsize,
+          'font.size': fsize,
+          'legend.fontsize': fsize,
+          'xtick.labelsize': fsize,
+          'ytick.labelsize': fsize,
+                  'text.usetex': False}
+        pyl.rcParams.update(params)
 
         #ax=pl.axes([0.1,0.1,0.9,0.8])
 
@@ -2396,14 +2405,13 @@ class history_data(DataPlot):
                 else :
                     lage[i]=np.log10(agemin)
             xxx = lage[modstart:modstop]
-            print('plot versus time left')
-            ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$') #,fontsize=fsize)
+            ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
         elif ixaxis =='model_number':
             xxx= self.get('model_number')[modstart:modstop]
             print('plot versus model number')
-            ax.set_xlabel('Model number') # ,fontsize=fsize)
+            ax.set_xlabel('Model number',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [self.get('model_number')[modstart],self.get('model_number')[modstop]]
         elif ixaxis =='age':
@@ -2411,14 +2419,14 @@ class history_data(DataPlot):
                 t0_mod=np.abs(mod-t0_model).argmin()
                 xxx= self.get('star_age')[modstart:modstop] - self.get('star_age')[t0_mod]
                 print('plot versus age')
-                ax.set_xlabel('Age [yr] - '+str(self.get('star_age')[modstart])) #,fontsize=fsize)
+                ax.set_xlabel('Age [yr] - '+str(self.get('star_age')[modstart]),fontsize=fsize)
             else:
                 xxx= old_div(self.get('star_age')[modstart:modstop],1.e6)
-                ax.set_xlabel('Age [Myr]') #,fontsize=fsize)
+                ax.set_xlabel('Age [Myr]',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
 
-        ax.set_ylabel('$\mathrm{Mass }(M_\odot)$')
+        ax.set_ylabel('$\mathrm{Mass }(M_\odot)$',fontsize=fsize)
 
         # some stuff for rasterizing only the contour part of the plot, for nice, but light, eps:
         class ListCollection(Collection):
@@ -2455,6 +2463,7 @@ class history_data(DataPlot):
         if ylims == [0.,0.]:
             ylims[0] = 0.
             ylims[1] = mup
+            #print("Setting ylims[1] to mup="+str(mup))
         if ylims[0] != 0.:
             ylab='$(\mathrm{Mass }$ - '+str(ylims[0])
             if yscale!='1.':
@@ -2488,15 +2497,19 @@ class history_data(DataPlot):
 
         if engenstyle == 'full' and engenPlus == True:
             if engenlevels!= None:
-                CBURN1  = ax.contourf(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.5, locator=matplotlib.ticker.LogLocator(),levels=engenlevels)
+                CBURN1  = ax.contourf(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.5,\
+                        locator=matplotlib.ticker.LogLocator(),levels=engenlevels)
                 if outlines:
-                    CB1_outlines  = ax.contour(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.7, locator=matplotlib.ticker.LogLocator(),levels=engenlevels)
+                    CB1_outlines  = ax.contour(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.7, \
+                        locator=matplotlib.ticker.LogLocator(),levels=engenlevels)
             else:
-                CBURN1  = ax.contourf(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.5, locator=matplotlib.ticker.LogLocator())
+                CBURN1  = ax.contourf(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.5, \
+                                      locator=matplotlib.ticker.LogLocator())
                 if outlines:
-                    CB1_outlines  = ax.contour(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.7, locator=matplotlib.ticker.LogLocator())
+                    CB1_outlines  = ax.contour(xxx[::dx],y,B1, cmap=cmapB1, alpha=0.7, \
+                                               locator=matplotlib.ticker.LogLocator())
             CBARBURN1 = pyl.colorbar(CBURN1)
-            CBARBURN1.set_label('$|\epsilon_\mathrm{nuc}-\epsilon_{\\nu}| \; (\mathrm{erg\,g}^{-1}\mathrm{\,s}^{-1})$') #,fontsize=fsize)
+            CBARBURN1.set_label('$|\epsilon_\mathrm{nuc}-\epsilon_{\\nu}| \; (\mathrm{erg\,g}^{-1}\mathrm{\,s}^{-1})$',fontsize=fsize)
             if rasterise==True:
                 insert_rasterized_contour_plot(CBURN1)
                 if outlines:
@@ -2508,7 +2521,7 @@ class history_data(DataPlot):
                 CBURN2_outlines  = ax.contour(xxx[::dx],y,B2, cmap=cmapB2, alpha=0.7, locator=matplotlib.ticker.LogLocator())
             CBARBURN2 = pl.colorbar(CBURN2)
             if engenPlus == False:
-                CBARBURN2.set_label('$|\epsilon_\mathrm{nuc}-\epsilon_{\\nu}| \; (\mathrm{erg\,g}^{-1}\mathrm{\,s}^{-1})$') #,fontsize=fsize)
+                CBARBURN2.set_label('$|\epsilon_\mathrm{nuc}-\epsilon_{\\nu}| \; (\mathrm{erg\,g}^{-1}\mathrm{\,s}^{-1})$',fontsize=fsize)
             if rasterise==True:
                 insert_rasterized_contour_plot(CBURN2)
                 if outlines:
