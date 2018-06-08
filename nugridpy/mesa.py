@@ -2405,7 +2405,8 @@ class history_data(DataPlot):
                 else :
                     lage[i]=np.log10(agemin)
             xxx = lage[modstart:modstop]
-            ax.set_xlabel('$\mathrm{log}_{10}(t^*) \, \mathrm{(yr)}$',fontsize=fsize)
+            print('plot versus time left')
+            ax.set_xlabel('$ \\log_{10}(t-t_\mathrm{end})\ /\  \mathrm{[yr]}$',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
         elif ixaxis =='model_number':
@@ -2419,14 +2420,14 @@ class history_data(DataPlot):
                 t0_mod=np.abs(mod-t0_model).argmin()
                 xxx= self.get('star_age')[modstart:modstop] - self.get('star_age')[t0_mod]
                 print('plot versus age')
-                ax.set_xlabel('Age [yr] - '+str(self.get('star_age')[modstart]),fontsize=fsize)
+                ax.set_xlabel('t - %.5e / [yr]' %self.get('star_age')[modstart],fontsize=fsize)
             else:
                 xxx= old_div(self.get('star_age')[modstart:modstop],1.e6)
-                ax.set_xlabel('Age [Myr]',fontsize=fsize)
+                ax.set_xlabel('t [Myr]',fontsize=fsize)
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
 
-        ax.set_ylabel('$\mathrm{Mass }(M_\odot)$',fontsize=fsize)
+        ax.set_ylabel('$\mathrm{enclosed\ mass\ /\ [M_\odot]}$',fontsize=fsize)
 
         # some stuff for rasterizing only the contour part of the plot, for nice, but light, eps:
         class ListCollection(Collection):
@@ -2952,7 +2953,7 @@ class history_data(DataPlot):
             if xlims[1] == 0.:
                 xlims = [xxx[0],xxx[-1]]
 
-        ax.set_ylabel('$\mathrm{Mass }(M_\odot)$')
+        ax.set_ylabel('$\mathrm{enclosed mass}(M_\odot)$')
 
         # some stuff for rasterizing only the contour part of the plot, for nice, but light, eps:
         class ListCollection(Collection):
