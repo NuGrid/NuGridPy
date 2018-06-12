@@ -1,5 +1,5 @@
 
-#
+# 
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
 # Copyright 2007 - 2014 by the NuGrid Team.
