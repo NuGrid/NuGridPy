@@ -49,7 +49,8 @@ import matplotlib.pylab as pyl
 import matplotlib.pyplot as pl
 import os
 
-class ascii_table(DataPlot):
+##### Name changed from ascii_table to readTable 2018/06/05 by John McKay
+class readTable(DataPlot):
     '''
     Data structure to read simple data tables and trajectory data
     tables.
@@ -286,11 +287,14 @@ class ascii_table(DataPlot):
                         header[str(tmp[0])]=str(tmp[1])
                 i+=1
         while i<len(fileLines):
-            tmp=fileLines[i].split()
-            for j in range(len(tmp)):
-                tmp[j]=tmp[j].strip()
-            data.append(tmp)
-            i+=1
+            if fileLines[i].startswith('#'):
+                i=i+1
+            else:
+                tmp=fileLines[i].split()
+                for j in range(len(tmp)):
+                    tmp[j]=tmp[j].strip()
+                data.append(tmp)
+                i+=1
         tmp=[]
         tmp1=[]
         for j in range(len(data)):
@@ -304,7 +308,13 @@ class ascii_table(DataPlot):
 
         for j in range(len(cols)):
             for k in range(len(data)):
-                tmp.append(float(data[k][j]))
+                try:
+                    a=float(data[k][j])
+                    tmp.append(a)
+                except ValueError:
+                    tmp.append(data[k][j])
+                #else:
+                 #   tmp.append(float(data[k][j])) # previously tmp.append(float(data[k][j]))
             tmp=array(tmp)
 
             if j == 0:
@@ -444,13 +454,14 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     for i in range(len(data)): #Line length stuff
         length=len(dcols[i])
-        for j in range(len(data[i])):
-            if len(str(data[i][j]))>length:
-                length=len(str(data[i][j]))
+        for j in range(len(data[dcols[i]])): #len(data[i]) throws error as type(data)=dict, not list
+            if len(str(data[dcols[i]][j]))>length: #data[i][j] throws error as type(data)=dict, not list
+                length=len(str(data[dcols[i]][j]))
         lengthList.append(length)
+    print(lengthList)
 
     tmp=''
-    tmp1=''
+    tmp1='9'
     if trajectory:
         tmp='#'
     for i in range(len(dcols)):
