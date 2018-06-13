@@ -3392,7 +3392,7 @@ class DataPlot(object):
             return artists
 
     def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,5],title_items=None,
-                        ref=-1,solar_filename=None,z_pin=None,pin=None,
+                        ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,show_names=True,label='',
                         colour='',**kwargs):
         '''
@@ -3419,13 +3419,13 @@ class DataPlot(object):
         ref : integer, optional
             ref = -1:   plot abundaces as mass fraction
             ref = N:    plot abundaces relative to cycle N abundance, similar to the
-                        'solar_filename' option. 
+                        'ref_filename' option. 
                         Cannot be active at the same time as
-                        the 'solar_filename' option.
+                        the 'ref_filename' option.
             ref = -2:   plot abundances relative to solar
-                        for this option, an additional keyword argument 'solar_filename'
+                        for this option, an additional keyword argument 'ref_filename'
                         must be passed with the path to the solar abundance dist. file.
-        solar_filename : string, optional
+        ref_filename : string, optional
             plot abundances relative to solar abundance. For this option, 
             a cycle number for the 'ref' option must not be provided
         z_pin : int, optional
@@ -3435,7 +3435,7 @@ class DataPlot(object):
             Can be used with the 'pin_filename' option to import an external 
             abundance file in the same format as solar abundances.
             If no file is given, the reference can be either cycle N='ref'
-            or the value from the 'solar_filename'.
+            or the value from the 'ref_filename'.
         pin : float, optional
             A manually provided [X/Fe] abundance to pin the element selected with 'z_pin'
         pin_filename: string, optional
@@ -3469,7 +3469,7 @@ class DataPlot(object):
         '''
         plotType=self._classTest()
         offset=0
-        if solar_filename!=None:
+        if ref_filename!=None:
             ref=-2
         print(ref)
         if plotType=='PPN':
@@ -3490,7 +3490,7 @@ class DataPlot(object):
             # if we have provided a solar abundance file
             if ref==-2:
                 from . import utils
-                utils.solar(solar_filename,1)
+                utils.solar(ref_filename,1)
                 menow = where(unique(utils.z_sol)==44.)[0][0]
                 #    print(1, menow, utils.solar_elem_abund[menow])
                 el_abu_sun=np.array(utils.solar_elem_abund)
@@ -3525,6 +3525,7 @@ class DataPlot(object):
                 for i in range(len(el_abu)):
                     el_abu_plot[i-1]=el_abu[i-1]/el_abu_ref[i-1]
                 el_abu=el_abu_plot
+                print(el_abu)
 
             # set a pinned element for offset calculation and adjustment
             if z_pin!=None:
@@ -3546,6 +3547,13 @@ class DataPlot(object):
                     el_abu_obs_log=[]
                     z_ul=[]
                     for z_i in z_el[zmin_ind:zmax_ind]:
+                        try:
+                            obs_file.data['[X/H]']
+                            x_over='[X/H]'
+                            sigma='sig_[X/H]'
+                        except:
+                            x_over='[X/Fe]'
+                            sigma='sig_[X/Fe]'
                         zelidx=where(z_el[zmin_ind:zmax_ind]==z_i)[0]
                         zpinidx=where(obs_file.data['Z']==z_i)[0] #str()
                         if len(zpinidx)==0:
@@ -3560,22 +3568,22 @@ class DataPlot(object):
                                 el_abu_obs_log.append([None]*len(zpinidx))
                                 xfe_sigma.append([None]*len(zpinidx))
                             else:'''
-                            tmp=obs_file.data['[X/Fe]'][zpinidx]#.astype(float) # array stores multiple values for a 
+                            tmp=obs_file.data[x_over][zpinidx]#.astype(float) # array stores multiple values for a 
                             el_abu_obs_log.append(tmp.tolist())                            # single element
-                            tmp=obs_file.data['sig_[X/Fe]'][zpinidx]#.astype(float)
+                            tmp=obs_file.data[sigma][zpinidx]#.astype(float)
                             xfe_sigma.append(tmp.tolist())
                             z_ul.append([None])
                         else:
                             if obs_file.data['ul'][zpinidx]==1: #.astype(int)
-                                tmp=obs_file.data['[X/Fe]'][zpinidx]#.astype(float)
+                                tmp=obs_file.data[x_over][zpinidx]#.astype(float)
                                 z_ul.append(tmp.tolist())
-                                tmp=obs_file.data['[X/Fe]'][zpinidx]#.astype(float)
+                                tmp=obs_file.data[x_over][zpinidx]#.astype(float)
                                 el_abu_obs_log.append([None])
                                 xfe_sigma.append([None])
                             else:
-                                tmp=obs_file.data['[X/Fe]'][zpinidx][0]#.astype(float)
+                                tmp=obs_file.data[x_over][zpinidx][0]#.astype(float)
                                 el_abu_obs_log.append([tmp])
-                                tmp=obs_file.data['sig_[X/Fe]'][zpinidx][0]#.astype(float)
+                                tmp=obs_file.data[sigma][zpinidx][0]#.astype(float)
                                 xfe_sigma.append([tmp])
                                 z_ul.append([None])
                     el_abu_obs=[]
@@ -3614,6 +3622,7 @@ class DataPlot(object):
                 el_abu=el_abu_plot
             
             # plot an elemental abundance distribution with labels:
+            #print(el_abu)
             self.el_abu_log = np.log10(el_abu)
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
@@ -3622,6 +3631,7 @@ class DataPlot(object):
                     if all(wi)!=None:
                         pl.errorbar([xi]*len(yi),yi,wi,color='red',capsize=5)
                 pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='blue')
+                pl.annotate('Offset: '+str(offset[0]),xy=(0.05,0.95),xycoords='axes fraction')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label='Simulations',\
                    marker='o',linestyle=':',color='black')#np.log10(el_abu))#,**kwargs)
@@ -3635,7 +3645,7 @@ class DataPlot(object):
             pl.xlabel('Z')
             #pl.legend()
             pl.grid(True)
-            ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_\odot$']
+            ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_{ref}$']
             if ref<0:
                 pl.ylabel(ylab[ref*-1])
             else:
@@ -3662,10 +3672,10 @@ class DataPlot(object):
                 ylab='log mass fraction'
             elif ref==1:
                 from . import utils
-                if solar_filename=='':
+                if ref_filename=='':
                     raise IOError('You chose to plot relative to the solar abundance dist. However, you did not supply the solar abundance file!')
                 else:
-                    nuutils.solar(solar_filename,1)
+                    nuutils.solar(ref_filename,1)
                     menow = where(unique(nuutils.z_sol)==44.)[0][0]
                     print(1, menow, nuutils.solar_elem_abund[menow])
                     el_abu_sun=np.array(nuutils.solar_elem_abund)

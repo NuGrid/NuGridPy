@@ -1,5 +1,5 @@
 
-# 
+#
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
 # Copyright 2007 - 2014 by the NuGrid Team.
@@ -162,6 +162,8 @@ class readTable(DataPlot):
             Additional list of strings of header data, only used in
             trajectory data Types. The default is [].
         '''
+        if filename.startswith('/'):
+            sldir=''
         self.sldir=sldir
         self.files = []
         self.header_char=header_char
