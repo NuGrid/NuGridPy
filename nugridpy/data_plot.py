@@ -3341,7 +3341,7 @@ class DataPlot(object):
 
             # set a pinned element for offset calculation and adjustment
             if z_pin!=None:
-                print("Pinned element: "+str(pin))
+                print("Pinned element: "+str(z_pin))
                 if pin!=None:
                     print('using manual pin')
                     pin=np.power(10,pin)
@@ -3352,8 +3352,8 @@ class DataPlot(object):
                 # using ascii_table.readTable to read in observation data
                 elif pin_filename!=None:
                     print('using the pin filename')
-                    from nugridpy2 import utils
-                    from nugridpy2 import ascii_table as asci
+#                    from nugridpy2 import utils
+                    from . import ascii_table as asci
                     obs_file=asci.readTable(pin_filename,header_char='#')
                     xfe_sigma=[]
                     el_abu_obs_log=[]
