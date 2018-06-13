@@ -1,4 +1,3 @@
-
 #
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
@@ -2704,192 +2703,6 @@ class DataPlot(object):
         return None
 
 
-    def elem_abund(self, cycle, Z_range=None, mass_range=None,
-                   ylim=[0,0], ref=-1, decayed=False, bracket=False,
-                   solar_file='./iniab2.0E-02GN93.ppn', ref_ZZ=1, fancy=False):
-        '''
-        plot the abundance of all elements
-
-        WARNING: Pavel and Falk spend an hour 150205 looking into this method
-                 and we convinced our case that at least for the mulit-zone
-                 i-process case that we looked at (mppnp-hif example) this method
-                 does not give the right plots. We think that elemental_abund does
-                 work, though. But neither does provide decayed elemental plots yet.
-
-
-        Parameters
-        ----------
-        cycle : string or integer
-            The cycle of interest.
-        Z_range : list, optional
-            A 1x2 array containing the lower and upper proton number
-            range. If None plot entire available proton number range.
-            The default is None.
-        mass_range : list, optional
-            A 1x2 array containing the lower and upper mass range. If
-            None it will plot over the entire mass range.
-            The default is None.
-        ylim : list, optional
-            A 1x2 array containing the lower and upper Y limits. If
-            [0,0] then ylim will be determined automatically.
-            The default is [0,0].
-        ref : integer, optional
-            reference cycle.  If it is not -1, this method will plot
-            the abundances of cycle divided by either the solar abundances
-            (ref=0) or divided by the cycle of the same
-            instance given in the ref variable (ref>0). If any abundence in
-            the reference cycle is zero, it will replace it with 1e-99.
-            The default is -1.
-        decayed : boolean, optional
-            If True plot decayed distributions, else plot live
-            distribution.
-            The default is False.
-        bracket : boolean, optional
-            If True, plot bracket notation [X/ZZ], which requires
-            knowledge of the solar abundance distribution from an
-            iniab file and the user to input which ZZ
-            The default is False
-        solar_file : string, optional
-            Path to the file containing the solar abundance distribution.
-            The default is './iniab2.0E-02GN93.ppn'
-        ref_ZZ : integer, optional
-            Proton number of denominator in bracket notation plot.
-            The default is 1.
-        fancy : boolean, optional
-            whether or not to try and use Times New Roman for the font.
-            The default is False
-        shape : string
-            linestyle string
-        '''
-
-        if fancy:
-            fsize=18
-            try:
-                params = {'axes.labelsize':  fsize,
-                        'text.fontsize':   fsize,
-                        'legend.fontsize': fsize,
-                        'xtick.labelsize': fsize,
-                        'ytick.labelsize': fsize,
-                        'text.usetex': False,
-                        'font.family': 'Times New Roman',
-                        'figure.facecolor': 'white',
-                        'ytick.minor.pad': 8,
-                        'ytick.major.pad': 8,
-                        'xtick.minor.pad': 8,
-                        'xtick.major.pad': 8,
-                        'figure.subplot.bottom' : 0.15,
-                        'lines.markersize': 6}
-                pl.rcParams.update(params)
-                elemfont = {'family' : 'sans-serif'}
-            except:
-                pass
-
-        plotType=self._classTest()
-        if plotType=='se':
-            if decayed:
-                raise IOError("Decayed not supported yet! Sorry!")
-
-            def get_av_elem(cycle):
-                mass=self.se.get(cycle,'mass')
-                print(mass)
-                if mass_range is not None:
-                    idx1=abs(mass-mass_range[0]).argmin()
-                    idx2=abs(mass-mass_range[1]).argmin()
-                    if idx1>idx2:
-                        mass=mass[idx2:idx1]
-                        ea=self.get_elemental_abunds(cycle,index=[idx2,idx1])
-                    else:
-                        mass=mass[idx1:idx2]
-                        ea=self.get_elemental_abunds(cycle,index=[idx1,idx2])
-                else:
-                    ea=self.get_elemental_abunds(cycle)
-                # mass-average the abundances:
-                dm=diff(np.insert(mass,0,0.))
-                totmass=sum(dm)
-                mea=[array(ea[i])*dm[i] for i in range(len(mass))]
-                eamsum=zeros(len(ea[0]))
-                for i in range(len(eamsum)):
-                    eamsum[i]=sum([zone[i] for zone in mea])
-                ea=old_div(eamsum,totmass)
-                return np.maximum(ea,1.e-99)
-
-            Z=array(self.se.Z)
-            Zuq=array(list(set(Z))) # unique list of Z
-            Zuq.sort()
-            names=self.se.isos[1:] # abolish the neutron
-
-            ea=get_av_elem(cycle)
-            if ref>0:
-                ea=old_div(ea,get_av_elem(ref))
-            elif ref==0 or bracket:
-                # initialise solar data
-                # If this import statment goes at the top of the file
-                # then it will cause a circular import loop witch will
-                # cause all modules that try to import data_plot to crash.
-                from . import utils as u
-                u.solar(solar_file,1)
-                selem=u.solar_elem_abund
-                selem=np.maximum(selem,1.e-99)
-                Zsol=array(u.z_sol)
-                Zuqsol=array(list(set(Zsol)))
-                Zuqsol.sort()
-                # get rid of MPPNP data not available for the Sun:
-                rm=[]
-                for ZZ in Zuq:
-                    if ZZ not in Zuqsol:
-                        rm.append(ZZ)
-
-                names=delete(names,[where(Zuq==rmz)[0] for rmz in rm])
-                ea=delete(ea,[where(Zuq==rmz)[0] for rmz in rm])
-                Zuq=delete(Zuq,[where(Zuq==rmz)[0] for rmz in rm])
-
-                # get rid of solar data not available from MPPNP:
-                rm=[]
-                for ZZ in Zuqsol:
-                    if ZZ not in Zuq:
-                        rm.append(ZZ)
-
-                selem=delete(selem,[where(Zuqsol==rmz)[0] for rmz in rm])
-
-                if bracket:
-                    xrefsol=selem[where(Zuqsol==ref_ZZ)[0]]
-                    xrefsol=np.maximum(xrefsol,1.e-99)
-                    xref=ea[where(Zuq==ref_ZZ)[0]]
-                    xref=np.maximum(xref,1.e-99)
-                    selem=old_div(selem,xrefsol)
-                    ea=old_div(ea,xref)
-
-                ea=old_div(ea,selem)
-
-        else:
-            raise IOError("elem_abund currently unsupported for this data type:")
-            print(plotType)
-
-        pl.plot(Zuq,np.log10(ea),'ro')
-        pl.plot(Zuq,np.log10(ea),'r-')
-        for i in range(len(Zuq)):
-            loc=(-1)**(i%2)*.5
-            if fancy:
-                pl.text(Zuq[i],np.log10(ea[i])+loc,names[i],fontsize=8,horizontalalignment='center',verticalalignment='center',clip_on=True,fontdict=elemfont)
-            else:
-                pl.text(Zuq[i],np.log10(ea[i])+loc,names[i],fontsize=8,horizontalalignment='center',verticalalignment='center',clip_on=True)
-
-        if ref>0:
-            pl.ylabel('$\log\,X('+str(cycle)+')/X('+str(ref)+')$')
-        elif ref==0:
-            pl.ylabel('$\log\,X/X_\odot$')
-        elif bracket:
-            dname=names[where(Zuq==ref_ZZ)[0]][0]
-            pl.ylabel('$[X/{\\rm '+dname+'}]$')
-        else:
-            pl.ylabel('$\log\,X$')
-        if ylim!=[0,0]:
-            pl.ylim((ylim[0],ylim[1]))
-        if Z_range is not None:
-            pl.xlim((Z_range[0],Z_range[1]))
-        pl.xlabel('$Z$')
-        pl.show()
-
 
     def iso_abund(self, cycle, stable=False, amass_range=None,
                   mass_range=None, ylim=[0,0], ref=-1, show=True,
@@ -3417,17 +3230,18 @@ class DataPlot(object):
             A list of cycle attributes that will be added to the title.
             For possible cycle attributes see self.cattrs.
         ref : integer, optional
-            ref = -1:   plot abundaces as mass fraction
-            ref = N:    plot abundaces relative to cycle N abundance, similar to the
+            ref = -1:   plot abundances as mass fraction
+            ref = N:    plot abundances relative to cycle N abundance, similar to the
                         'ref_filename' option. 
                         Cannot be active at the same time as
                         the 'ref_filename' option.
-            ref = -2:   plot abundances relative to solar
-                        for this option, an additional keyword argument 'ref_filename'
-                        must be passed with the path to the solar abundance dist. file.
+            ref = -2:   plot abundances relative to a reference abundance, 
+                        an additional keyword argument 'ref_filename'
+                        must be passed with the path to the refernece abundance dist. file.
         ref_filename : string, optional
-            plot abundances relative to solar abundance. For this option, 
-            a cycle number for the 'ref' option must not be provided
+            plot abundances relative to a refernece abundance file, often this would be
+            a solar or solar scaled abundance file. For this option, 
+            a cycle number for the 'ref' option must not be provided (or ref = -2)
         z_pin : int, optional
             Charge number for an element to be 'pinned'. An offset will be
             calculated from the difference between the cycle value and the
@@ -3441,8 +3255,8 @@ class DataPlot(object):
         pin_filename: string, optional
             use provided file to provide reference to pin an element to. An offset is
             calculated and used to shift the plot.
-            The file requires header columns marked by '#', column spacing of '  ', and at minimum two columns
-            containing:
+            The file requires header columns marked by '#', column spacing of '  ', and 
+            at minimum two columns containing:
                 'Z': charge number
                 '[X/Fe]': metallicity
         label : string, optional
@@ -3491,8 +3305,6 @@ class DataPlot(object):
             if ref==-2:
                 from . import utils
                 utils.solar(ref_filename,1)
-                menow = where(unique(utils.z_sol)==44.)[0][0]
-                #    print(1, menow, utils.solar_elem_abund[menow])
                 el_abu_sun=np.array(utils.solar_elem_abund)
                 #    print(2, el_abu_sun)
                 #    print(3, el_abu_sun[42])
@@ -3673,14 +3485,11 @@ class DataPlot(object):
             elif ref==1:
                 from . import utils
                 if ref_filename=='':
-                    raise IOError('You chose to plot relative to the solar abundance dist. However, you did not supply the solar abundance file!')
+                    raise IOError('You chose to plot relative to an external refernece \
+                    abundance dist. However, you did not supply the reference abundance file!')
                 else:
                     nuutils.solar(ref_filename,1)
-                    menow = where(unique(nuutils.z_sol)==44.)[0][0]
-                    print(1, menow, nuutils.solar_elem_abund[menow])
                     el_abu_sun=np.array(nuutils.solar_elem_abund)
-                    print(2, el_abu_sun)
-                    print(3, el_abu_sun[42])
                     el_abu_plot=np.zeros(len(el_abu))
                     for zs in z_el[zmin_ind:zmax_ind]:
                         zelidx=where(z_el[zmin_ind:zmax_ind]==zs)[0]
@@ -3692,7 +3501,7 @@ class DataPlot(object):
 
                     ylab='log X/X$_\odot$'
             else:
-                raise IOError('Your choice of ref is not available yet. Please use another.')
+                raise IOError('Your choice of ref is not valid.')
             if label != '':
                 if colour!='':
                     print("Plotting without color and label:")
