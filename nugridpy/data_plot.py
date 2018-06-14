@@ -3316,7 +3316,7 @@ class DataPlot(object):
                         el_abu_plot[zelidx]=el_abu[zelidx[0]]/el_abu_sun[zsolidx]
                     else:
                         el_abu_plot[zelidx]=-1
-                el_abu=el_abu_plot
+                #el_abu=el_abu_plot
             
             # if we have provided a reference cycle number
             elif ref>-1:
@@ -3336,8 +3336,7 @@ class DataPlot(object):
                     el_abu_hash_ref[el_ref]=X_el
                 for i in range(len(el_abu)):
                     el_abu_plot[i-1]=el_abu[i-1]/el_abu_ref[i-1]
-                el_abu=el_abu_plot
-                print(el_abu)
+                #el_abu=el_abu_plot
 
             # set a pinned element for offset calculation and adjustment
             if z_pin!=None:
@@ -3425,16 +3424,23 @@ class DataPlot(object):
                     el_abu_pin=np.zeros(len(el_abu))
                     for i in range(len(el_abu)):
                         el_abu_pin[i-1]=el_abu[i-1]/el_abu_ref[i-1]
+                    #print(el_abu)
+                    #print(el_abu_ref)
+                    #print(el_abu_pin)
+                    #print(el_abu_plot)
                 else:
                     print("something's wrong here")
                     
             # calculating the offset value
                 zelidx=where(z_el[zmin_ind:zmax_ind]==z_pin)[0][0]
                 offset=np.log10(el_abu_pin[zelidx])-np.log10(el_abu_plot[zelidx])
+                print(offset)
+            
+            if ref!=-1:
                 el_abu=el_abu_plot
+                
             
             # plot an elemental abundance distribution with labels:
-            #print(el_abu)
             self.el_abu_log = np.log10(el_abu)
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
