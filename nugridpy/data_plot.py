@@ -57,8 +57,6 @@ import time
 import sys
 
 from . import astronomy as ast
-from . import ascii_table as asci
-from . import utils
 
 
 def _padding_model_number(number, max_num):
@@ -3469,6 +3467,8 @@ class DataPlot(object):
             elemental abundances (as you asked for them, could be ref to something else)
 
         '''
+        #from . import utils
+        from . import ascii_table as asci
         plotType=self._classTest()
         offset=0
         if ref_filename!=None:
