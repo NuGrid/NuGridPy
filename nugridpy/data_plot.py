@@ -57,6 +57,8 @@ import time
 import sys
 
 from . import astronomy as ast
+from . import ascii_table as asci
+from . import utils
 
 
 def _padding_model_number(number, max_num):
@@ -3422,7 +3424,7 @@ class DataPlot(object):
                         'ref_filename' option. 
                         Cannot be active at the same time as
                         the 'ref_filename' option.
-            ref = -2:   plot abundances relative to solar
+            ref = -2:   plot abundances relative to a reference solar-type file
                         for this option, an additional keyword argument 'ref_filename'
                         must be passed with the path to the solar abundance dist. file.
         ref_filename : string, optional
@@ -3539,8 +3541,6 @@ class DataPlot(object):
                 # using ascii_table.readTable to read in observation data
                 elif pin_filename!=None:
                     print('using the pin filename')
-                    from nugridpy2 import utils
-                    from nugridpy2 import ascii_table as asci
                     obs_file=asci.readTable(pin_filename,header_char='#')
                     xfe_sigma=[]
                     el_abu_obs_log=[]
@@ -3607,6 +3607,8 @@ class DataPlot(object):
                     el_abu_pin=np.zeros(len(el_abu))
                     for i in range(len(el_abu)):
                         el_abu_pin[i-1]=el_abu[i-1]/el_abu_sol[i-1]
+                elif ref>=0:
+                    print("Error: A reference file or manual pin is required - the plot will fail")
                 '''elif ref>=0:
                     print('using ref pin')
                     el_abu_pin=np.zeros(len(el_abu))
@@ -3616,8 +3618,8 @@ class DataPlot(object):
                     print(el_abu_ref)
                     print(el_abu_pin)
                     print(el_abu_plot)'''
-                else:
-                    print("something's wrong here")
+                #else:
+                 #   print("something's wrong here")
                     
             # calculating the offset value
                 zelidx=where(z_el[zmin_ind:zmax_ind]==z_pin)[0][0]
