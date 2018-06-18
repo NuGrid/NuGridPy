@@ -3393,7 +3393,7 @@ class DataPlot(object):
 
     def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,5],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
-                        pin_filename=None,show_names=True,label='',
+                        pin_filename=None,logeps=False,show_names=True,label='',
                         colour='',**kwargs):
         '''
         Plot the decayed elemental abundance distribution (PPN).
@@ -3417,14 +3417,10 @@ class DataPlot(object):
             A list of cycle attributes that will be added to the title.
             For possible cycle attributes see self.cattrs.
         ref : integer, optional
-            ref = -1:   plot abundaces as mass fraction
             ref = N:    plot abundaces relative to cycle N abundance, similar to the
                         'ref_filename' option. 
                         Cannot be active at the same time as
                         the 'ref_filename' option.
-            ref = -2:   plot abundances relative to a reference solar-type file
-                        for this option, an additional keyword argument 'ref_filename'
-                        must be passed with the path to the solar abundance dist. file.
         ref_filename : string, optional
             plot abundances relative to solar abundance. For this option, 
             a cycle number for the 'ref' option must not be provided
@@ -3445,6 +3441,8 @@ class DataPlot(object):
             containing:
                 'Z': charge number
                 '[X/Fe]': metallicity
+        logeps : boolean, optional
+            Plots log eps instead of [X/Fe] charts.
         label : string, optional
             The label for the abundance distribution
             The default is '' (i.e. do not show a label)
@@ -3473,6 +3471,9 @@ class DataPlot(object):
         offset=0
         if ref_filename!=None:
             ref=-2
+        if logeps==True:
+            z_pin=1
+            ref=-3
         print(ref)
         if plotType=='PPN':
             self.get(cycle,decayed=True)
@@ -3530,13 +3531,21 @@ class DataPlot(object):
 
             # set a pinned element for offset calculation and adjustment
             if z_pin!=None:
-                print("Pinned element: "+str(pin))
+                print("Pinned element: "+str(z_pin))
                 if pin!=None:
                     print('using manual pin')
                     pin=np.power(10,pin)
                     el_abu_pin=np.zeros(len(el_abu))
                     for i in range(len(el_abu)):
                         el_abu_pin[i-1]=pin
+                
+                elif logeps==True:
+                    print('finding log eps')
+                    atomic_mass=[1.008, 4.003, 6.94, 9.012, 10.81, 12.011, 14.007, 15.999, 18.998, 20.18, 22.99, 24.305, 26.982, 28.085, 30.74, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 6.46, 65.38, 69.723, 72.63, 74.922, 78.971, 79.904, 83.798, 85.468, 87.62, 88.906, 91.224, 92.906, 95.95, 97., 01.07, 102.906, 106.42, 107.868, 112.414, 114.818, 118.71, 121.76, 127.6, 126.904, 131.293, 132.905, 137.27, 138.905, 140.116, 140.908, 144.242, 145. , 150.36, 151.964, 157.25, 158.925, 162.5, 164.93, 167.259, 18.934, 173.045, 174.967, 178.49, 180.948, 183.84, 186.207, 190.23, 192.217, 195.084, 196.967, 200.592, 24.38, 207.2, 208.98, 209., 210., 222., 223., 226., 227., 232.038, 231.036, 238.029, 237., 244., 243., 247., 247., 251., 252., 257., 258., 259., 262., 267., 270., 269., 270., 270., 278., 281., 281., 285., 286., 289., 289., 293., 293., 294.]
+                    el_abu_pin=atomic_mass
+                    el_abu_plot=np.zeros(len(el_abu))
+                    for i in range(len(el_abu)):
+                        el_abu_plot[i-1]=el_abu[i-1]/el_abu_pin[i-1]
                 
                 # using ascii_table.readTable to read in observation data
                 elif pin_filename!=None:
@@ -3598,15 +3607,12 @@ class DataPlot(object):
                     #el_abu_obs_log=[[i] for i in el_abu_obs_log] # converting to list of lists for the zip() function plotting 
                     
                     
-                    # reading in upper limits
-                    
-                    # reading in error bars
                     
                 elif ref==-2:
                     print('using solar pin')
                     el_abu_pin=np.zeros(len(el_abu))
                     for i in range(len(el_abu)):
-                        el_abu_pin[i-1]=el_abu[i-1]/el_abu_sol[i-1]
+                        el_abu_pin[i-1]=el_abu[i-1]/el_abu_sun[i-1]
                 elif ref>=0:
                     print("Error: A reference file or manual pin is required - the plot will fail")
                 '''elif ref>=0:
@@ -3628,7 +3634,6 @@ class DataPlot(object):
             
             if ref!=-1:
                 el_abu=el_abu_plot
-                
             
             # plot an elemental abundance distribution with labels:
             self.el_abu_log = np.log10(el_abu)
@@ -3642,7 +3647,7 @@ class DataPlot(object):
                 pl.annotate('Offset: '+str(offset[0]),xy=(0.05,0.95),xycoords='axes fraction')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label='Simulations',\
-                   marker='o',linestyle=':',color='black')#np.log10(el_abu))#,**kwargs)
+                   marker='o',linestyle=':',color='black')#,np.log10(el_abu))#,**kwargs)
             j=0        # add labels
             for z in z_el[zmin_ind:zmax_ind]:
                 pl.text(z+0.15,log10(el_abu[j])+offset+0.05,el_name[j])
@@ -3653,9 +3658,11 @@ class DataPlot(object):
             pl.xlabel('Z')
             #pl.legend()
             pl.grid(True)
-            ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_{ref}$']
+            ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_{ref}$','log$\epsilon$']
             if ref<0:
                 pl.ylabel(ylab[ref*-1])
+            if logeps==True:
+                pl.ylabel(ylab[3])
             else:
                 pl.ylabel(ylab[0])
 #           savefig('elemental'+str(i)+'.png')
