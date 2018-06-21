@@ -2897,7 +2897,7 @@ class DataPlot(object):
                   grid=False, point_set=1, include_title=False,
                   data_provided=False,thedata=None, verbose=True,
                   mov=False,drawfig=None,drawax=None,show_names=True,
-                  label=None,colour=None,elemaburtn=False,mypoint=None):
+                  label=None,colour=None,elemaburtn=False,mypoint=None,plot_type=['-','--','-.',':','-']):
         '''
         plot the abundance of all the chemical species
 
@@ -2958,7 +2958,7 @@ class DataPlot(object):
             automatically
         elemaburtn : boolean, private
             If true, iso_abund() returns after writing self.***_iso_to_plot for
-            use with other plotting routines.
+            use with other plotting routines.f
         mypoint : string, optional
             fix the marker style of all the points in this plot to one type, given
             as a string. If None, multiple point styles are used as per point_set.
@@ -3174,7 +3174,11 @@ class DataPlot(object):
             abund_plot.append(abunds[(el_iso_to_plot==el)][argsort(numbers)])
             mass_num.append(sort(numbers))
         # now plot:
-        plot_type = ['-','--','-.',':','-']
+        #plot_type = ['-','--','-.',':','-'] ##now implemented as an arg
+        print(plot_type)
+        while len(plot_type)<=4:
+            plot_type.append('')
+            print(plot_type)
         pl_index = 0
         if mypoint is None:
             points = [['o','^','p','h','*'],['x','+','D','>','s'],['H','v','<','*','3']]
@@ -3394,7 +3398,7 @@ class DataPlot(object):
     def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,5],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,logeps=False,show_names=True,label='',
-                        colour='',**kwargs):
+                        colour='',plotlines=':',plotlabels=True,mark='x',**kwargs):
         '''
         Plot the decayed elemental abundance distribution (PPN).
         Plot the elemental abundance distribution (nugridse).
@@ -3449,9 +3453,14 @@ class DataPlot(object):
         show_names : boolean, optional
             Whether or not to show the element names on the figure.
         colour : string, optional
-            In case you want to dictate line colours. Takes cymkrgb single-character colours
-            or any other colour string accepted by matplotlib.
-            The default is '' (automatic colour selection)
+            In case you want to dictate marker and line colours. Takes cymkrgb 
+            single-character colours or any other colour string accepted by
+            matplotlib. The default is '' (automatic colour selection)
+        plotlines : string, optional
+            In case you want to dictate line style. Takes MatPlotLib linestyles.
+        mark : string, optional
+            In case you want to dictate marker style. Takes MatPlotLib markers.
+            Default is 'x'.
         kwargs : additional keyword arguments
             These arguments are equivalent to those of iso_abund, e.g.
             mass_range. Routines from iso_abund are called, to perform
@@ -3474,7 +3483,6 @@ class DataPlot(object):
         if logeps==True:
             z_pin=1
             ref=-3
-        print(ref)
         if plotType=='PPN':
             self.get(cycle,decayed=True)
             z_el=unique(self.z_iso_to_plot)
@@ -3647,11 +3655,12 @@ class DataPlot(object):
                 pl.annotate('Offset: '+str(offset[0]),xy=(0.05,0.95),xycoords='axes fraction')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label='Simulations',\
-                   marker='o',linestyle=':',color='black')#,np.log10(el_abu))#,**kwargs)
+                   linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
             j=0        # add labels
-            for z in z_el[zmin_ind:zmax_ind]:
-                pl.text(z+0.15,log10(el_abu[j])+offset+0.05,el_name[j])
-                j += 1
+            if plotlabels==True:
+                for z in z_el[zmin_ind:zmax_ind]:
+                    pl.text(z+0.15,log10(el_abu[j])+offset+0.05,el_name[j])
+                    j += 1
             if title_items is not None:
                 pl.title(self._do_title_string(title_items,cycle))
             pl.ylim(ylim[0],ylim[1])
@@ -3659,12 +3668,14 @@ class DataPlot(object):
             #pl.legend()
             pl.grid(True)
             ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_{ref}$','log$\epsilon$']
-            if ref<0:
-                pl.ylabel(ylab[ref*-1])
-            if logeps==True:
+            if ref==-2:
+                pl.ylabel(ylab[2])
+            elif ref>-1:
+                pl.ylabel(ylab[0])
+            elif logeps==True:
                 pl.ylabel(ylab[3])
             else:
-                pl.ylabel(ylab[0])
+                pl.ylabel(ylab[1])
 #           savefig('elemental'+str(i)+'.png')
         elif plotType=='se':
             # get self.***_iso_to_plot by calling iso_abund function, which writes them
