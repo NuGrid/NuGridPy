@@ -3853,7 +3853,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
                 if iso in p.cols:
                     abus[i].append(iso)
             
-        print(abus)        
+                
     else:
         abus = abus    
     ax = [ax1,ax2,ax3,ax4]
@@ -3885,7 +3885,6 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
     for i in range(4):
         for thing in abus[i]:
             ind = abus[i].index(thing)
-            print(np.log10(p.get(thing)))
             ax[i].plot(xxx, np.log10(p.get(thing)), ls=u.linestylecb(ind,a,b)[0],\
             marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
             markevery=50,label=thing)
