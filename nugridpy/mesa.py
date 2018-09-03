@@ -368,7 +368,7 @@ class mesa_profile(DataPlot):
                  nearest = min(abs(self.model[nearmods[0]]-num),\
                    abs(self.model[nearmods[1]]-num))
                  num = self.model[sometable[nearest]]
-            print('Found and load nearest profile for cycle hello '+str(num))
+            print('Found and load nearest profile for cycle '+str(num))
             num_type = 'model'
         if num_type is 'model':
             try:
@@ -438,7 +438,7 @@ class mesa_profile(DataPlot):
         f = open(self.sldir+'/'+prof_ind_name,'r')
         line = f.readline()
         numlines=int(line.split()[0])
-        print(str(numlines)+' hello in profiles.index file ...')
+        print(str(numlines)+' in profiles.index file ...')
 
         model=[]
         log_file_num=[]
@@ -3810,7 +3810,7 @@ a=15; b=5     # linestyle params
 xlm=(0,30)
 xaxis_type="Lagrangian"
 
-def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=(8,8)):
+def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figsize1=(8,8)):
     '''Four panels of abundance plots
 
     Parameters
@@ -3822,7 +3822,8 @@ def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=
     xlm : tuple
       xlimits: mass_min, mass_max
       
-    abus : 'default' provides common species only otherwise provide a list of lists of desired abus 
+    abus : 'All' plots many 'commonly used' isotopes up to Fe if they are in your mesa output.
+    otherwise provide a list of lists of desired abus 
 
     show : Boolean
       False  for batch use
@@ -3840,12 +3841,19 @@ def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=
     f, ([ax1,ax2],[ax3,ax4]) = pl.subplots(2, 2, sharex=False, sharey=True, figsize=figsize1)
     
     
-    # define 4 groups of elements, one for each of the 4 subplots
-    if abus == 'default':
-        abus = [['h1','he4'],\
-            ['na23','ne22','mg24'],\
-            ['c12','n14','o16'],\
-            ['si28']]
+    # define 4 groups of elements, one for each of the 4 subplots 
+    all_isos=[['h1','he3','he4','li6','c12','c13','n13','n14','n15','o16','o17','o18','f19'],['ne20','ne21','ne22','na22','na23','mg24','mg25','mg26','al26','al27','si28','si29','si30'], ['p31', 's32','s33', 's34','s36','cl35','cl37','ar36', 'ar38','ar40', 'k39', 'k40','k41'],
+['ca40','ca42','ca48','sc45','ti46','ti48','ti50','v50','v51','cr52','cr54','mn55','fe56']]
+    
+    if abunds == 'All':
+        abus=[[],[],[],[]]
+        
+        for i, row in enumerate(all_isos):
+            for iso in row:
+                if iso in p.cols:
+                    abus[i].append(iso)
+            
+        print(abus)        
     else:
         abus = abus    
     ax = [ax1,ax2,ax3,ax4]
@@ -3869,7 +3877,7 @@ def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=
     elif xaxis is "Lagrangian": 
         xxx = mass
         xll = xlm
-        xxlabel = "$mass / \mathrm{M_{sun}}$"
+        xxlabel = "$M / \mathrm{M_{sun}}$"
     else:
         print("Error: don't understand xaxis choice, must be Lagrangian or Eulerian")
 
@@ -3877,6 +3885,7 @@ def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=
     for i in range(4):
         for thing in abus[i]:
             ind = abus[i].index(thing)
+            print(np.log10(p.get(thing)))
             ax[i].plot(xxx, np.log10(p.get(thing)), ls=u.linestylecb(ind,a,b)[0],\
             marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
             markevery=50,label=thing)
@@ -3899,7 +3908,7 @@ def abu_profiles(p,xlm=xlm,show=False,abus='default',xaxis=xaxis_type, figsize1=
   
    # matplotlib.pyplot.close('all')
 
-def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
+def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
     '''Four panels of other profile plots
    
    Parameters
@@ -3934,7 +3943,7 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
     elif xaxis is "Lagrangian": 
         xxx = mass
         xll = xlm
-        xxlabel = "$mass / \mathrm{M_{sun}}$"
+        xxlabel = "$M / \mathrm{M_{sun}}$"
     else:
         print("Error: don't understand xaxis choice, must be Lagrangian or Eulerian")
 
@@ -3958,7 +3967,7 @@ def other_profiles(p,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
     #ax.set_title('Nuclear Energy Production')
     ax.set_ylim(0,15)
     ax.set_xlim(xll)
-    ax.legend(loc=3, ncol=2)
+    ax.legend(loc=1, ncol=2, fontsize='small')
     #ax.set_xlabel(xxlabel)
     ax.set_ylabel('$ \log \epsilon $')
 #--------------------------------------------------------------------------------------------#
