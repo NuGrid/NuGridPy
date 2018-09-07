@@ -137,6 +137,7 @@ from matplotlib.patches import PathPatch
 import os
 import sys
 
+from . import astronomy as ast
 from . import ascii_table
 from . import utils as u
 from .data_plot import *
@@ -519,7 +520,7 @@ class mesa_profile(DataPlot):
         except ImportError:
             print('Module ProgenitorHotb_new not found.')
             return
-        import astronomy as ast
+        
         nz=len(self.get('mass'))
         prog=ProgenitorHotb_new(nz)
 
@@ -762,7 +763,7 @@ class mesa_profile(DataPlot):
             xlab = 'Mass / M$_\odot$'
         else:
             xaxis = old_div(radius, 1.e8) # Mm
-            xlab = 'radius / Mm'
+            xlab = 'Radius (Mm)'
 
         pl.plot(xaxis, np.log10(eps_nuc),
                 'k-',
@@ -1338,7 +1339,7 @@ class history_data(DataPlot):
     def mcc_t(self,ifig=None,lims=[0,15,0,25],label=None,colour=None,
               mask=False,s2ms=False,dashes=None):
         """
-        Plot mass of convective core as a function of time.
+        Plot mass of [oclark01@scandium 15M_led_f_print_nets]$ cp ../15M_led_f_ppcno/ective core as a function of time.
 
         Parameters
         ----------
@@ -3809,8 +3810,7 @@ title_format="%10.2e"
 a=15; b=5     # linestyle params
 xlm=(0,30)
 xaxis_type="Lagrangian"
-
-def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figsize1=(8,8)):
+def abu_profiles(p,ifig=1,xlm=xlm,ylm=(-8,0),show=False,abunds='All',xaxis=xaxis_type, figsize1=(8,8)):
     '''Four panels of abundance plots
 
     Parameters
@@ -3859,7 +3859,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
     ax = [ax1,ax2,ax3,ax4]
     xxx = p.get('radius') if xaxis is "Eulerian" else p.get('mass') 
     mass = p.get('mass')                      # in units of Msun
-    radius = p.get('radius')#*at.rsun_cm/1.e8  # in units of Mm
+    radius = p.get('radius')*ast.rsun_cm/1.e8  # in units of Mm
     if xaxis is "Eulerian":
         xxx = radius
 
@@ -3872,7 +3872,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
 	   
 
         xll = (radius[indbot],radius[indtop])
-        xxlabel = "$radius / Rsun$"
+        xxlabel = "Radius (Mm)"
    
     elif xaxis is "Lagrangian": 
         xxx = mass
@@ -3889,7 +3889,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
             marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
             markevery=50,label=thing)
     # set x and y lims and labels
-        ax[i].set_ylim(-14,0)
+        ax[i].set_ylim(ylm)
         ax[i].set_xlim(xll)
         ax[i].legend(loc=1)
         ax[i].set_xlabel(xxlabel)
@@ -3899,7 +3899,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,show=False,abunds='All',xaxis=xaxis_type, figs
    
     title_str = "Abundance plot: "+'t ='+str(title_format%p.header_attr['star_age'])\
               +' dt ='+str(title_format%p.header_attr['time_step'])\
-              +'model number ='+str(int(p.header_attr['model_number']))
+              +'model number = '+str(int(p.header_attr['model_number']))
     f.suptitle(title_str, fontsize=12)
     f.tight_layout()
     f.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.9, wspace=0, hspace=0.1)
@@ -3928,7 +3928,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
     matplotlib.rc('figure',facecolor='white',figsize=figsize2)
 
     mass = p.get('mass')                      # in units of Msun
-    radius = p.get('radius')#*at.rsun_cm/1.e8  # in units of Mm
+    radius = p.get('radius')*ast.rsun_cm/1.e8  # in units of Mm
     if xaxis is "Eulerian":
         xxx = radius
         if xlm[0]==0 and xlm[1] == 0:
@@ -3938,7 +3938,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
             indbot = np.where(radius>=xlm[0])[0][-1]
             indtop = np.where(radius<xlm[1])[0][0]
         xll = (radius[indbot],radius[indtop])
-        xxlabel = "$radius / Rsun$"
+        xxlabel = "radius (Mm)"
     elif xaxis is "Lagrangian": 
         xxx = mass
         xll = xlm
@@ -3962,6 +3962,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
         ax.plot(xxx, np.log10(p.get(thing)), ls=u.linestylecb(ind,a,b)[0],\
              marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
              markevery=50,label=thing)
+        
     # set x and y lims and labels
     #ax.set_title('Nuclear Energy Production')
     ax.set_ylim(0,15)
@@ -4010,12 +4011,12 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
          marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
          markevery=50,label=thing)
     # set x and y lims and labels
-   # ax.set_title('Specific Entropy (/A*kerg)')
+    #ax.set_title('Specific Entropy (/A*kerg)')
     ax.set_ylim(0,50)
     ax.set_xlim(xll)
     ax.legend(loc=1)
     ax.set_xlabel(xxlabel)
-    ax.set_ylabel(' S ')
+    ax.set_ylabel(' Specific Entropy')
 
 #--------------------------------------------------------------------------------------------#
     # rho, mu, T
@@ -4031,7 +4032,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
          markevery=50,label=thing)
     # set x and y lims and labels                                                              
     #ax.set_title('Rho, mu, T')
-    ax.set_ylim(0.,7.)
+    ax.set_ylim(0.,9.)
     ax.set_xlim(xll)
     ax.legend(loc=0)
     ax.set_xlabel(xxlabel)
@@ -4069,7 +4070,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
     ax.legend(loc=0)
     axo.legend(loc=(.15,.85))
     #ax.set_xlabel(xxlabel)
-    ax.set_ylabel('$ P_{gas} / P_{tot}$')
+    ax.set_ylabel('$\mathrm{ P_{gas} / P_{tot}}$')
     axo.set_ylabel('$ log(Opacity)$')
 
 #--------------------------------------------------------------------------------------------#
@@ -4087,7 +4088,7 @@ def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)
          marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
          markevery=50,label=thing)
 # set x and y lims and labels
-    ax.axhline(16,ls='dashed',color='black',label="$0 for v_{conv}/c_s$")
+    ax.axhline(16,ls='dashed',color='black',label="$\mathrm{Ma}=0$")
    # ax.set_title('Mixing')
     ax.set_ylim(10,17)
     ax.set_xlim(xll)
