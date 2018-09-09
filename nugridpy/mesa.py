@@ -3847,12 +3847,36 @@ def abu_profiles(p,ifig=1,xlm=xlm,ylm=(-8,0),show=False,abunds='All',xaxis=xaxis
     
     if abunds == 'All':
         abus=[[],[],[],[]]
-        
+        j=0
         for i, row in enumerate(all_isos):
             for iso in row:
                 if iso in p.cols:
                     abus[i].append(iso)
-            
+                    j+=1  
+                  
+                    
+        abus1=[]
+        abus2 =[[],[],[],[]]
+        for l in range(len(abus)):
+            for k in range(len(abus[l])):
+                abus1.append(abus[l][k])
+
+                
+        is_small_isos = False                
+        for i in range(len(abus)):
+            if len(abus[i]) < 5:
+                is_small_isos = True
+                print("Missing isotopes from the default list. Distributing the ones you have over the panels.")
+        
+        if is_small_isos:
+            n=4
+            quo, rem = divmod(len(abus1), n)
+            for i in range(len(abus2)):
+                for k in range(i*quo,(i+1)*quo+rem):
+                    abus2[i].append(abus1[k])
+         
+        abus = abus2
+        #print(abus)        
                 
     else:
         abus = abus    
