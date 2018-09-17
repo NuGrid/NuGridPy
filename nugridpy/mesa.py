@@ -137,6 +137,7 @@ from matplotlib.patches import PathPatch
 import os
 import sys
 
+from . import astronomy as ast
 from . import ascii_table
 from . import utils as u
 from .data_plot import *
@@ -404,7 +405,7 @@ class mesa_profile(DataPlot):
                     print('error: no log.data file found in '+sldir)
 
 
-        print('reading '+filename+' ...')
+        print('reading profile'+filename+' ...')
         header_attr = _read_mesafile(filename,only='header_attr')
         num_zones=int(header_attr['num_zones'])
         header_attr,cols,data = _read_mesafile(filename,data_rows=num_zones,only='all')
@@ -519,7 +520,7 @@ class mesa_profile(DataPlot):
         except ImportError:
             print('Module ProgenitorHotb_new not found.')
             return
-        import astronomy as ast
+        
         nz=len(self.get('mass'))
         prog=ProgenitorHotb_new(nz)
 
@@ -762,7 +763,7 @@ class mesa_profile(DataPlot):
             xlab = 'Mass / M$_\odot$'
         else:
             xaxis = old_div(radius, 1.e8) # Mm
-            xlab = 'radius / Mm'
+            xlab = 'Radius (Mm)'
 
         pl.plot(xaxis, np.log10(eps_nuc),
                 'k-',
@@ -1338,7 +1339,7 @@ class history_data(DataPlot):
     def mcc_t(self,ifig=None,lims=[0,15,0,25],label=None,colour=None,
               mask=False,s2ms=False,dashes=None):
         """
-        Plot mass of convective core as a function of time.
+        Plot mass of [oclark01@scandium 15M_led_f_print_nets]$ cp ../15M_led_f_ppcno/ective core as a function of time.
 
         Parameters
         ----------
@@ -3817,3 +3818,330 @@ def _cleanstarlog(file_in):
     for j in np.arange(len(lignes)):
         fout.write(lignes[j])
     fout.close()
+
+
+title_format="%10.2e"
+a=15; b=5     # linestyle params
+xlm=(0,30)
+xaxis_type="Lagrangian"
+def abu_profiles(p,ifig=1,xlm=xlm,ylm=(-8,0),show=False,abunds='All',xaxis=xaxis_type, figsize1=(8,8)):
+    '''Four panels of abundance plots
+
+    Parameters
+    ----------
+
+    p : instance
+      mesa_profile instance
+
+    xlm : tuple
+      xlimits: mass_min, mass_max
+      
+    abus : 'All' plots many 'commonly used' isotopes up to Fe if they are in your mesa output.
+    otherwise provide a list of lists of desired abus 
+
+    show : Boolean
+      False  for batch use
+      True   for interactive use
+
+    xaxis : character
+      Lagrangian    mass is radial mass coordinate
+      Eulerian      radius is radial coordinate, in Mm
+    '''
+
+
+    matplotlib.rc('figure',facecolor='white',figsize=figsize1)
+   
+    # create subplot structure
+    f, ([ax1,ax2],[ax3,ax4]) = pl.subplots(2, 2, sharex=False, sharey=True, figsize=figsize1)
+    
+    
+    # define 4 groups of elements, one for each of the 4 subplots 
+    all_isos=[['h1','he3','he4','li6','c12','c13','n13','n14','n15','o16','o17','o18','f19'],['ne20','ne21','ne22','na22','na23','mg24','mg25','mg26','al26','al27','si28','si29','si30'], ['p31', 's32','s33', 's34','s36','cl35','cl37','ar36', 'ar38','ar40', 'k39', 'k40','k41'],
+['ca40','ca42','ca48','sc45','ti46','ti48','ti50','v50','v51','cr52','cr54','mn55','fe56']]
+    
+    if abunds == 'All':
+        abus=[[],[],[],[]]
+        j=0
+        for i, row in enumerate(all_isos):
+            for iso in row:
+                if iso in p.cols:
+                    abus[i].append(iso)
+                    j+=1  
+                  
+                    
+        abus1=[]
+        abus2 =[[],[],[],[]]
+        for l in range(len(abus)):
+            for k in range(len(abus[l])):
+                abus1.append(abus[l][k])
+
+                
+        is_small_isos = False                
+        for i in range(len(abus)):
+            if len(abus[i]) < 5:
+                is_small_isos = True
+                print("Missing isotopes from the default list. Distributing the ones you have over the panels.")
+        
+        if is_small_isos:
+            n=4
+            quo, rem = divmod(len(abus1), n)
+            for i in range(len(abus2)):
+                for k in range(i*quo,(i+1)*quo+rem):
+                    abus2[i].append(abus1[k])
+         
+        abus = abus2
+        #print(abus)        
+                
+    else:
+        abus = abus    
+    ax = [ax1,ax2,ax3,ax4]
+    xxx = p.get('radius') if xaxis is "Eulerian" else p.get('mass') 
+    mass = p.get('mass')                      # in units of Msun
+    radius = p.get('radius')*ast.rsun_cm/1.e8  # in units of Mm
+    if xaxis is "Eulerian":
+        xxx = radius
+
+        if xlm[0] == 0 and xlm[1] == 0:
+            indtop = 0
+            indbot = len(mass)-1
+        else: 
+            indbot = np.where(radius>=xlm[0])[0][-1]
+            indtop = np.where(radius<xlm[1])[0][0]
+	   
+
+        xll = (radius[indbot],radius[indtop])
+        xxlabel = "Radius (Mm)"
+   
+    elif xaxis is "Lagrangian": 
+        xxx = mass
+        xll = xlm
+        xxlabel = "$M / \mathrm{M_{sun}}$"
+    else:
+        print("Error: don't understand xaxis choice, must be Lagrangian or Eulerian")
+
+
+    for i in range(4):
+        for thing in abus[i]:
+            ind = abus[i].index(thing)
+            ax[i].plot(xxx, np.log10(p.get(thing)), ls=u.linestylecb(ind,a,b)[0],\
+            marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+            markevery=50,label=thing)
+    # set x and y lims and labels
+        ax[i].set_ylim(ylm)
+        ax[i].set_xlim(xll)
+        ax[i].legend(loc=1)
+        ax[i].set_xlabel(xxlabel)
+        if i%2 == 0:
+            ax[i].set_ylabel('log X')
+       # ax[i].set_aspect('equal')
+   
+    title_str = "Abundance plot: "+'t ='+str(title_format%p.header_attr['star_age'])\
+              +' dt ='+str(title_format%p.header_attr['time_step'])\
+              +'model number = '+str(int(p.header_attr['model_number']))
+    f.suptitle(title_str, fontsize=12)
+    f.tight_layout()
+    f.subplots_adjust(left=0.1, bottom=0.1, right=0.95, top=0.9, wspace=0, hspace=0.1)
+    f.savefig('abuprof'+str(int(p.header_attr['model_number'])).zfill(6)+'.png')
+  
+   # matplotlib.pyplot.close('all')
+
+def other_profiles(p,ifig=1,xlm=xlm,show=False,xaxis=xaxis_type, figsize2=(10,8)):
+    '''Four panels of other profile plots
+   
+   Parameters
+    ----------
+
+    p : instance
+      mesa_profile instance
+
+    xll : tuple
+      xlimits: mass_min, mass_max
+  
+
+    show : Boolean
+      False  for batch use
+      True   for interactive use
+    '''
+
+    matplotlib.rc('figure',facecolor='white',figsize=figsize2)
+
+    mass = p.get('mass')                      # in units of Msun
+    radius = p.get('radius')*ast.rsun_cm/1.e8  # in units of Mm
+    if xaxis is "Eulerian":
+        xxx = radius
+        if xlm[0]==0 and xlm[1] == 0:
+            indtop = 0
+            indbot = len(mass)-1
+        else: 
+            indbot = np.where(radius>=xlm[0])[0][-1]
+            indtop = np.where(radius<xlm[1])[0][0]
+        xll = (radius[indbot],radius[indtop])
+        xxlabel = "radius (Mm)"
+    elif xaxis is "Lagrangian": 
+        xxx = mass
+        xll = xlm
+        xxlabel = "$M / \mathrm{M_{sun}}$"
+    else:
+        print("Error: don't understand xaxis choice, must be Lagrangian or Eulerian")
+
+
+    # create subplot structure
+    t, ([ax1,ax2],[ax3, ax4],[ax5,ax6]) = matplotlib.pyplot.subplots(3, 2, sharex=True, sharey=False)
+    
+# panel 1: burns: pp, cno, burn_c
+# panel 2: convection and mixing: entropy, Tgrad
+
+
+    # which burning to show
+    Enuc = ['pp','cno','tri_alfa','burn_c','burn_o','burn_n','burn_si','burn_mg','burn_na','burn_ne','eps_nuc']
+    ax = ax1
+    for thing in Enuc:
+        ind = Enuc.index(thing)
+        ax.plot(xxx, np.log10(p.get(thing)), ls=u.linestylecb(ind,a,b)[0],\
+             marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+             markevery=50,label=thing)
+        
+    # set x and y lims and labels
+    #ax.set_title('Nuclear Energy Production')
+    ax.set_ylim(0,15)
+    ax.set_xlim(xll)
+    ax.legend(loc=1, ncol=2, fontsize='small')
+    #ax.set_xlabel(xxlabel)
+    ax.set_ylabel('$ \log \epsilon $')
+#--------------------------------------------------------------------------------------------#
+
+    # gradients
+
+    mix = [['gradr']]
+    mix1 = [['grada']]
+    
+    for i in range(1):
+        for thing in mix[i]:
+            ind = mix[i].index(thing)
+    for i in range(1):
+        for thing1 in mix1[i]:
+            ind1 = mix1[i].index(thing1)
+            ax2.plot(xxx, (np.tanh(np.log10(p.get(thing))-np.log10(p.get(thing1))))\
+            ,ls=u.linestylecb(ind,a,b)[0],\
+             marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+             markevery=50,label=thing)
+    # set x and y lims and labels
+    ax2.axhline(ls='dashed',color='black',label="")
+    #ax2.set_title('Mixing Regions')
+    ax2.yaxis.tick_right()
+    ax2.yaxis.set_label_position("right")
+    ax2.set_ylim(-.1,.1)
+    ax2.set_xlim(xll)
+    ax2.legend(labels='Mixing',loc=1)
+    #ax2.set_xlabel(xxlabel)
+    ax2.set_ylabel('$\\tanh(\\log(\\frac{\\nabla_{rad}}{\\nabla_{ad}}))$')
+
+#--------------------------------------------------------------------------------------------#
+
+    # entropy
+    S = ['entropy']
+
+    ax = ax5
+    
+    for thing in S:
+        ind = 2
+        ax.plot(xxx, p.get(thing), ls=u.linestylecb(ind,a,b)[0],\
+         marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+         markevery=50,label=thing)
+    # set x and y lims and labels
+    #ax.set_title('Specific Entropy (/A*kerg)')
+    ax.set_ylim(0,50)
+    ax.set_xlim(xll)
+    ax.legend(loc=1)
+    ax.set_xlabel(xxlabel)
+    ax.set_ylabel(' Specific Entropy')
+
+#--------------------------------------------------------------------------------------------#
+    # rho, mu, T
+    S = ['logRho','mu','temperature']
+    T8 = [False,False,True]
+    ax = ax6
+
+    for thing in S:
+        ind = S.index(thing)
+        thisy = p.get(thing)/1.e8 if T8[ind] else p.get(thing)
+        ax.plot(xxx, thisy, ls=u.linestylecb(ind,a,b)[0],\
+         marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+         markevery=50,label=thing)
+    # set x and y lims and labels                                                              
+    #ax.set_title('Rho, mu, T')
+    ax.set_ylim(0.,9.)
+    ax.set_xlim(xll)
+    ax.legend(loc=0)
+    ax.set_xlabel(xxlabel)
+    ax.set_ylabel('log Rho, mu, T8')
+
+
+#--------------------------------------------------------------------------------------------#
+
+    
+    # gas pressure fraction and opacity
+    S = ['pgas_div_ptotal']
+    o = ['log_opacity']
+
+    ax = ax4
+    axo = ax.twinx()
+    
+    for thing in S:
+        ind = 5
+        ax.plot(xxx, p.get(thing), ls=u.linestylecb(ind,a,b)[0],\
+         marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+         markevery=50,label=thing)
+
+    for thing in o:
+        ind = 3
+        axo.plot(xxx, p.get(thing), ls=u.linestylecb(ind,a,b)[0],\
+         marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+         markevery=50,label=thing)
+
+   
+    # set x and y lims and labels
+   # ax.set_title('Pgas fraction + opacity')
+   # ax.set_ylim(0,60)
+    ax.set_xlim(xll)
+    axo.set_xlim(xll)
+    ax.legend(loc=0)
+    axo.legend(loc=(.15,.85))
+    #ax.set_xlabel(xxlabel)
+    ax.set_ylabel('$\mathrm{ P_{gas} / P_{tot}}$')
+    axo.set_ylabel('$ log(Opacity)$')
+
+#--------------------------------------------------------------------------------------------#
+
+    # Diffusion coefficient
+    gT = ['log_D_mix','conv_vel_div_csound']
+    logy = [False,True]
+    
+    ax = ax3
+    ind = 0
+    for thing in gT:
+        ind = gT.index(thing)
+        thisx = np.log(p.get(thing))+16 if logy[ind] else p.get(thing)
+        ax.plot(xxx, thisx, ls=u.linestylecb(ind,a,b)[0],\
+         marker=u.linestylecb(ind,a,b)[1], color=u.linestylecb(ind,a,b)[2],\
+         markevery=50,label=thing)
+# set x and y lims and labels
+    ax.axhline(16,ls='dashed',color='black',label="$\mathrm{Ma}=0$")
+   # ax.set_title('Mixing')
+    ax.set_ylim(10,17)
+    ax.set_xlim(xll)
+    ax.legend(loc=0)
+   # ax.set_xlabel(xxlabel)
+    ax.set_ylabel('$\\log D / [cgs] \\log v_{\mathrm{conv}}/c_s + 16 $ ')
+
+    title_str = "Other profiles: "+'t ='+str(title_format%p.header_attr['star_age'])\
+              +', dt ='+str(title_format%p.header_attr['time_step'])\
+              +', model number ='+str(int(p.header_attr['model_number']))
+    t.suptitle(title_str, fontsize=12)
+   # t.tight_layout()
+    t.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.15, hspace=0.1)
+    t.savefig('other'+str(int(p.header_attr['model_number'])).zfill(6)+'.png')
+ # show(block=show)
+    #pl.close('all')
+
+
