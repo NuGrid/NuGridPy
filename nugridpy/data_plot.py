@@ -1938,7 +1938,7 @@ class DataPlot(object):
     def abu_flux_chart(self, cycle, ilabel=True, imlabel=True,
                        imagic=False, boxstable=True, lbound=(-12,0),
                        plotaxis=[0,0,0,0], which_flux=None, prange=None,
-                       profile='charged', show=True):
+                       profile='charged', show=True, alpha =0.6):
         '''
         Plots an abundance and flux chart
 
@@ -2554,7 +2554,7 @@ class DataPlot(object):
 
 
 
-        a = PatchCollection(apatches, cmap=cmapr, norm=normr,edgecolors='black',linewidths=1,alpha=0.6)
+        a = PatchCollection(apatches, cmap=cmapr, norm=normr,edgecolors='black',linewidths=1,alpha=alpha)
         a.set_array(array(acolor))
         a.set_zorder(3)
         ax2.add_collection(a)
