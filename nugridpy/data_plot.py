@@ -2122,13 +2122,17 @@ class DataPlot(object):
                   'xtick.labelsize': 15,
                   'ytick.labelsize': 15,
                   'text.usetex': True}
+        
+
         #pl.rcParams.update(params) #May cause Error, someting to do with tex
         #fig=pl.figure(figsize=(xdim,ydim),dpi=100)
         fig=pl.figure()
+        '''
         if profile == 'charged':
             ax1 = fig.add_subplot(1, 2, 1)
         elif profile == 'neutron':
             ax1 = fig.add_subplot(2, 1, 1)
+
         #axx = 0.10
         #axy = 0.10
         #axw = 0.85
@@ -2143,7 +2147,7 @@ class DataPlot(object):
         ymajorlocator = MultipleLocator(5)
         ax1.yaxis.set_major_locator(ymajorlocator)
         ax1.yaxis.set_minor_locator(yminorlocator)
-
+        '''
         # color map choice for abundances
         #cmapa = cm.jet
         cmapa = cm.summer
@@ -2160,7 +2164,7 @@ class DataPlot(object):
         temp = ' '#'%8.3e' %ff['temp']
         time = ' '#'%8.3e' %ff['time']
         dens = ' '#'%8.3e' %ff['dens']
-
+        
         #May cause Error, someting to do with tex
         '''
         #box1 = TextArea("t : " + time + " s~~/~~T$_{9}$ : " + temp + "~~/~~$\\rho_{b}$ : " \
@@ -2202,15 +2206,15 @@ class DataPlot(object):
         p = PatchCollection(patches, cmap=cmapa, norm=norma)
         p.set_array(array(color))
         p.set_zorder(1)
-        ax1.add_collection(p)
-        cb = pl.colorbar(p)
+        #ax1.add_collection(p)
+      #  cb = pl.colorbar(p)
 
         # colorbar label
-        if profile == 'neutron':
-            cb.set_label('log$_{10}$(X)',fontsize='x-large')
+      #  if profile == 'neutron':
+      #      cb.set_label('log$_{10}$(X)',fontsize='x-large')
 
         # plot file name
-        graphname = 'abundance-flux-chart'+str(cycle)
+        graphname = 'abundance-flux-chart '+str(cycle)
 
         # Add black frames for stable isotopes
         if boxstable:
@@ -2235,14 +2239,14 @@ class DataPlot(object):
                     xy = nn-0.5,zz-0.5
                     rect = Rectangle(xy,1,1,ec='k',fc='None',fill='False',lw=4.)
                     rect.set_zorder(2)
-                    ax1.add_patch(rect)
+                    #ax1.add_patch(rect)
 
 
 
 
         # decide which array to take for label positions
         iarr = 0
-
+        '''
         # plot element labels
         if ilabel:
             for z in range(nzmax):
@@ -2300,7 +2304,7 @@ class DataPlot(object):
         if profile == 'charged':
             ax1.set_xlabel('Neutron number',fontsize='xx-large')
         #pl.title('Isotopic Chart for cycle '+str(int(cycle)))
-
+        '''
         #
         # here below I read data from the flux_*****.DAT file.
         #
@@ -2314,9 +2318,9 @@ class DataPlot(object):
         print_max_flux_in_plot =  False
         # color map choice for fluxes
         #cmapa = cm.jet
-        cmapa = cm.autumn
+        cmapa = cm.plasma
         # color map choice for arrows
-        cmapr = cm.autumn
+        cmapr = cm.plasma
         # starting point of arrow
         coord_x_1 = []
         coord_y_1 = []
@@ -2427,7 +2431,9 @@ class DataPlot(object):
 
         for i in range(nzmax):
             for j in range(nnmax):
+                #print(i,j)
                 if nzycheck[j,i,0]==1:
+                 #   print(j,i)
                     xy = j-0.5,i-0.5
                     rect = Rectangle(xy,1,1,)
                     patches.append(rect)
@@ -2455,9 +2461,9 @@ class DataPlot(object):
 
         #### create plot
         if profile == 'charged':
-            ax2 = fig.add_subplot(1, 2, 2)
+            ax2 = fig.add_subplot(1, 1, 1)
         elif profile == 'neutron':
-            ax2 = fig.add_subplot(2, 1, 2)
+            ax2 = fig.add_subplot(1, 1, 1)
         # Tick marks
         xminorlocator = MultipleLocator(1)
         xmajorlocator = MultipleLocator(5)
@@ -2548,14 +2554,14 @@ class DataPlot(object):
 
 
 
-        a = PatchCollection(apatches, cmap=cmapr, norm=normr)
+        a = PatchCollection(apatches, cmap=cmapr, norm=normr,edgecolors='black',linewidths=1,alpha=0.6)
         a.set_array(array(acolor))
         a.set_zorder(3)
         ax2.add_collection(a)
         cb = pl.colorbar(a)
 
         # colorbar label
-        cb.set_label('log$_{10}$($x$)',fontsize='x-large')
+        #cb.set_label('log$_{10}$($x$)',fontsize='x-large')
         if profile == 'neutron':
             cb.set_label('log$_{10}$(f)',fontsize='x-large')
 
@@ -2624,6 +2630,7 @@ class DataPlot(object):
         if turnoff:
             ion()
         return
+
 
     def iso_abundMulti(self, cyclist, stable=False, amass_range=None,
                        mass_range=None, ylim=[0,0], ref=-1,
@@ -4426,7 +4433,7 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
         zz = int(tmp[2])
         nn = int(tmp[3])
         xy = nn-0.5,zz-0.5
-        rect = Rectangle(xy,1,1,ec='k',fc='None',fill='False',lw=3.)
+        rect = Rectangle(xy,1,1,ec='k',fc='None',fill='False',lw=1.)
         rect.set_zorder(2)
         ax.add_patch(rect)
 
@@ -4655,14 +4662,17 @@ def flux_chart(file_name, plotaxis, plot_type, which_flux=None,
             ax.text(plotaxis[1]-1.8,plotaxis[2]+0.1,max_flux_label,fontsize=10.)
         elif which_flux == 2:
             ax.text(plotaxis[1]-1.8,plotaxis[2]+0.1,min_flux_label,fontsize=10.)
-
+    
 
 
     fig.savefig(graphname)
-    print(graphname,'is done')
+    print(graphname,'is done ')
     if which_flux == None or which_flux < 2:
         print(max_flux_label,'for reaction =',ind_max_flux+1)
     elif which_flux == 2:
         print(min_flux_label,'for reaction =',ind_min_flux+1)
 
     plt.show()
+    
+    
+    
