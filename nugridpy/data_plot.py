@@ -2897,7 +2897,7 @@ class DataPlot(object):
                   grid=False, point_set=1, include_title=False,
                   data_provided=False,thedata=None, verbose=True,
                   mov=False,drawfig=None,drawax=None,show_names=True,
-                  label=None,colour=None,elemaburtn=False,mypoint=None):
+                  label=None,colour=None,elemaburtn=False,mypoint=None,plot_type=['-','--','-.',':','-']):
         '''
         plot the abundance of all the chemical species
 
@@ -2958,7 +2958,7 @@ class DataPlot(object):
             automatically
         elemaburtn : boolean, private
             If true, iso_abund() returns after writing self.***_iso_to_plot for
-            use with other plotting routines.
+            use with other plotting routines.f
         mypoint : string, optional
             fix the marker style of all the points in this plot to one type, given
             as a string. If None, multiple point styles are used as per point_set.
@@ -3174,7 +3174,11 @@ class DataPlot(object):
             abund_plot.append(abunds[(el_iso_to_plot==el)][argsort(numbers)])
             mass_num.append(sort(numbers))
         # now plot:
-        plot_type = ['-','--','-.',':','-']
+        #plot_type = ['-','--','-.',':','-'] ##now implemented as an arg
+        print(plot_type)
+        while len(plot_type)<=4:
+            plot_type.append('')
+            print(plot_type)
         pl_index = 0
         if mypoint is None:
             points = [['o','^','p','h','*'],['x','+','D','>','s'],['H','v','<','*','3']]
@@ -3391,9 +3395,10 @@ class DataPlot(object):
         if mov:
             return artists
 
-    def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,0],title_items=None,
-                        ref=0,solar_filename='',show_names=True,label='',
-                        colour='',**kwargs):
+    def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,0.1],title_items=None,
+                        ref=-1,ref_filename=None,z_pin=None,pin=None,
+                        pin_filename=None,logeps=False,dilution=None,show_names=True,label='',
+                        colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
         '''
         Plot the decayed elemental abundance distribution (PPN).
         Plot the elemental abundance distribution (nugridse).
@@ -3416,20 +3421,49 @@ class DataPlot(object):
             A list of cycle attributes that will be added to the title.
             For possible cycle attributes see self.cattrs.
         ref : integer, optional
-            ref = 0: plot abundaces as mass fraction
-            ref = 1: plot abundances relative to solar
-                for this option, an additional keyword argument 'solar_filename'
-                must be passed with the path to the solar abundance dist. file.
-            ref = 2: in progress
+            ref = N:    plot abundaces relative to cycle N abundance, similar to the
+                        'ref_filename' option.
+                        Cannot be active at the same time as
+                        the 'ref_filename' option.
+        ref_filename : string, optional
+            plot abundances relative to solar abundance. For this option,
+            a cycle number for the 'ref' option must not be provided
+        z_pin : int, optional
+            Charge number for an element to be 'pinned'. An offset will be
+            calculated from the difference between the cycle value and the
+            value from the pinned reference.
+            Can be used with the 'pin_filename' option to import an external
+            abundance file in the same format as solar abundances.
+            If no file is given, the reference can be either cycle N='ref'
+            or the value from the 'ref_filename'.
+        pin : float, optional
+            A manually provided [X/Fe] abundance to pin the element selected with 'z_pin'
+        pin_filename: string, optional
+            use provided file to provide reference to pin an element to. An offset is
+            calculated and used to shift the plot.
+            The file requires header columns marked by '#', column spacing of '  ', and at minimum two columns
+            containing:
+                'Z': charge number
+                '[X/Fe]': metallicity
+        logeps : boolean, optional
+            Plots log eps instead of [X/Fe] charts.
+        dilution : float, optional
+            Provides the dilution factor for mixing nucleosynthesis products to the surface
+            Cannot be active at the same time as the 'z_pin' option.
         label : string, optional
             The label for the abundance distribution
             The default is '' (i.e. do not show a label)
         show_names : boolean, optional
             Whether or not to show the element names on the figure.
         colour : string, optional
-            In case you want to dictate line colours. Takes cymkrgb single-character colours
-            or any other colour string accepted by matplotlib.
-            The default is '' (automatic colour selection)
+            In case you want to dictate marker and line colours. Takes cymkrgb
+            single-character colours or any other colour string accepted by
+            matplotlib. The default is '' (automatic colour selection)
+        plotlines : string, optional
+            In case you want to dictate line style. Takes MatPlotLib linestyles.
+        mark : string, optional
+            In case you want to dictate marker style. Takes MatPlotLib markers.
+            Default is 'x'.
         kwargs : additional keyword arguments
             These arguments are equivalent to those of iso_abund, e.g.
             mass_range. Routines from iso_abund are called, to perform
@@ -3443,7 +3477,15 @@ class DataPlot(object):
             elemental abundances (as you asked for them, could be ref to something else)
 
         '''
+        #from . import utils
+        from . import ascii_table as asci
         plotType=self._classTest()
+        offset=0
+        if ref_filename!=None:
+            ref=-2
+        if logeps==True:
+            z_pin=1
+            ref=-3
         if plotType=='PPN':
             self.get(cycle,decayed=True)
             z_el=unique(self.z_iso_to_plot)
@@ -3453,23 +3495,210 @@ class DataPlot(object):
             a_el=[]; el_name=[]; el_abu=[]; el_abu_hash={}
             for z in z_el[zmin_ind:zmax_ind]:
                 el=self.el_iso_to_plot[where(self.z_iso_to_plot==z)[0].tolist()[0]]
-                X_el=self.abunds[where(self.el_iso_to_plot==el)[0].tolist()].sum()
+                X_el=self.abunds[where(self.el_iso_to_plot==el)[0].tolist()].sum()  # take all iso abunds for one Z and sum
                 a_el.append(self.a_iso_to_plot[where(self.z_iso_to_plot==z)[0].tolist()[0]])
                 el_abu.append(X_el)
                 el_name.append(el)
                 el_abu_hash[el]=X_el
+            fe_abund=self.abunds[where(self.el_iso_to_plot=='Fe')[0].tolist()].sum()    # Fe abund is always needed to find [X/Fe]
+
+            # if we have provided a solar abundance file
+            if ref==-2:
+                from . import utils
+                utils.solar(ref_filename,1)
+                menow = where(unique(utils.z_sol)==44.)[0][0]
+                el_abu_sun=np.array(utils.solar_elem_abund)
+                el_abu_plot=np.zeros(len(el_abu))
+                for zs in z_el[zmin_ind:zmax_ind]:
+                    zelidx=where(z_el[zmin_ind:zmax_ind]==zs)[0]
+                    zsolidx=int(zs-1)
+                    if el_abu_sun[zsolidx] > 0. :
+                        el_abu_plot[zelidx]=el_abu[zelidx[0]]/el_abu_sun[zsolidx]
+                    else:
+                        el_abu_plot[zelidx]=-1
+
+            # if we have provided a reference cycle number
+            elif ref>-1:
+                self.get(ref,decayed=True)
+                z_el_ref=unique(self.z_iso_to_plot)
+                zmin_ind=min(where(z_el_ref>=zrange[0])[0])
+                zmax_ind=max(where(z_el_ref<=zrange[1])[0])
+                # extract some elemental quantities:
+                a_el_ref=[]; el_name_ref=[]; el_abu_ref=[]; el_abu_hash_ref={}
+                el_abu_plot=np.zeros(len(el_abu))
+                for z_ref in z_el[zmin_ind:zmax_ind]:
+                    el_ref=self.el_iso_to_plot[where(self.z_iso_to_plot==z_ref)[0].tolist()[0]]
+                    X_el_ref=self.abunds[where(self.el_iso_to_plot==el_ref)[0].tolist()].sum()
+                    a_el_ref.append(self.a_iso_to_plot[where(self.z_iso_to_plot==z_ref)[0].tolist()[0]])
+                    el_abu_ref.append(X_el_ref)
+                    el_name_ref.append(el_ref)
+                    el_abu_hash_ref[el_ref]=X_el
+                for i in range(len(el_abu)):
+                    el_abu_plot[i-1]=el_abu[i-1]/el_abu_ref[i-1]
+
+            # if we want to include observation data
+            if pin_filename!=None:
+                print('using the pin filename')
+                obs_file=asci.readTable(pin_filename,header_char='#')
+                xfe_sigma=[]
+                el_abu_obs_log=[]
+                z_ul=[]
+                for z_i in z_el[zmin_ind:zmax_ind]:
+                    try:
+                        obs_file.data['[X/H]']
+                        x_over='[X/H]'
+                        sigma='sig_[X/H]'
+                    except:
+                        x_over='[X/Fe]'
+                        sigma='sig_[X/Fe]'
+                    zelidx=where(z_el[zmin_ind:zmax_ind]==z_i)[0]
+                    zpinidx=where(obs_file.data['Z']==z_i)[0] #str()
+                    if len(zpinidx)==0:
+                        el_abu_obs_log.append([None])
+                        xfe_sigma.append([None])
+                        z_ul.append([None])
+                    elif len(zpinidx)>1:
+                        '''if any(obs_file.data['ul'][zpinidx].astype(int))==1:
+                            print('hi')
+                            tmp=obs_file.data['[X/Fe]'][zpinidx].astype(float)
+                            z_ul.append(tmp.tolist())
+                            el_abu_obs_log.append([None]*len(zpinidx))
+                            xfe_sigma.append([None]*len(zpinidx))
+                        else:'''
+                        tmp=obs_file.data[x_over][zpinidx]#.astype(float) # array stores multiple values for a
+                        el_abu_obs_log.append(tmp.tolist())                            # single element
+                        tmp=obs_file.data[sigma][zpinidx]#.astype(float)
+                        xfe_sigma.append(tmp.tolist())
+                        z_ul.append([None])
+                    else:
+                        if obs_file.data['ul'][zpinidx]==1: #.astype(int)
+                            tmp=obs_file.data[x_over][zpinidx]#.astype(float)
+                            z_ul.append(tmp.tolist())
+                            tmp=obs_file.data[x_over][zpinidx]#.astype(float)
+                            el_abu_obs_log.append([None])
+                            xfe_sigma.append([None])
+                        else:
+                            tmp=obs_file.data[x_over][zpinidx][0]#.astype(float)
+                            el_abu_obs_log.append([tmp])
+                            tmp=obs_file.data[sigma][zpinidx][0]#.astype(float)
+                            xfe_sigma.append([tmp])
+                            z_ul.append([None])
+                el_abu_obs=[]
+
+
+            # set a pinned element for offset calculation and adjustment
+            if z_pin!=None:
+                print("Pinned element: "+str(z_pin))
+
+                if pin_filename!=None:
+                    # converting obervation data from log to standard form for compatibility
+                    # with later code
+                    for i in range(len(el_abu_obs_log)):
+                       if all(el_abu_obs_log[i])==None:
+                           el_abu_obs.append(None)
+                       else:
+                           el_abu_obs.append(np.power(10,el_abu_obs_log[i]))
+                       el_abu_pin=el_abu_obs
+
+                elif pin!=None:
+                    print('using manual pin')
+                    pin=np.power(10,pin)
+                    el_abu_pin=np.zeros(len(el_abu))
+                    for i in range(len(el_abu)):
+                        el_abu_pin[i-1]=pin
+
+                elif logeps==True:
+                    print('finding log eps')
+                    atomic_mass=[1.008, 4.003, 6.94, 9.012, 10.81, 12.011, 14.007, 15.999, 18.998, 20.18, 22.99, 24.305, 26.982, 28.085, 30.74, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 6.46, 65.38, 69.723, 72.63, 74.922, 78.971, 79.904, 83.798, 85.468, 87.62, 88.906, 91.224, 92.906, 95.95, 97., 01.07, 102.906, 106.42, 107.868, 112.414, 114.818, 118.71, 121.76, 127.6, 126.904, 131.293, 132.905, 137.27, 138.905, 140.116, 140.908, 144.242, 145. , 150.36, 151.964, 157.25, 158.925, 162.5, 164.93, 167.259, 18.934, 173.045, 174.967, 178.49, 180.948, 183.84, 186.207, 190.23, 192.217, 195.084, 196.967, 200.592, 24.38, 207.2, 208.98, 209., 210., 222., 223., 226., 227., 232.038, 231.036, 238.029, 237., 244., 243., 247., 247., 251., 252., 257., 258., 259., 262., 267., 270., 269., 270., 270., 278., 281., 281., 285., 286., 289., 289., 293., 293., 294.]
+                    el_abu_pin=atomic_mass
+                    el_abu_plot=np.zeros(len(el_abu))
+                    for i in range(len(el_abu)):
+                        el_abu_plot[i-1]=el_abu[i-1]/el_abu_pin[i-1]
+
+                elif ref==-2:
+                    print('using solar pin')
+                    el_abu_pin=np.zeros(len(el_abu))
+                    for i in range(len(el_abu)):
+                        el_abu_pin[i-1]=el_abu[i-1]/el_abu_sun[i-1]
+                elif ref>=0:
+                    print("Error: A reference file or manual pin is required - the plot will fail")
+                '''elif ref>=0:
+                    print('using ref pin')
+                    el_abu_pin=np.zeros(len(el_abu))
+                    for i in range(len(el_abu)):nacon
+                        el_abu_pin[i-1]=el_abu[i-1]/el_abu_ref[i-1]
+                    print(el_abu)
+                    print(el_abu_ref)
+                    print(el_abu_pin)
+                    print(el_abu_plot)'''
+
+            # calculating the offset value
+                zelidx=where(z_el[zmin_ind:zmax_ind]==z_pin)[0][0]
+                offset=np.log10(el_abu_pin[zelidx])-np.log10(el_abu_plot[zelidx])
+
+            if ref!=-1 and dilution==None:
+                el_abu=el_abu_plot
+
+            if dilution!=None:
+
+                self.get(0,decayed=True)
+                z_el_ini=unique(self.z_iso_to_plot)
+                zmin_ind=min(where(z_el>=zrange[0])[0])
+                zmax_ind=max(where(z_el<=zrange[1])[0])
+                # extract some elemental quantities:
+                a_el_ini=[]; el_name_ini=[]; el_abu_ini=[]; el_abu_hash_ini={}
+                for z in z_el_ini:
+                    el_ini=self.el_iso_to_plot[where(self.z_iso_to_plot==z)[0].tolist()[0]]
+                    X_el_ini=self.abunds[where(self.el_iso_to_plot==el_ini)[0].tolist()].sum()  # take all iso abunds for one Z and sum
+                    a_el_ini.append(self.a_iso_to_plot[where(self.z_iso_to_plot==z)[0].tolist()[0]])
+                    el_abu_ini.append(X_el_ini)
+                    el_name_ini.append(el_ini)
+                    el_abu_hash_ini[el]=X_el_ini
+
+                el_abu_dilution=[]
+                for i in range(len(el_abu)):
+                    el_adjusted=(dilution*el_abu[i])+((1-dilution)*el_abu_ini[zmin_ind+i])
+                    fe_adjusted=(dilution*fe_abund)+((1-dilution)*el_abu_ini[24])
+                    num=el_adjusted*el_abu_sun[25]
+                    denom=fe_adjusted*el_abu_sun[zmin_ind+1+i]
+                    el_abu_dilution.append(num/denom)
+                #print(el_abu_dilution)
+                el_abu=el_abu_dilution
+
             # plot an elemental abundance distribution with labels:
-            pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu),**kwargs)
+            self.el_abu_log = np.log10(el_abu)
+            if pin_filename!=None:                                   # plotting the observation data
+                # using zip() to plot multiple values for a single element
+                for xi,yi,wi  in zip(z_el[zmin_ind:zmax_ind],el_abu_obs_log,xfe_sigma):
+                    pl.scatter([xi]*len(yi),yi,marker='*',s=100,color='red')
+                    if all(wi)!=None:
+                        pl.errorbar([xi]*len(yi),yi,wi,color='red',capsize=5)
+                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='blue')
+                # plotting simulation data
+            pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label='Simulations',\
+                   linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
             j=0        # add labels
-            for z in z_el[zmin_ind:zmax_ind]:
-               pl.text(z+0.15,log10(el_abu[j])+0.05,el_name[j])
-               j += 1
+            if plotlabels==True:
+                for z in z_el[zmin_ind:zmax_ind]:
+                    pl.text(z+0.15,log10(el_abu[j])+offset+0.05,el_name[j])
+                    j += 1
             if title_items is not None:
-               pl.title(self._do_title_string(title_items,cycle))
+                pl.title(self._do_title_string(title_items,cycle))
             pl.ylim(ylim[0],ylim[1])
             pl.xlabel('Z')
-            pl.ylabel('log mass fraction')
-#           savefig('elemental'+str(i)+'.png')
+            #pl.legend()
+            pl.grid(True)
+            ylab=['log X/X$_{'+str(ref)+'}$','log mass fraction','log X/X$_{ref}$','log$\epsilon$']
+            if ref==-2:
+                pl.ylabel(ylab[2])
+            elif ref>-1:
+                if plotlabels==True:
+                    pl.annotate('Offset: '+str(offset),xy=(0.05,0.95),xycoords='axes fraction')
+                pl.ylabel(ylab[0])
+            elif logeps==True:
+                pl.ylabel(ylab[3])
+            else:
+                pl.ylabel(ylab[1])
         elif plotType=='se':
             # get self.***_iso_to_plot by calling iso_abund function, which writes them
             self.iso_abund(cycle,elemaburtn=True,**kwargs)
@@ -3491,10 +3720,10 @@ class DataPlot(object):
                 ylab='log mass fraction'
             elif ref==1:
                 from . import utils
-                if solar_filename=='':
+                if ref_filename=='':
                     raise IOError('You chose to plot relative to the solar abundance dist. However, you did not supply the solar abundance file!')
                 else:
-                    nuutils.solar(solar_filename,1)
+                    nuutils.solar(ref_filename,1)
                     menow = where(unique(nuutils.z_sol)==44.)[0][0]
                     print(1, menow, nuutils.solar_elem_abund[menow])
                     el_abu_sun=np.array(nuutils.solar_elem_abund)
@@ -3574,7 +3803,7 @@ class DataPlot(object):
 
         for item in title_items:
             num=self.get(item,fname=cycle)
-            if num > 999:
+            if num > 999 or num < 0.1:
                 num=log10(num)
                 prefix='log '
             else:
