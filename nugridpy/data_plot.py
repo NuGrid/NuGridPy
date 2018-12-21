@@ -3696,7 +3696,8 @@ class DataPlot(object):
             if ref==-2:
                 pl.ylabel(ylab[2])
             elif ref>-1:
-                pl.annotate('Offset: '+str(offset),xy=(0.05,0.95),xycoords='axes fraction')
+                if plotlabels==True:
+                    pl.annotate('Offset: '+str(offset),xy=(0.05,0.95),xycoords='axes fraction')
                 pl.ylabel(ylab[0])
             elif logeps==True:
                 pl.ylabel(ylab[3])
