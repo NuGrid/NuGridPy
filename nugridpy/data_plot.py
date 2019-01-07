@@ -3395,7 +3395,7 @@ class DataPlot(object):
         if mov:
             return artists
 
-    def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,0.1],title_items=None,
+    def elemental_abund(self,cycle,zrange=[1,15],ylim=[0,0],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,logeps=False,dilution=None,show_names=True,label='',
                         colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
