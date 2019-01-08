@@ -1833,7 +1833,7 @@ class DataPlot(object):
             cb = pl.colorbar(p)
 
             # colorbar label
-            cb.set_label('log$_{10}$(X)',fontsize='x-large')
+            cb.set_label('log$_{10}$(X)')
 
         # plot file name
         graphname = 'abundance-chart'+str(cycle)
@@ -2207,7 +2207,7 @@ class DataPlot(object):
 
         # colorbar label
         if profile == 'neutron':
-            cb.set_label('log$_{10}$(X)',fontsize='x-large')
+            cb.set_label('log$_{10}$(X)')
 
         # plot file name
         graphname = 'abundance-flux-chart'+str(cycle)
@@ -2250,9 +2250,9 @@ class DataPlot(object):
                     nmin = min(argwhere(nzycheck[:,z,iarr]))[0]-1
                     nmax = max(argwhere(nzycheck[:,z,iarr]))[0]+1
                     ax1.text(nmin,z,elname[z],horizontalalignment='center',verticalalignment='center',\
-                            fontsize='medium',clip_on=True)
+                            fontsize='small',clip_on=True)
                     ax1.text(nmax,z,elname[z],horizontalalignment='center',verticalalignment='center',\
-                            fontsize='medium',clip_on=True)
+                            fontsize='small',clip_on=True)
                 except ValueError:
                     continue
 
@@ -2263,7 +2263,7 @@ class DataPlot(object):
                     a = z+n
                     if nzycheck[n,z,iarr]==1:
                         ax1.text(n,z,a,horizontalalignment='center',verticalalignment='center',\
-                                fontsize='xx-small',clip_on=True)
+                                fontsize='x-small',clip_on=True)
 
 
         # plot lines at magic numbers
@@ -2296,9 +2296,9 @@ class DataPlot(object):
             ax1.axis(plotaxis)
 
         # set x- and y-axis label
-        ax1.set_ylabel('Proton number',fontsize='xx-large')
+        ax1.set_ylabel('Proton number')
         if profile == 'charged':
-            ax1.set_xlabel('Neutron number',fontsize='xx-large')
+            ax1.set_xlabel('Neutron number')
         #pl.title('Isotopic Chart for cycle '+str(int(cycle)))
 
         #
@@ -2555,9 +2555,9 @@ class DataPlot(object):
         cb = pl.colorbar(a)
 
         # colorbar label
-        cb.set_label('log$_{10}$($x$)',fontsize='x-large')
+        cb.set_label('log$_{10}$($x$)')
         if profile == 'neutron':
-            cb.set_label('log$_{10}$(f)',fontsize='x-large')
+            cb.set_label('log$_{10}$(f)')
 
         # decide which array to take for label positions
         iarr = 2
@@ -2567,8 +2567,8 @@ class DataPlot(object):
             try:
                 nmin = min(argwhere(nzycheck_plot[:,z,iarr-2]))[0]-1
                 nmax = max(argwhere(nzycheck_plot[:,z,iarr-2]))[0]+1
-                ax2.text(nmin,z,elname[z],horizontalalignment='center',verticalalignment='center',fontsize='medium',clip_on=True)
-                ax2.text(nmax,z,elname[z],horizontalalignment='center',verticalalignment='center',fontsize='medium',clip_on=True)
+                ax2.text(nmin,z,elname[z],horizontalalignment='center',verticalalignment='center',fontsize='small',clip_on=True)
+                ax2.text(nmax,z,elname[z],horizontalalignment='center',verticalalignment='center',fontsize='small',clip_on=True)
             except ValueError:
                 continue
 
@@ -2578,7 +2578,7 @@ class DataPlot(object):
                 for n in range(nnmax_plot):
                     a = z+n
                     if nzycheck_plot[n,z,iarr-2]==1:
-                        ax2.text(n,z,a,horizontalalignment='center',verticalalignment='center',fontsize='xx-small',clip_on=True)
+                        ax2.text(n,z,a,horizontalalignment='center',verticalalignment='center',fontsize='x-small',clip_on=True)
 
         # plot lines at magic numbers
         if imagic==1:
@@ -2607,9 +2607,9 @@ class DataPlot(object):
             ax2.axis(plotaxis)
 
         # set x- and y-axis label
-        ax2.set_xlabel('Neutron number',fontsize='xx-large')
+        ax2.set_xlabel('Neutron number')
         if profile == 'neutron':
-            ax2.set_ylabel('Proton number',fontsize='xx-large')
+            ax2.set_ylabel('Proton number')
         if which_flux == None or which_flux == 0:
             max_flux_label="max flux = "+str('{0:.4f}'.format(max_flux))
         elif which_flux == 1:
