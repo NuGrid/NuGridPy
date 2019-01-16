@@ -3395,7 +3395,7 @@ class DataPlot(object):
         if mov:
             return artists
 
-    def elemental_abund(self,cycle,zrange=[1,15],ylim=[-12,0.1],title_items=None,
+    def elemental_abund(self,cycle,zrange=[1,15],ylim=[0,0],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,logeps=False,dilution=None,show_names=True,label='',
                         colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
@@ -3484,6 +3484,9 @@ class DataPlot(object):
         if ref_filename!=None:
             ref=-2
         if logeps==True:
+            if zrange[0]!=1:
+                print("To use logeps, the z range must be [1,X], otherwise the program will exit.")
+                sys.exit()
             z_pin=1
             ref=-3
         if plotType=='PPN':
@@ -3670,12 +3673,13 @@ class DataPlot(object):
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
                 for xi,yi,wi  in zip(z_el[zmin_ind:zmax_ind],el_abu_obs_log,xfe_sigma):
+                    print(xi)
                     pl.scatter([xi]*len(yi),yi,marker='*',s=100,color='red')
                     if all(wi)!=None:
                         pl.errorbar([xi]*len(yi),yi,wi,color='red',capsize=5)
                 pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='blue')
                 # plotting simulation data
-            pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label='Simulations',\
+            pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label=label,\
                    linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
             j=0        # add labels
             if plotlabels==True:
