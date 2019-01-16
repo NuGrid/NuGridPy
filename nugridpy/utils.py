@@ -291,13 +291,13 @@ class Utils(object):
                 def __eq__(self, other):
                     return mycmp(self.obj, other.obj) == 0
                 def __le__(self, other):
-                    return mycmp(self.obj, other.obj) <= 0  
+                    return mycmp(self.obj, other.obj) <= 0
                 def __ge__(self, other):
                     return mycmp(self.obj, other.obj) >= 0
                 def __ne__(self, other):
                     return mycmp(self.obj, other.obj) != 0
             return K
-        
+
         tmp=[]
         isom=[]
         for i in range(len(a)):
@@ -323,9 +323,9 @@ class Utils(object):
             el_iso_to_plot.append(self.stable_names[int(tmp[i][2])])
 
         return a_iso_to_plot,z_iso_to_plot,abunds,isotope_to_plot,el_iso_to_plot,isom
-    
 
-    
+
+
     def compar(self, x, y):
         '''
         simple comparator method
@@ -539,8 +539,8 @@ class iniabu(Utils):
 
 
     filename = ''
-    
-    
+
+
     def __init__(self,filename,filetype):
         if filetype == 'iniabu.ppn':
             f0=open(filename)
@@ -556,7 +556,7 @@ class iniabu(Utils):
                 z.append(int(sol[i][1:3]))
                 names.extend([sol[i].split("         ")[0][4:]])
                 yps[i]=float(sol[i].split("         ")[1])
-               
+
                 try:
                     mass_number[i]=int(names[i][2:5])
                 except ValueError:
@@ -588,7 +588,7 @@ class iniabu(Utils):
 
         if filetype == 'iso_massf':  #this has only been tested with write and set_and_normalize functions within this class.
                                      # If you have an issue contact Ondrea.
-            
+
             f0=open(filename)
             ppn_out=f0.readlines()
             f0.close
@@ -600,7 +600,7 @@ class iniabu(Utils):
             mass_number=np.zeros(len(ppn_out))
             yps1=[]
 
-            isomers_to_remove = ['AL*26', 'KR*85', 'CD*15', 'LU*76', 'TAg80']            
+            isomers_to_remove = ['AL*26', 'KR*85', 'CD*15', 'LU*76', 'TAg80']
             for i in range(7,len(ppn_out)): #skip the header and NEUT
                 element_name = ppn_out[i].split("         ")[0][37:42]
                 if element_name in isomers_to_remove:
@@ -610,12 +610,12 @@ class iniabu(Utils):
                 z1.append(float(ppn_out[i][9:12]))
                 names1.extend([element_name])
                 yps1.append(ppn_out[i].split("         ")[0][24:35])
-             
+
 
             #convert data
             yps=np.zeros(len(yps1))
             z=np.zeros(len(z1),dtype=int)
-        
+
             for j in range(len(z1)):
                 z[j]= int(z1[j])
                 yps[j]= float(yps1[j])
@@ -631,7 +631,7 @@ class iniabu(Utils):
 
             for i in range(len(names)):
                 hash_index[names[i]] = i
-            
+
 
           #  print(names)
             self.z=z
@@ -644,7 +644,7 @@ class iniabu(Utils):
 
 
 
-           
+
     def write(self, outfile='initial_abundance.dat',
               header_string='initial abundances for a PPN run'):
         '''
@@ -706,7 +706,7 @@ class iniabu(Utils):
 
         '''
 
-        
+
         f=open('isos.txt')
         a=f.readlines()
         isos=[]
@@ -738,7 +738,7 @@ class iniabu(Utils):
         hd=[header_string]
         att.write(outfile,hd,dcols,data,header_char=header_char)
         return mesa_names,abus
-        
+
     def set_and_normalize(self,species_hash):
         '''
         species_hash is a hash array in which you provide abundances
@@ -757,26 +757,26 @@ class iniabu(Utils):
         >>> sp['h   1']=0.5
 
         '''
-        
+
         sum_before = sum(self.abu)
         for i in range(len(species_hash)):
             sum_before -= self.abu[self.hindex[list(species_hash.keys())[i]]]
         print("sum_before = "+str(sum_before))
         normalization_factor=old_div(1.0-sum(species_hash.values()),sum_before)
         print("normalizing the rest witih factor "+str(normalization_factor))
-        self.abu *= normalization_factor 
+        self.abu *= normalization_factor
         for i in range(len(species_hash)):
             self.abu[self.hindex[list(species_hash.keys())[i]]]=list(species_hash.values())[i]
-                  
+
         for l in range(len(self.abu)):
             if self.abu[l] <= 1e-99:   #otherwise we might write e-100 which will be read as e-10 by ppn
                 self.abu[l] = 1.0e-99
         for name in self.habu:
             self.habu[name]=self.abu[self.hindex[name]]
-    
 
 
-    
+
+
     def isoratio_init(self,isos):
         '''
         This file returns the isotopic ratio of two isotopes specified
