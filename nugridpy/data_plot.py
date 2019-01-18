@@ -2625,15 +2625,13 @@ class DataPlot(object):
             ion()
         return
     
-    
-    def solo_flux_chart(self, cycle, ilabel=True, imlabel=True,
+    def flux_solo(self, cycle, ilabel=True, imlabel=True,
                        imagic=False, boxstable=True, lbound=(-12,0),
                        plotaxis=[0,0,0,0], which_flux=None, prange=None,
                        profile='charged', show=True, alpha =0.6):
         '''
         Plots just a flux chart. This must be merged with abu_flux_chart as most of it is the same code.
         OC 1/19
-
         Parameters
         ----------
         cycle : string, integer or list
@@ -2671,7 +2669,6 @@ class DataPlot(object):
             Boolean of if the plot should be displayed.  Useful with
             saving multiple plots using abu_chartMulti.  The default is
             True.
-
         '''
         #######################################################################
         #### plot options
@@ -3231,7 +3228,6 @@ class DataPlot(object):
         if turnoff:
             ion()
         return    
-
     def iso_abundMulti(self, cyclist, stable=False, amass_range=None,
                        mass_range=None, ylim=[0,0], ref=-1,
                        decayed=False, include_title=False, title=None,

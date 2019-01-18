@@ -3889,7 +3889,7 @@ def abu_profiles(p,ifig=1,xlm=xlm,ylm=(-8,0),show=False,abunds='All',xaxis=xaxis
                 for k in range(i*quo,(i+1)*quo+rem):
                     abus2[i].append(abus1[k])
          
-        abus = abus2
+                    abus = abus2
         #print(abus)        
                 
     else:
