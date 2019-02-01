@@ -4079,7 +4079,12 @@ class DataPlot(object):
                     el_adjusted=(dilution*el_abu[i])+((1-dilution)*el_abu_ini[zmin_ind+i])
                     fe_adjusted=(dilution*fe_abund)+((1-dilution)*el_abu_ini[24])
                     num=el_adjusted*el_abu_sun[25]
-                    denom=fe_adjusted*el_abu_sun[zmin_ind+1+i]
+                    iadd = 1
+                    if z_el[zmin_ind+i] > 43:
+                        iadd = 2
+                    if z_el[zmin_ind+i] > 61:
+                        iadd = 3
+                    denom=fe_adjusted*el_abu_sun[zmin_ind+iadd+i]
                     el_abu_dilution.append(num/denom)
                 #print(el_abu_dilution)
                 el_abu=el_abu_dilution
