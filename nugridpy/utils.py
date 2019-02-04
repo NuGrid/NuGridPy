@@ -23,6 +23,7 @@ from scipy import optimize
 import matplotlib.pyplot as pl
 import os
 from decimal import *
+
 class data_fitting(object):
     '''
     Wrapper for the scipy method optimize.leastsq
@@ -544,7 +545,7 @@ class iniabu(Utils):
 		The name of the file to be read in (input)
 
 	filetype : string
-		Can be "iniabu.ppn" or "iso_massf" depending on the format of the input file
+		Can be "iniabu.ppn" (default) or "iso_massf" depending on the format of the input file
 	
 
     '''
@@ -554,7 +555,7 @@ class iniabu(Utils):
     filename = ''
 
 
-    def __init__(self,filename,filetype):
+    def __init__(self,filename,filetype = "iniabu.ppn"):
         if filetype == 'iniabu.ppn':
             f0=open(filename)
             sol=f0.readlines()
