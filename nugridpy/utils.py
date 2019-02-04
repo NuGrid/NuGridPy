@@ -402,6 +402,9 @@ class Utils(object):
         instantaneously decay an abundance vector. These are attributes
         are.
 
+		Parameters
+		=================
+
         decay_idp : list
             points in the iso_to_plot (i.e. the undecayed abundance
             vector index space) to the decay target.
@@ -528,11 +531,21 @@ class Utils(object):
 class iniabu(Utils):
     '''
     This class in the utils package reads an abundance distribution file
-    of the types iniab.dat or iso_massf. It then provides you with methods to change
-    some abundances, modify, normalise and eventually write out the
+    of the type iniabu.ppn or iso_massf. It then provides methods to change
+    some abundances, modify, normalise, and eventually write out the
     final distribution in a format that can be used as an initial
     abundance file for ppn. This class also contains a method to write
-    initial abundance files for a MESA run, for a given MESA netowrk.
+    initial abundance files for a MESA run, for a given MESA network.
+
+	Parameters
+	================
+	
+	filename : string
+		The name of the file to be read in (input)
+
+	filetype : string
+		Can be "iniabu.ppn" or "iso_massf" depending on the format of the input file
+	
 
     '''
     # clean variables that we will use in this class
