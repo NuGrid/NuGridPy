@@ -35,9 +35,9 @@ class data_fitting(object):
         'linear' or 'powerlaw'. If func is not a string it must be
         a custom function.  The default is "linear".
     coef : tuple or list
-        A guess for the list of coeffiecients.  For 'powerlaw' coef
-        must have three enries.  For 'linear' coef must have two
-        enries.  If you provide your own function, then provide as
+        A guess for the list of coefficients.  For 'powerlaw' coef
+        must have three entries.  For 'linear' coef must have two
+        entries.  If you provide your own function, then provide as
         many coef entries as your function needs.
 
     Examples
@@ -84,9 +84,9 @@ class data_fitting(object):
             'linear' or 'powerlaw'. If func is not a string it must be
             a custom function.  The default is "linear".
         coef : list, optional
-            A guess for the list of coeffiecients.  For 'powerlaw' coef
-            must have three enries.  For 'linear' coef must have two
-            enries.  If you provide your own function, then provide as
+            A guess for the list of coefficients.  For 'powerlaw' coef
+            must have three entries.  For 'linear' coef must have two
+            entries.  If you provide your own function, then provide as
             many coef entries as your function needs.  The default is
             (1, 1).
 
@@ -212,7 +212,7 @@ class constants(object):
 class Utils(object):
     '''
     This private class contains utilities that are used by methods,
-    mostly in the ppn and mppnp classes.  Users whould normally not use
+    mostly in the ppn and mppnp classes.  Users would normally not use
     these methods directly.  Things go here when it can be imagined that
     they may be used not in immediate conjunction with plotting.
     Otherwise they would go into the superclass data_plot.
