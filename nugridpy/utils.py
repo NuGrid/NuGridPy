@@ -600,7 +600,7 @@ class iniabu(Utils):
 
 
 
-        if filetype == 'iso_massf':  #this has only been tested with write and set_and_normalize functions within this class.
+        elif filetype == 'iso_massf':  #this has only been tested with write and set_and_normalize functions within this class.
                                      # If you have an issue contact Ondrea.
 
             f0=open(filename)
