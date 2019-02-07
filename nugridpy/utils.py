@@ -549,13 +549,8 @@ class iniabu(Utils):
 	
 
     '''
-    # clean variables that we will use in this class
 
-
-    filename = ''
-
-
-    def __init__(self,filename,filetype = "iniabu.ppn"):
+    def __init__(self,filename='',filetype = "iniabu.ppn"):
         if filetype == 'iniabu.ppn':
             f0=open(filename)
             sol=f0.readlines()
