@@ -3813,7 +3813,7 @@ class DataPlot(object):
 
     def elemental_abund(self,cycle,zrange=[1,15],ylim=[0,0],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
-                        pin_filename=None,logeps=False,dilution=None,show_names=True,label='',
+                        pin_filename=None,zchi2=None,logeps=False,dilution=None,show_names=True,label='',
                         colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
         '''
         Plot the decayed elemental abundance distribution (PPN).
@@ -3861,6 +3861,9 @@ class DataPlot(object):
             containing:
                 'Z': charge number
                 '[X/Fe]': metallicity
+        zchi2 : list, optional
+            A 1x2 array containing the lower and upper atomic number
+            limit for chi2 test when pin_filename != None
         logeps : boolean, optional
             Plots log eps instead of [X/Fe] charts.
         dilution : float, optional
@@ -3896,6 +3899,7 @@ class DataPlot(object):
         #from . import utils
         from . import ascii_table as asci
         plotType=self._classTest()
+        chi2 = 0.
         offset=0
         if ref_filename!=None:
             ref=-2
@@ -4093,12 +4097,18 @@ class DataPlot(object):
             self.el_abu_log = np.log10(el_abu)
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
+                # also calculate and return chi squared
                 for xi,yi,wi  in zip(z_el[zmin_ind:zmax_ind],el_abu_obs_log,xfe_sigma):
-                    print(xi)
-                    pl.scatter([xi]*len(yi),yi,marker='*',s=100,color='red')
+                    #print(xi)
+                    pl.scatter([xi]*len(yi),yi,marker='o',s=25,color='black')
                     if all(wi)!=None:
-                        pl.errorbar([xi]*len(yi),yi,wi,color='red',capsize=5)
-                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='blue')
+                        pl.errorbar([xi]*len(yi),yi,wi,color='black',capsize=5)
+                        if zchi2 != None:
+                            if zchi2[0] <= xi and xi <= zchi2[1]:
+                                zelidx=where(z_el[zmin_ind:zmax_ind]==xi)[0][0]
+                                chi2 += (((sum(yi)/len(yi)) - (np.log10(el_abu[zelidx])+offset))/\
+                                        (sum(wi)/len(wi)))**2
+                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='black')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label=label,\
                    linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
@@ -4200,6 +4210,8 @@ class DataPlot(object):
         else:
             print('This method is not supported for '+plotType)
             return
+
+        return chi2
 
     def _do_title_string(self,title_items,cycle):
         '''
