@@ -3862,8 +3862,8 @@ class DataPlot(object):
                 'Z': charge number
                 '[X/Fe]': metallicity
         zchi2 : list, optional
-            A 1x2 array containing the lower and upper atomic number
-            limit for chi2 test when pin_filename != None
+            A 1x2 array containing atomic numbers of the elements
+            for which chi2 test is done when plotType == 'PPN' and pin_filename != None
         logeps : boolean, optional
             Plots log eps instead of [X/Fe] charts.
         dilution : float, optional
@@ -3890,16 +3890,19 @@ class DataPlot(object):
 
         Output
         ------
+        if plotType == 'PPN' and pin_filename != None
+        chi2 : float
+            chi-squared deviation of predicted abundances from observed ones
+        if plotType == 'se'
         z_el : array
             proton number of elements being returned
-        el_to_plot : array
+        el_abu_plot : array
             elemental abundances (as you asked for them, could be ref to something else)
 
         '''
         #from . import utils
         from . import ascii_table as asci
         plotType=self._classTest()
-        chi2 = 0.
         offset=0
         if ref_filename!=None:
             ref=-2
@@ -4095,6 +4098,7 @@ class DataPlot(object):
 
             # plot an elemental abundance distribution with labels:
             self.el_abu_log = np.log10(el_abu)
+            chi2 = 0.
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
                 # also calculate and return chi squared
@@ -4104,7 +4108,8 @@ class DataPlot(object):
                     if all(wi)!=None:
                         pl.errorbar([xi]*len(yi),yi,wi,color='black',capsize=5)
                         if zchi2 != None:
-                            if zchi2[0] <= xi and xi <= zchi2[1]:
+                            #if zchi2[0] <= xi and xi <= zchi2[1]:
+                            if xi in zchi2:
                                 zelidx=where(z_el[zmin_ind:zmax_ind]==xi)[0][0]
                                 chi2 += (((sum(yi)/len(yi)) - (np.log10(el_abu[zelidx])+offset))/\
                                         (sum(wi)/len(wi)))**2
@@ -4134,6 +4139,7 @@ class DataPlot(object):
                 pl.ylabel(ylab[3])
             else:
                 pl.ylabel(ylab[1])
+            return chi2
         elif plotType=='se':
             # get self.***_iso_to_plot by calling iso_abund function, which writes them
             self.iso_abund(cycle,elemaburtn=True,**kwargs)
@@ -4210,8 +4216,6 @@ class DataPlot(object):
         else:
             print('This method is not supported for '+plotType)
             return
-
-        return chi2
 
     def _do_title_string(self,title_items,cycle):
         '''
