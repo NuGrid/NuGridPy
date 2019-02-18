@@ -24,6 +24,24 @@ Assumptions for ascii Files:
     of equal length.  Any file name that has 'trajectory' or
     'Trajectory' in it, is assumed to be a trajectory type file.
 
+Example:
+
+The python code
+
+    >>> headers=['aabbcc','ffddff']
+    >>> dcols=['num1','num2']
+    >>> data=reshape(rand(10),(2,5))
+    >>> att.write('test.dat',headers,dcols,data)
+
+will produce this output file test.dat:
+
+H aabbcc
+H ffddff
+  num1                 num2                
+  0.5898817548027964   0.17357421254551553 
+  0.20924261738154715  0.08721243340942653 
+  0.3524132080283058   0.050080167878330584
+
 Assumptions for Trajectory Files:
 
     The first three lines start with a '#'.  The first of these contains
