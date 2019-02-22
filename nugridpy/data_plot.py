@@ -1467,7 +1467,7 @@ class DataPlot(object):
         pyl.xlim(xmin,xmax)
 
     def abu_chartMulti(self, cyclist, mass_range=None, ilabel=True,
-                       imlabel=True, imlabel_fontsize=12, imagic=False,
+                       imlabel=True, imlabel_fontsize=8, imagic=False,
                        boxstable=True, lbound=20, plotaxis=[0,0,0,0],
                        color_map='jet', pdf=False, title=None, path=None):
         '''
@@ -1539,7 +1539,7 @@ class DataPlot(object):
 
     #from mppnp.se
     def abu_chart(self, cycle, mass_range=None ,ilabel=True,
-                  imlabel=True, imlabel_fontsize=12, imagic=False,
+                  imlabel=True, imlabel_fontsize=8, imagic=False,
                   boxstable=True, lbound=(-12, 0),
                   plotaxis=[0, 0, 0, 0], show=True, color_map='jet',
                   ifig=None,data_provided=False,thedata=None,
@@ -1566,7 +1566,7 @@ class DataPlot(object):
         imlabel : boolean, optional
             Label for isotopic masses off/on.  The default is True.
         imlabel_fontsize : integer, optional
-            Fontsize for isotopic mass labels.  The default is 12.
+            Fontsize for isotopic mass labels.  The default is 10.
         imagic : boolean, optional
             Turn lines for magic numbers off/on.  The default is False.
         boxstable : boolean, optional
@@ -1916,8 +1916,8 @@ class DataPlot(object):
             ax.axis(plotaxis)
 
         # set x- and y-axis label
-        ax.set_xlabel('neutron number (A-Z)',fontsize=14)
-        ax.set_ylabel('proton number Z',fontsize=14)
+        ax.set_xlabel('neutron number (A-Z)')
+        ax.set_ylabel('proton number Z')
         if not mov:
             pl.title('Isotopic Chart for cycle '+str(int(cycle)))
         if savefig:
@@ -3811,7 +3811,7 @@ class DataPlot(object):
         if mov:
             return artists
 
-    def elemental_abund(self,cycle,zrange=[1,15],ylim=[0,0],title_items=None,
+    def elemental_abund(self,cycle,zrange=[1,85],ylim=[0,0],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,zchi2=None,logeps=False,dilution=None,show_names=True,label='',
                         colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
@@ -4124,6 +4124,9 @@ class DataPlot(object):
                     j += 1
             if title_items is not None:
                 pl.title(self._do_title_string(title_items,cycle))
+            if ylim[0]==0 and ylim[1]==0:
+                ylim[0]=max(-15.0,min(np.log10(el_abu)+offset))
+                ylim[1]=max(ylim[0]+1.0,max(np.log10(el_abu)+offset))
             pl.ylim(ylim[0],ylim[1])
             pl.xlabel('Z')
             #pl.legend()
@@ -4207,6 +4210,9 @@ class DataPlot(object):
                     j += 1
             if title_items is not None:
                 pl.title(self._do_title_string(title_items,cycle))
+            if ylim[0]==0 and ylim[1]==0:
+                ylim[0]=max(-15.0,min(np.log10(el_abu_plot)))
+                ylim[1]=max(ylim[0]+1.0,max(np.log10(el_abu_plot)))
             pl.ylim(ylim[0],ylim[1])
             pl.xlabel('Z')
             pl.ylabel(ylab)
