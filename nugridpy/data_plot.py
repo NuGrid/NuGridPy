@@ -1491,7 +1491,7 @@ class DataPlot(object):
         imlabel : boolean, optional
             Label for isotopic masses off/on.  The efault is True.
         imlabel_fontsize : intager, optional
-            Fontsize for isotopic mass labels.  The default is 12.
+            Fontsize for isotopic mass labels.  The default is 8.
         imagic : boolean, optional
             Turn lines for magic numbers off/on.  The default is False.
         boxstable : boolean, optional
@@ -4113,7 +4113,8 @@ class DataPlot(object):
                                 zelidx=where(z_el[zmin_ind:zmax_ind]==xi)[0][0]
                                 chi2 += (((sum(yi)/len(yi)) - (np.log10(el_abu[zelidx])+offset))/\
                                         (sum(wi)/len(wi)))**2
-                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='black')
+                #pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='black')
+                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,marker='v',color='black')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label=label,\
                    linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
