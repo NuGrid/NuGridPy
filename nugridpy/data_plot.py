@@ -1566,7 +1566,7 @@ class DataPlot(object):
         imlabel : boolean, optional
             Label for isotopic masses off/on.  The default is True.
         imlabel_fontsize : integer, optional
-            Fontsize for isotopic mass labels.  The default is 10.
+            Fontsize for isotopic mass labels.  The default is 8.
         imagic : boolean, optional
             Turn lines for magic numbers off/on.  The default is False.
         boxstable : boolean, optional
