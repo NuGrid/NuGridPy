@@ -1467,7 +1467,7 @@ class DataPlot(object):
         pyl.xlim(xmin,xmax)
 
     def abu_chartMulti(self, cyclist, mass_range=None, ilabel=True,
-                       imlabel=True, imlabel_fontsize=12, imagic=False,
+                       imlabel=True, imlabel_fontsize=8, imagic=False,
                        boxstable=True, lbound=20, plotaxis=[0,0,0,0],
                        color_map='jet', pdf=False, title=None, path=None):
         '''
@@ -1491,7 +1491,7 @@ class DataPlot(object):
         imlabel : boolean, optional
             Label for isotopic masses off/on.  The efault is True.
         imlabel_fontsize : intager, optional
-            Fontsize for isotopic mass labels.  The default is 12.
+            Fontsize for isotopic mass labels.  The default is 8.
         imagic : boolean, optional
             Turn lines for magic numbers off/on.  The default is False.
         boxstable : boolean, optional
@@ -1539,7 +1539,7 @@ class DataPlot(object):
 
     #from mppnp.se
     def abu_chart(self, cycle, mass_range=None ,ilabel=True,
-                  imlabel=True, imlabel_fontsize=12, imagic=False,
+                  imlabel=True, imlabel_fontsize=8, imagic=False,
                   boxstable=True, lbound=(-12, 0),
                   plotaxis=[0, 0, 0, 0], show=True, color_map='jet',
                   ifig=None,data_provided=False,thedata=None,
@@ -1566,7 +1566,7 @@ class DataPlot(object):
         imlabel : boolean, optional
             Label for isotopic masses off/on.  The default is True.
         imlabel_fontsize : integer, optional
-            Fontsize for isotopic mass labels.  The default is 12.
+            Fontsize for isotopic mass labels.  The default is 8.
         imagic : boolean, optional
             Turn lines for magic numbers off/on.  The default is False.
         boxstable : boolean, optional
@@ -1916,8 +1916,8 @@ class DataPlot(object):
             ax.axis(plotaxis)
 
         # set x- and y-axis label
-        ax.set_xlabel('neutron number (A-Z)',fontsize=14)
-        ax.set_ylabel('proton number Z',fontsize=14)
+        ax.set_xlabel('neutron number (A-Z)')
+        ax.set_ylabel('proton number Z')
         if not mov:
             pl.title('Isotopic Chart for cycle '+str(int(cycle)))
         if savefig:
@@ -3811,7 +3811,7 @@ class DataPlot(object):
         if mov:
             return artists
 
-    def elemental_abund(self,cycle,zrange=[1,15],ylim=[0,0],title_items=None,
+    def elemental_abund(self,cycle,zrange=[1,85],ylim=[0,0],title_items=None,
                         ref=-1,ref_filename=None,z_pin=None,pin=None,
                         pin_filename=None,zchi2=None,logeps=False,dilution=None,show_names=True,label='',
                         colour='black',plotlines=':',plotlabels=True,mark='x',**kwargs):
@@ -3862,8 +3862,8 @@ class DataPlot(object):
                 'Z': charge number
                 '[X/Fe]': metallicity
         zchi2 : list, optional
-            A 1x2 array containing the lower and upper atomic number
-            limit for chi2 test when pin_filename != None
+            A 1x2 array containing atomic numbers of the elements
+            for which chi2 test is done when plotType == 'PPN' and pin_filename != None
         logeps : boolean, optional
             Plots log eps instead of [X/Fe] charts.
         dilution : float, optional
@@ -3890,16 +3890,19 @@ class DataPlot(object):
 
         Output
         ------
+        if plotType == 'PPN' and pin_filename != None
+        chi2 : float
+            chi-squared deviation of predicted abundances from observed ones
+        if plotType == 'se'
         z_el : array
             proton number of elements being returned
-        el_to_plot : array
+        el_abu_plot : array
             elemental abundances (as you asked for them, could be ref to something else)
 
         '''
         #from . import utils
         from . import ascii_table as asci
         plotType=self._classTest()
-        chi2 = 0.
         offset=0
         if ref_filename!=None:
             ref=-2
@@ -4095,6 +4098,7 @@ class DataPlot(object):
 
             # plot an elemental abundance distribution with labels:
             self.el_abu_log = np.log10(el_abu)
+            chi2 = 0.
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
                 # also calculate and return chi squared
@@ -4104,11 +4108,13 @@ class DataPlot(object):
                     if all(wi)!=None:
                         pl.errorbar([xi]*len(yi),yi,wi,color='black',capsize=5)
                         if zchi2 != None:
-                            if zchi2[0] <= xi and xi <= zchi2[1]:
+                            #if zchi2[0] <= xi and xi <= zchi2[1]:
+                            if xi in zchi2:
                                 zelidx=where(z_el[zmin_ind:zmax_ind]==xi)[0][0]
                                 chi2 += (((sum(yi)/len(yi)) - (np.log10(el_abu[zelidx])+offset))/\
                                         (sum(wi)/len(wi)))**2
-                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='black')
+                #pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,label='Upper limits',marker='v',color='black')
+                pl.scatter(z_el[zmin_ind:zmax_ind],z_ul,marker='v',color='black')
                 # plotting simulation data
             pl.plot(z_el[zmin_ind:zmax_ind],np.log10(el_abu)+offset,label=label,\
                    linestyle=plotlines,color=colour,marker=mark)#,np.log10(el_abu))#,**kwargs)
@@ -4119,6 +4125,9 @@ class DataPlot(object):
                     j += 1
             if title_items is not None:
                 pl.title(self._do_title_string(title_items,cycle))
+            if ylim[0]==0 and ylim[1]==0:
+                ylim[0]=max(-15.0,min(np.log10(el_abu)+offset))
+                ylim[1]=max(ylim[0]+1.0,max(np.log10(el_abu)+offset))
             pl.ylim(ylim[0],ylim[1])
             pl.xlabel('Z')
             #pl.legend()
@@ -4134,6 +4143,7 @@ class DataPlot(object):
                 pl.ylabel(ylab[3])
             else:
                 pl.ylabel(ylab[1])
+            return chi2
         elif plotType=='se':
             # get self.***_iso_to_plot by calling iso_abund function, which writes them
             self.iso_abund(cycle,elemaburtn=True,**kwargs)
@@ -4201,6 +4211,9 @@ class DataPlot(object):
                     j += 1
             if title_items is not None:
                 pl.title(self._do_title_string(title_items,cycle))
+            if ylim[0]==0 and ylim[1]==0:
+                ylim[0]=max(-15.0,min(np.log10(el_abu_plot)))
+                ylim[1]=max(ylim[0]+1.0,max(np.log10(el_abu_plot)))
             pl.ylim(ylim[0],ylim[1])
             pl.xlabel('Z')
             pl.ylabel(ylab)
@@ -4210,8 +4223,6 @@ class DataPlot(object):
         else:
             print('This method is not supported for '+plotType)
             return
-
-        return chi2
 
     def _do_title_string(self,title_items,cycle):
         '''
