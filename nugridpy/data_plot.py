@@ -1,4 +1,3 @@
-
 #
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
@@ -3890,11 +3889,11 @@ class DataPlot(object):
 
         Output
         ------
-        z_el : array
-            proton number of elements being returned
-        el_to_plot : array
-            elemental abundances (as you asked for them, could be ref to something else)
+        This method adds the following data to the abu_vector instance:
 
+        self.el_abu_hash : elemental abundance, dictionary
+        self.el_name     : element names, can be used as keys in el_abu_hash
+        self.el_abu_log  : array of log10 of elemental abundance as plotted, including any ref scaling
         '''
         #from . import utils
         from . import ascii_table as asci
@@ -3924,12 +3923,10 @@ class DataPlot(object):
                 el_name.append(el)
                 el_abu_hash[el]=X_el
             fe_abund=self.abunds[where(self.el_iso_to_plot=='Fe')[0].tolist()].sum()    # Fe abund is always needed to find [X/Fe]
-
             # if we have provided a solar abundance file
             if ref==-2:
                 from . import utils
                 utils.solar(ref_filename,1)
-                menow = where(unique(utils.z_sol)==44.)[0][0]
                 el_abu_sun=np.array(utils.solar_elem_abund)
                 el_abu_plot=np.zeros(len(el_abu))
                 for zs in z_el[zmin_ind:zmax_ind]:
@@ -4032,7 +4029,7 @@ class DataPlot(object):
 
                 elif logeps==True:
                     print('finding log eps')
-                    atomic_mass=[1.008, 4.003, 6.94, 9.012, 10.81, 12.011, 14.007, 15.999, 18.998, 20.18, 22.99, 24.305, 26.982, 28.085, 30.74, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 6.46, 65.38, 69.723, 72.63, 74.922, 78.971, 79.904, 83.798, 85.468, 87.62, 88.906, 91.224, 92.906, 95.95, 97., 01.07, 102.906, 106.42, 107.868, 112.414, 114.818, 118.71, 121.76, 127.6, 126.904, 131.293, 132.905, 137.27, 138.905, 140.116, 140.908, 144.242, 145. , 150.36, 151.964, 157.25, 158.925, 162.5, 164.93, 167.259, 18.934, 173.045, 174.967, 178.49, 180.948, 183.84, 186.207, 190.23, 192.217, 195.084, 196.967, 200.592, 24.38, 207.2, 208.98, 209., 210., 222., 223., 226., 227., 232.038, 231.036, 238.029, 237., 244., 243., 247., 247., 251., 252., 257., 258., 259., 262., 267., 270., 269., 270., 270., 278., 281., 281., 285., 286., 289., 289., 293., 293., 294.]
+                    atomic_mass=[1.008, 4.003, 6.94, 9.012, 10.81, 12.011, 14.007, 15.999, 18.998, 20.18, 22.99, 24.305, 26.982, 28.085, 30.74, 32.06, 35.45, 39.948, 39.098, 40.078, 44.956, 47.867, 50.942, 51.996, 54.938, 55.845, 58.933, 58.693, 6.46, 65.38, 69.723, 72.63, 74.922, 78.971, 79.904, 83.798, 85.468, 87.62, 88.906, 91.224, 92.906, 95.95, 97., 01.07, 102.906, 106.42, 107.868, 112.414, 114.818, 118.71, 121.76, 127.6, 126.904, 131.293, 132.905, 137.27, 138.905, 140.116, 140.908, 144.242, 145. , 150.36, 151.964, 157.25, 158.925, 162.5, 164.93, 167.259, 18.934, 173.045, 174.967, 178.49, 180.948, 183.84, 186.207, 190.23, 192.217, 195.084, 196.967, 200.592, 24.38, 207.2, 208.98, 209., 210., 222., 223., 226., 227., 232.038, 231.036, 238.029, 237., 244., 243., 247., 247., 251., 252., 257., 258., 259., 262., 267., 270., 269., 270., 270., 278., 281., 281., 285., 286., 289., 289., 293., 293., 294.]  # this belongs in utils! (FH)
                     el_abu_pin=atomic_mass
                     el_abu_plot=np.zeros(len(el_abu))
                     for i in range(len(el_abu)):
@@ -4094,7 +4091,6 @@ class DataPlot(object):
                 el_abu=el_abu_dilution
 
             # plot an elemental abundance distribution with labels:
-            self.el_abu_log = np.log10(el_abu)
             if pin_filename!=None:                                   # plotting the observation data
                 # using zip() to plot multiple values for a single element
                 # also calculate and return chi squared
@@ -4211,6 +4207,9 @@ class DataPlot(object):
             print('This method is not supported for '+plotType)
             return
 
+        self.el_abu_hash = el_abu_hash
+        self.el_name = el_name
+        self.el_abu_log = np.log10(el_abu)
         return chi2
 
     def _do_title_string(self,title_items,cycle):
