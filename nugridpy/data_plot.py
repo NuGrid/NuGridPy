@@ -4228,7 +4228,6 @@ class DataPlot(object):
         self.el_abu_hash = el_abu_hash
         self.el_name = el_name
         self.el_abu_log = np.log10(el_abu)
-        return chi2
 
     def _do_title_string(self,title_items,cycle):
         '''
