@@ -3930,6 +3930,8 @@ class DataPlot(object):
                 el_name.append(el)
                 el_abu_hash[el]=X_el
             fe_abund=self.abunds[where(self.el_iso_to_plot=='Fe')[0].tolist()].sum()    # Fe abund is always needed to find [X/Fe]
+            self.el_abu_hash = el_abu_hash
+            self.el_name     = el_name
             # if we have provided a solar abundance file
             if ref==-2:
                 from . import utils
