@@ -112,7 +112,7 @@ class readTable(DataPlot):
     Examples
     --------
     >>> from ascii_table import *
-    >>> p=ascii_table('c12cg.dat')
+    >>> p=readTable('c12cg.dat')
     >>> p.hattrs
     ['1 12  6  1  1  1  0  0  0  1 13  7  0', '55   1.943', 'c12pg']
     >>> a.dcols

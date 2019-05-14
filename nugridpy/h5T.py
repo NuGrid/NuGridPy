@@ -362,7 +362,7 @@ class Files(threading.Thread):
             b = str(self.filename)+os.sep+str(self.preprocName)
 
         if self.preprocExists:
-            preprocTable=ascii_table(self.preprocName,self.filename)
+            preprocTable=readTable(self.preprocName,self.filename)
             if int(preprocTable.hattrs[0])<len(self.h5files):
                 self.preprocExists=False
                 print('A File was added, rewriteing preprocessor file')
@@ -459,7 +459,7 @@ class Files(threading.Thread):
 
         else:
 #            print 'Reading preprocessor files'
-#            preprocTable=ascii_table(self.preprocName,self.filename)
+#            preprocTable=readTable(self.preprocName,self.filename)
 #            for i in xrange(len(self.h5s)-1):
 #                dat=preprocTable.get(os.path.basename(self.h5s[i+1].filename)+'-cyc')
 #                dat1=[]
@@ -486,7 +486,7 @@ class Files(threading.Thread):
 #                for j in xrange(len(dat)):
 #                    self.ages.append(dat[j])
             print('Reading preprocessor files')
-            preprocTable=ascii_table(self.preprocName,self.filename)
+            preprocTable=readTable(self.preprocName,self.filename)
             for i in range(len(self.h5s)):
                 dat=preprocTable.get(os.path.basename(self.h5s[i].filename)+'-cyc')
                 dat1=[]
