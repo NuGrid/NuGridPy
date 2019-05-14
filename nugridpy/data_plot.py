@@ -3677,7 +3677,7 @@ class DataPlot(object):
             else:
                 if show_names:
 #                    pl.text(coordinates[0]+0.1,1.05*coordinates[1],el_list[j],clip_on=True)
-                    pl.text(coordinates[0],np.log10(2.2*10.**coordinates[1]),
+                    pl.text(coordinates[0],np.log10(1.3*10.**coordinates[1]),
                             el_list[j],clip_on=True,
                             horizontalalignment='center')
 
@@ -3730,17 +3730,17 @@ class DataPlot(object):
         else:
             pl.ylim(ylim[0],ylim[1])
         pl.xlim([amass_range[0]-.5,amass_range[1]+.5])
-        pl.xlabel('mass number (A)',fontsize=14)
+        pl.xlabel('mass number (A)')
         if ref is not -1:
             if log_logic:
-                pl.ylabel(r'log abundance ratio',fontsize=14)
+                pl.ylabel(r'log abundance ratio')
             else:
-                pl.ylabel(r'abundance ratio',fontsize=14)
+                pl.ylabel(r'abundance ratio')
         else:
             if log_logic:
-                pl.ylabel(r'log mass fraction ',fontsize=14)
+                pl.ylabel(r'log mass fraction ')
             else:
-                pl.ylabel(r'mass fraction',fontsize=14)
+                pl.ylabel(r'mass fraction')
 
 
         if amass_range != None:
