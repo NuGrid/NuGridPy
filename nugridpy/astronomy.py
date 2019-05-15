@@ -45,6 +45,29 @@ avogadro_constant_unit='mol^-1'
 radiation_constant = 4*boltzmann_sigma/speed_light
 radiation_constant_unit = 'erg cm^-3 K^-4'
 
+
+def f_screening_strong(Z1, Z2, rho, T, mu_e):
+    '''Strong screening according to Kippenhahn & Weigart textbook, Eqn 18.58
+    
+    Parameters
+    ----------
+    
+    Z1, Z2 : float
+       charge number of each reactant
+
+    rho    : float
+       density
+       
+    T      : float
+       temperature
+    
+    mu_e   : float
+       mean molecular weight per electron fraction
+    '''
+    Ed_kT = 0.0205*((Z1+Z2)**(5/3.) -Z1**(5./3) -Z2**(5/3))*(rho*Mu_e)**(1/3.)/(T/1e7)
+    return exp(Ed_kT)
+
+
 def visc_mol_sol(T,rho,X):
     '''
     Molecular plasma viscosity (Spitzer 1962)
