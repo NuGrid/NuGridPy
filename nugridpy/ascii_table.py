@@ -474,8 +474,8 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     for i in range(len(data)): #Line length stuff
         length=len(dcols[i])
-        for j in range(len(data[dcols[i]])): #len(data[i]) throws error as type(data)=dict, not list
-            if len(str(data[dcols[i]][j]))>length: #data[i][j] throws error as type(data)=dict, not list
+        for j in range(len(data[i])): #len(data[i]) throws error as type(data)=dict, not list
+            if len(str(data[i][j]))>length: #data[i][j] throws error as type(data)=dict, not list
                 length=len(str(data[dcols[i]][j]))
         lengthList.append(length)
     print(lengthList)
