@@ -1,4 +1,3 @@
-
 #
 # NuGridpy - Tools for accessing and visualising NuGrid data.
 #
@@ -397,7 +396,7 @@ def writeTraj(filename='trajectory.input', data=[], ageunit=0, tunit=0,
 
 def write(filename, headers, dcols, data, headerlines=[],
           header_char='H', sldir='.', sep='  ', trajectory=False,
-          download=False):
+          download=False,data_fmt='{:.4f}'):
     '''
     Method for writeing Ascii files.
 
@@ -435,7 +434,8 @@ def write(filename, headers, dcols, data, headerlines=[],
         If using iPython notebook, do you want a download link for
         the file you write?
         The default is False.
-
+    data_fmt : string
+        Data format string.
     '''
     if sldir.endswith(os.sep):
         filename = str(sldir)+str(filename)
@@ -462,6 +462,8 @@ def write(filename, headers, dcols, data, headerlines=[],
         print('The number of data columns does not equal the number of Data attributes')
         print('returning none')
         return None
+    icols = len(data)
+
     if trajectory:
         sep=' '
     for i in range(len(headers)):
@@ -472,13 +474,13 @@ def write(filename, headers, dcols, data, headerlines=[],
     headers=tmp
     tmp=''
 
-    for i in range(len(data)): #Line length stuff
+    for i in range(icols): # Determine length of each columnn
         length=len(dcols[i])
-        for j in range(len(data[i])): #len(data[i]) throws error as type(data)=dict, not list
-            if len(str(data[i][j]))>length: #data[i][j] throws error as type(data)=dict, not list
-                length=len(str(data[dcols[i]][j]))
+        for j in range(len(data[i])): 
+            tmp1=data_fmt.format(data[i][j])
+            if len(tmp1)>length:
+                length=len(tmp1)
         lengthList.append(length)
-    print(lengthList)
 
     tmp=''
     tmp1='9'
@@ -501,9 +503,9 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     for i in range(len(data[0])):
         for j in range(len(data)):
-            tmp1=str(data[j][i])
-            if len(str(data[j][i])) < lengthList[j]:
-                l=lengthList[j]-len(str(data[j][i]))
+            tmp1=data_fmt.format(data[j][i])
+            if len(tmp1) < lengthList[j]:
+                l=lengthList[j]-len(tmp1)
                 for k in range(l):
                     tmp1+=' '
             tmp+=sep+tmp1
