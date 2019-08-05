@@ -1,6 +1,6 @@
 import unittest
 import os
-from unittest.mock import patch
+from mock import patch
 
 from nugridpy import nugridse as nuse
 from nugridpy.ascii_table import readTable
