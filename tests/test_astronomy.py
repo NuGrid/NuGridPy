@@ -29,7 +29,7 @@ class TestFunctions(unittest.TestCase):
             _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, bywhat=None)
 
         with self.assertRaises(ValueError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, bynumber=None)
+            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, integral=None)
 
         with self.assertRaises(TypeError):
             _ = astronomy.int_imf_dm(self.m1, self.m2, [self.m1, self.m2], self.imf_arr)
