@@ -4,3 +4,6 @@ scipy
 matplotlib
 h5py
 mock
+sphinx
+sphinx-bootstrap-theme
+nose
