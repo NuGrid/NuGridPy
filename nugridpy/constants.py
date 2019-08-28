@@ -28,11 +28,14 @@ class Constant(float):
         units (str)       : The units of the constant (i.e. [Constant])
 
     Attributes:
+        value (float)     : The numerical value of the constant
         description (str) : A name and/or physical description of the constant
         units (str)       : The units of the constant (i.e. [Constant])
 
     """
+
     def __new__(cls, value, description, units):
+        # Raise an error if description/units attributes are not strings
         if not isinstance(description, str) or not isinstance(units, str):
             raise TypeError('Constant description and units must be entered as strings')
 
@@ -42,9 +45,9 @@ class Constant(float):
         instance.units = units
         return instance
 
-    def __str__(self):
-        # Ensures constants are represented by their long-form descriptions, not just as values
-        return '{self.description} | {self.value} [{self.units}]'.format(self=self)
+    def __repr__(self):
+        # Ensures constants are represented by a custom long-form description, not just values
+        return 'Constant({self.value}, {self.description}, {self.units})'.format(self=self)
 
 # Astronomical constants
 r_sun = Constant(6.9598e10, 'r_sun: Solar radius', 'cm')
@@ -56,26 +59,20 @@ speed_light = Constant(2.99792458e10, 'speed_light: Speed of light in vacuum (c)
 grav_const = Constant(6.67428e-8, 'grav_const: Gravitational constant (G)', 'cm^3 g^-1 s^-2')
 
 # Physical constants
-stef_boltz_const = Constant(5.670400e-5, 'stef_boltz_const: Stefan-Boltzmann constant (sigma)', 
-                            'erg cm^-2 s^-1 K^-4')
+stef_boltz_const = Constant(5.670400e-5, 'stef_boltz_const: Stefan-Boltzmann constant (sigma)', 'erg cm^-2 s^-1 K^-4')
 mass_H_atom = Constant(1.6726231e-24, 'mass_H_atom: Mass of hydrogen atom', 'g')
 mass_electron = Constant(9.1093826e-28, 'mass_electron: Mass of the electron', 'g')
 planck_const = Constant(6.62606896E-27, 'planck_const: Planck\'s constant (h)', 'erg s')
 atomic_mass_unit = Constant(1.660538782e-24, 'atomic_mass_unit: Atomic mass unit (u)', 'g')
 boltzmann_const = Constant(1.3806504e-16, 'boltzmann_const: Boltzmann constant (k)', 'erg K^-1')
 avogadro_const = Constant(6.02214179e23, 'avogadro_const: Avogadro\'s number', 'mol^-1')
-rad_const = Constant(4*stef_boltz_const / speed_light, 
-                     'rad_const: Radiation constant, total energy radiated by a blackbody', 
-                     'erg cm^-3 K^-4')
+rad_const = Constant(4*stef_boltz_const / speed_light, 'rad_const: Radiation constant, total energy radiated by a blackbody', 'erg cm^-3 K^-4')
 day_secs = Constant(86400., 'day_secs: Number of seconds in a day', 's')
 
 # Miscellaneous coefficients and other constants for astronomy functions
-visc_mol_const = Constant(1.84e-17, 'visc_mol_const: For calculating molecular diffusivity', 
-                          'g cm^-1 K^-2.5')
-nu_rad_const = Constant(6.88e-26, 'nu_rad_const: Constant for calculating radiative diffusivity',
-                        'g^2 cm^-2 K^-4')
-core_mass_coeff = Constant(6.22e5, 'core_mass_coeff: Core mass multiplicative constant', 
-                           'Dimensionless')
+visc_mol_const = Constant(1.84e-17, 'visc_mol_const: Constant for calculating molecular diffusivity', 'g cm^-1 K^-2.5')
+nu_rad_const = Constant(6.88e-26, 'nu_rad_const: Constant for calculating radiative diffusivity', 'g^2 cm^-2 K^-4')
+core_mass_coeff = Constant(6.22e5, 'core_mass_coeff: Core mass multiplicative constant', 'Dimensionless')
 core_mass_offset = Constant(0.487, 'core_mass_offset: Core mass additive constant', 'M_sun')
 idrad_const = Constant(3.2e7, 'idrad_const: radiation/gas pressure boundary', 'K cm')
 iddeg_const = Constant(1.207e5, 'iddeg_const: ideal gas/degenerate pressure boundary', 'K')
@@ -97,7 +94,6 @@ imf_a2 = Constant(1.30, 'imf_a2: Kroupa IMF alpha value', 'Dimensionless')
 imf_a3 = Constant(2.3, 'imf_a3: Kroupa IMF alpha value', 'Dimensionless')
 
 # van Loon (2005) mass loss rate constants
-van_loon_1 = Constant(-5.65, 'van_loon_1: van Loon (2005) mass loss rate constant',
-                      'M_sun yr^-1')
+van_loon_1 = Constant(-5.65, 'van_loon_1: van Loon (2005) mass loss rate constant','M_sun yr^-1')
 van_loon_2 = Constant(6.3, 'van_loon_2: van Loon (2005) mass loss rate constant', 'M_sun yr^-1')
 van_loon_3 = Constant(3500., 'van_loon_3: van Loon (2005) mass loss rate constant', 'K')

@@ -9,18 +9,36 @@ Useful functions for astronomy & astrophysics
 
 import numpy as np
 from scipy import integrate
+from functools import update_wrapper
 from . import constants as cs
 
-def show_func_constants(*args):
-    """Decorator for adding relevant constants as an attribute to each function."""
-    def wrap(func):
-        func.show_constants = ()
-        for arg in args:
-            func.show_constants += (str(arg),)
-        return func
-    return wrap
+class ReadOnlyConstants:
+    """Callable class for attaching constants as read-only property to a function."""
 
-@show_func_constants(cs.visc_mol_const)
+    def __init__(self, constants, func):
+        """Constructor that defines function and constants in class instance."""
+        self._constants = constants
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        """Defines the class as a callable and executes the decorated function."""
+        return self.func(*args, **kwargs)
+
+    @property
+    def constants(self):
+        """Returns constants as private attribute."""
+        return self._constants
+
+
+def attach_constants(*args):
+    """Decorator receives function constants first, then attaches them through a callable class."""
+    def attach(func):
+        function_with_constants = ReadOnlyConstants(args, func)
+        return update_wrapper(function_with_constants, func) # inherit docstring and other magic info from original function
+    return attach
+
+
+@attach_constants(cs.visc_mol_const)
 def visc_mol_sol(T, rho, X):
     '''
     Molecular plasma viscosity (Spitzer 1962)
@@ -49,7 +67,8 @@ def visc_mol_sol(T, rho, X):
     visc_mol = cs.visc_mol_const * (1. + (7.*X)) * (T**2.5 / rho)
     return visc_mol
 
-@show_func_constants(cs.nu_rad_const)
+
+@attach_constants(cs.nu_rad_const)
 def visc_rad_kap_sc(T, rho, X):
     '''
     Radiative viscosity (Thomas, 1930) for e- scattering opacity
@@ -78,7 +97,8 @@ def visc_rad_kap_sc(T, rho, X):
     nu_rad = cs.nu_rad_const * (T**4 / (kappa*rho**2))
     return nu_rad
 
-@show_func_constants()
+
+@attach_constants()
 def Gamma1_gasrad(beta):
     '''
     Gamma1 for a mix of ideal gas and radiation
@@ -95,7 +115,8 @@ def Gamma1_gasrad(beta):
     Gamma1 = beta + (4. - (3.*beta)) * Gamma3minus1
     return Gamma1
 
-@show_func_constants(cs.boltzmann_const, cs.atomic_mass_unit)
+
+@attach_constants(cs.boltzmann_const, cs.atomic_mass_unit)
 def Pgas(rho, T, mmu):
     '''
     P = R/mu * rho * T
@@ -117,7 +138,8 @@ def Pgas(rho, T, mmu):
     R = cs.boltzmann_const / cs.atomic_mass_unit
     return (R / mmu) * rho * T
 
-@show_func_constants(cs.rad_const)
+
+@attach_constants(cs.rad_const)
 def Prad(T):
     '''
     P = cs.rad_const/3 * T**4
@@ -134,7 +156,8 @@ def Prad(T):
     '''
     return (cs.rad_const / 3.) * T**4
 
-@show_func_constants(cs.mimf_coeff_6, cs.mimf_coeff_5, cs.mimf_coeff_4,
+
+@attach_constants(cs.mimf_coeff_6, cs.mimf_coeff_5, cs.mimf_coeff_4,
            cs.mimf_coeff_3, cs.mimf_coeff_2, cs.mimf_coeff_1, cs.mimf_coeff_0)
 def mimf_ferrario(mi):
     ''' Curvature MiMf from Ferrario et al. 2005MNRAS.361.1131.'''
@@ -143,7 +166,8 @@ def mimf_ferrario(mi):
        + cs.mimf_coeff_3*(mi**3) - cs.mimf_coeff_2*(mi**2) + cs.mimf_coeff_1*mi + cs.mimf_coeff_0
     return mf
 
-@show_func_constants(cs.core_mass_coeff, cs.core_mass_offset)
+
+@attach_constants(cs.core_mass_coeff, cs.core_mass_offset)
 def core_mass_L(MH):
     '''
     Core-mass luminosity relationship from Bloecker (1993)
@@ -161,7 +185,8 @@ def core_mass_L(MH):
     '''
     return cs.core_mass_coeff*(MH - cs.core_mass_offset)
 
-@show_func_constants(cs.imf_m1, cs.imf_m2, cs.imf_a1, cs.imf_a2, cs.imf_a3)
+
+@attach_constants(cs.imf_m1, cs.imf_m2, cs.imf_a1, cs.imf_a2, cs.imf_a3)
 def imf(m):
     '''
     Initial mass function from Kroupa
@@ -192,7 +217,8 @@ def imf(m):
         const = 0.
     return m**-alpha + const
 
-@show_func_constants()
+
+@attach_constants()
 def int_imf_dm(m1, m2, m, imf_ar, bywhat='bymass', integral='normal'):
     '''
     Integrate IMF between m1 and m2
@@ -236,7 +262,8 @@ def int_imf_dm(m1, m2, m, imf_ar, bywhat='bymass', integral='normal'):
         return int_func(imf_ar[ind_m], m[ind_m])
     raise ValueError("Error in int_imf_dm: Need integration type (bymass or bynumber)")
 
-@show_func_constants(cs.r_sun, cs.m_sun, cs.grav_const)
+
+@attach_constants(cs.r_sun, cs.m_sun, cs.grav_const)
 def am_orb(m1, m2, a, e):
     '''
     Orbital angular momentum equation
@@ -264,7 +291,8 @@ def am_orb(m1, m2, a, e):
     J_orb = np.sqrt(cs.grav_const*a_cm*((m1_g**2*m2_g**2) / (m1_g+m2_g)))*(1-e**2)
     return J_orb
 
-@show_func_constants(cs.van_loon_1, cs.van_loon_2, cs.van_loon_3)
+
+@attach_constants(cs.van_loon_1, cs.van_loon_2, cs.van_loon_3)
 def mass_loss_loon05(L, Teff):
     '''
     Mass loss rate from van Loon et al (2005)
@@ -290,7 +318,8 @@ def mass_loss_loon05(L, Teff):
     Mdot = cs.van_loon_1 + np.log10(L / 10.**4) - cs.van_loon_2*np.log10(Teff / cs.van_loon_3)
     return Mdot
 
-@show_func_constants(cs.grav_const, cs.m_sun, cs.r_sun)
+
+@attach_constants(cs.grav_const, cs.m_sun, cs.r_sun)
 def energ_orb(m1, m2, r):
     '''
     Orbital potential energy equation
@@ -311,7 +340,8 @@ def energ_orb(m1, m2, r):
     epo = -cs.grav_const * m1 * m2 * cs.m_sun**2 / (r * cs.r_sun)
     return epo
 
-@show_func_constants(cs.r_sun, cs.grav_const, cs.m_sun, cs.day_secs)
+
+@attach_constants(cs.r_sun, cs.grav_const, cs.m_sun, cs.day_secs)
 def period(A, M1, M2):
     """
     Calculate binary period from separation.
@@ -338,7 +368,8 @@ def period(A, M1, M2):
     p = (2.*np.pi * A / velocity) / cs.day_secs
     return p
 
-@show_func_constants(cs.grav_const, cs.m_sun, cs.r_sun)
+
+@attach_constants(cs.grav_const, cs.m_sun, cs.r_sun)
 def escape_velocity(M, R):
     """
     Escape velocity
@@ -361,7 +392,8 @@ def escape_velocity(M, R):
     ve = ve*1.e-5
     return ve
 
-@show_func_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
+
+@attach_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
 def Nasv(macs_val, T):
     '''
     Returns
@@ -378,7 +410,8 @@ def Nasv(macs_val, T):
     Nasv_val = s*vtherm*Na
     return Nasv_val
 
-@show_func_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
+
+@attach_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
 def macs(nasv, T):
     '''
     Returns
@@ -395,7 +428,8 @@ def macs(nasv, T):
     macs_val = s*1.e27
     return macs_val
 
-@show_func_constants()
+
+@attach_constants()
 def mu_e(X):
     '''
     Mean molecular weight per free electron, assuming full ionisation, and
@@ -418,7 +452,8 @@ def mu_e(X):
 
     return mu_el
 
-@show_func_constants()
+
+@attach_constants()
 def mu(X, Z, A):
     '''
     Mean molecular weight assuming full ionisation.
@@ -453,7 +488,8 @@ def mu(X, Z, A):
 
     return mmu
 
-@show_func_constants(cs.idrad_const)
+
+@attach_constants(cs.idrad_const)
 def Trho_idrad(rho, mmu):
     '''
     T(rho) that separates P_rad from P_gas dominated regions.
@@ -472,7 +508,8 @@ def Trho_idrad(rho, mmu):
     T = cs.idrad_const * (rho / mmu)**(1./3.)
     return T
 
-@show_func_constants(cs.iddeg_const)
+
+@attach_constants(cs.iddeg_const)
 def Trho_iddeg(rho, mmu, mu_el):
     '''
     T(rho) that separates ideal gas and degenerate pressure dominated regions.
