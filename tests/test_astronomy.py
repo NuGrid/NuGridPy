@@ -6,12 +6,12 @@ import numpy as np
 from nugridpy import constants
 from nugridpy import astronomy
 from scipy import integrate
-from unittest.mock import patch
 
 class TestFunctions(unittest.TestCase):
     """Test some of the functions in the astronomy module."""
 
     def setUp(self):
+        """Declare variables for self object."""
         self.m1 = random.uniform(0, constants.imf_m1)
         self.m2 = random.uniform(constants.imf_m1, constants.imf_m2)
         self.m3 = random.uniform(constants.imf_m2, 1.e30)
@@ -43,25 +43,29 @@ class TestDecorator(unittest.TestCase):
     """Test the functionality of the attach_constants/read-only property decorator."""
 
     def setUp(self):
-        self.parameter = random.random()
+        """Declare variables for self object and define test functions."""
+        self.arguments = [random.random() for _ in range(random.randint(1, 10))]
+        self.kwarguments = {str(_): str(random.random()) for _ in range(random.randint(1, 10))}
+        self.test_constant = constants.Constant(1., 'Test constant', 'None')
 
-    @patch('nugridpy.constants.Constant')
-    def test_args_kwargs(self, mocked_constant):
+        # decorated test function for taking/returning args/kwargs
+        @astronomy.attach_constants(self.test_constant)
+        def arg_test(*args, **kwargs):
+            return args, kwargs
+
+        self.arg_test = arg_test
+        self.result = arg_test(*self.arguments, **self.kwarguments)
+
+    def test_args_kwargs(self):
         """Make sure decorator and function args/kwargs are passed around properly."""
 
-        @astronomy.attach_constants(mocked_constant)
-        def arg_test(parameter, kwarg=str(self.parameter)):
-            return parameter, kwarg
-
-        self.assertEqual(self.parameter, arg_test(self.parameter)[0])
-        self.assertEqual(str(self.parameter), arg_test(self.parameter)[1])
-        self.assertEqual(arg_test.constants, (mocked_constant,))
+        self.assertEqual(tuple(self.arguments), self.result[0])
+        self.assertEqual(self.kwarguments, self.result[1])
 
     def test_read_only(self):
-        """Ensure that constants are a read-only property attached to astronomy functions."""
-        @astronomy.attach_constants()
-        def f_test():
-            pass
+        """Ensure that correct constants are attached to functions as read-only property."""
+
+        self.assertEqual(self.arg_test.constants, (self.test_constant,))
 
         with self.assertRaisesRegex(AttributeError, 'can\'t set attribute'):
-            f_test.constants = self.parameter
+            self.arg_test.constants = self.test_constant
