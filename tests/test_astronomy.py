@@ -3,9 +3,11 @@
 import unittest
 import random
 import numpy as np
-from nugridpy import constants
-from nugridpy import astronomy
 from scipy import integrate
+
+from nugridpy import constants, astronomy
+from .fixtures import random_string
+
 
 class TestFunctions(unittest.TestCase):
     """Test some of the functions in the astronomy module."""
@@ -20,23 +22,28 @@ class TestFunctions(unittest.TestCase):
 
     def test_imf(self):
         """Test that imf and int_imf_dm are working properly."""
-        astro_imf = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, bywhat='bynumber')
+        astro_imf = astronomy.int_imf_dm(
+            self.m1, self.m2, self.m_arr, self.imf_arr, bywhat='bynumber')
         test_imf = integrate.trapz(self.imf_arr, self.m_arr)
         self.assertAlmostEqual(astro_imf, test_imf, places=3)
 
     def test_args(self):
         """Test that int_imf_dm raises appropriate errors."""
         with self.assertRaises(ValueError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, bywhat=None)
+            _ = astronomy.int_imf_dm(
+                self.m1, self.m2, self.m_arr, self.imf_arr, bywhat=None)
 
         with self.assertRaises(ValueError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, self.imf_arr, integral=None)
+            _ = astronomy.int_imf_dm(
+                self.m1, self.m2, self.m_arr, self.imf_arr, integral=None)
 
         with self.assertRaises(TypeError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, [self.m1, self.m2], self.imf_arr)
+            _ = astronomy.int_imf_dm(
+                self.m1, self.m2, [self.m1, self.m2], self.imf_arr)
 
         with self.assertRaises(TypeError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, [self.imf_arr[0], self.imf_arr[-1]])
+            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, [
+                                     self.imf_arr[0], self.imf_arr[-1]])
 
 
 class TestDecorator(unittest.TestCase):
@@ -44,8 +51,11 @@ class TestDecorator(unittest.TestCase):
 
     def setUp(self):
         """Declare variables for self object and define test functions."""
-        self.arguments = [random.random() for _ in range(random.randint(1, 10))]
-        self.kwarguments = {str(_): str(random.random()) for _ in range(random.randint(1, 10))}
+        self.arguments = [random.random()
+                          for _ in range(random.randint(1, 10))]
+        self.kwarguments = {
+            random_string(): random.random()
+            for _ in range(random.randint(1, 10))}
         self.test_constant = constants.Constant(1., 'Test constant', 'None')
 
         # decorated test function for taking/returning args/kwargs
