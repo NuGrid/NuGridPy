@@ -6,6 +6,7 @@ def random_string(length=None):
     """
     Generate a random string of random length using upper/lower case
     letters and digits.
+
     """
 
     length = length or random.randint(5, 64)

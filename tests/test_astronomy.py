@@ -42,8 +42,8 @@ class TestFunctions(unittest.TestCase):
                 self.m1, self.m2, [self.m1, self.m2], self.imf_arr)
 
         with self.assertRaises(TypeError):
-            _ = astronomy.int_imf_dm(self.m1, self.m2, self.m_arr, [
-                                     self.imf_arr[0], self.imf_arr[-1]])
+            _ = astronomy.int_imf_dm(
+                self.m1, self.m2, self.m_arr, [self.imf_arr[0], self.imf_arr[-1]])
 
 
 class TestDecorator(unittest.TestCase):

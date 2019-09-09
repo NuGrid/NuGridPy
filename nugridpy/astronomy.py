@@ -7,9 +7,11 @@ Useful functions for astronomy & astrophysics
 
 """
 
+from functools import update_wrapper
+
 import numpy as np
 from scipy import integrate
-from functools import update_wrapper
+
 from . import constants as cs
 
 
@@ -69,7 +71,7 @@ def visc_mol_sol(T, rho, X):
 
     '''
 
-    visc_mol = cs.visc_mol_const * (1. + (7. * X)) * (T ** 2.5 / rho)
+    visc_mol = cs.visc_mol_const * (1. + (7.*X)) * (T**2.5 / rho)
     return visc_mol
 
 
@@ -99,8 +101,8 @@ def visc_rad_kap_sc(T, rho, X):
 
     '''
 
-    kappa = 0.2 * (1. + X)
-    nu_rad = cs.nu_rad_const * (T ** 4 / (kappa * rho ** 2))
+    kappa = 0.2 * (1.+X)
+    nu_rad = cs.nu_rad_const * (T**4 / (kappa * rho**2))
     return nu_rad
 
 
@@ -118,8 +120,8 @@ def Gamma1_gasrad(beta):
 
     '''
 
-    Gamma3minus1 = (2. / 3.) * (4. - (3. * beta)) / (8. - (7. * beta))
-    Gamma1 = beta + (4. - (3. * beta)) * Gamma3minus1
+    Gamma3minus1 = (2./3.) * (4. - (3.*beta)) / (8. - (7.*beta))
+    Gamma1 = beta + (4. - (3.*beta)) * Gamma3minus1
     return Gamma1
 
 
@@ -144,7 +146,7 @@ def Pgas(rho, T, mmu):
     '''
 
     R = cs.boltzmann_const / cs.atomic_mass_unit
-    return (R / mmu) * rho * T
+    return (R/mmu) * rho * T
 
 
 @attach_constants(cs.rad_const)
@@ -163,7 +165,7 @@ def Prad(T):
 
     '''
 
-    return (cs.rad_const / 3.) * T ** 4
+    return (cs.rad_const/3.) * T**4
 
 
 @attach_constants(cs.mimf_coeff_6, cs.mimf_coeff_5, cs.mimf_coeff_4,
@@ -171,8 +173,9 @@ def Prad(T):
 def mimf_ferrario(mi):
     ''' Curvature MiMf from Ferrario et al. 2005MNRAS.361.1131.'''
 
-    mf = (cs.mimf_coeff_6 * (mi ** 6) + cs.mimf_coeff_5 * (mi ** 5) - cs.mimf_coeff_4 * (mi ** 4)
-          + cs.mimf_coeff_3 * (mi ** 3) - cs.mimf_coeff_2 * (mi ** 2) + cs.mimf_coeff_1 * mi + cs.mimf_coeff_0)
+    mf = ((cs.mimf_coeff_6 * (mi**6)) + (cs.mimf_coeff_5 * (mi**5))
+          - (cs.mimf_coeff_4 * (mi**4)) + (cs.mimf_coeff_3 * (mi**3))
+          - (cs.mimf_coeff_2 * (mi**2)) + (cs.mimf_coeff_1 * mi) + cs.mimf_coeff_0)
     return mf
 
 
@@ -213,8 +216,8 @@ def imf(m):
 
     '''
 
-    const2 = cs.imf_m1 ** (-cs.imf_a1) - cs.imf_m1 ** (-cs.imf_a2)
-    const3 = cs.imf_m2 ** (-cs.imf_a2) - cs.imf_m2 ** (-cs.imf_a3)
+    const2 = cs.imf_m1**(-cs.imf_a1) - cs.imf_m1**(-cs.imf_a2)
+    const3 = cs.imf_m2**(-cs.imf_a2) - cs.imf_m2**(-cs.imf_a3)
 
     if m < cs.imf_m1:
         alpha = cs.imf_a1
@@ -225,7 +228,7 @@ def imf(m):
     else:
         alpha = cs.imf_a3
         const = 0.
-    return m ** -alpha + const
+    return m**(-alpha) + const
 
 
 @attach_constants()
@@ -300,8 +303,7 @@ def am_orb(m1, m2, a, e):
     a_cm = a * cs.r_sun
     m1_g = m1 * cs.m_sun
     m2_g = m2 * cs.m_sun
-    J_orb = np.sqrt(cs.grav_const * a_cm *
-                    ((m1_g ** 2 * m2_g ** 2) / (m1_g + m2_g))) * (1 - e ** 2)
+    J_orb = np.sqrt(cs.grav_const * a_cm * ((m1_g**2 * m2_g**2) / (m1_g + m2_g))) * (1 - e**2)
     return J_orb
 
 
@@ -328,8 +330,8 @@ def mass_loss_loon05(L, Teff):
 
     '''
 
-    Mdot = cs.van_loon_1 + np.log10(L / 10.**4) - \
-        cs.van_loon_2 * np.log10(Teff / cs.van_loon_3)
+    Mdot = (cs.van_loon_1 + np.log10(L / 10.**4) -
+            cs.van_loon_2 * np.log10(Teff / cs.van_loon_3))
     return Mdot
 
 
@@ -352,7 +354,7 @@ def energ_orb(m1, m2, r):
 
     '''
 
-    epo = -cs.grav_const * m1 * m2 * cs.m_sun ** 2 / (r * cs.r_sun)
+    epo = -cs.grav_const * m1 * m2 * cs.m_sun**2 / (cs.r_sun * r)
     return epo
 
 
@@ -376,8 +378,8 @@ def period(A, M1, M2):
     """
 
     A *= cs.r_sun
-    velocity = np.sqrt(cs.grav_const * cs.m_sun * (M1 + M2) / A)
-    p = (2. * np.pi * A / velocity) / cs.day_secs
+    velocity = np.sqrt(cs.grav_const * cs.m_sun * (M1+M2) / A)
+    p = ((2. * np.pi * A) / velocity) / cs.day_secs
     return p
 
 
@@ -417,7 +419,7 @@ def Nasv(macs_val, T):
 
     Na = cs.avogadro_const
     k = cs.boltzmann_const
-    vtherm = (2. * k * T / cs.mass_H_atom) ** 0.5
+    vtherm = (2. * k * T / cs.mass_H_atom)**0.5
     s = macs_val * 1.e-27
     Nasv_val = s * vtherm * Na
     return Nasv_val
@@ -435,7 +437,7 @@ def macs(nasv, T):
 
     Na = cs.avogadro_const
     k = cs.boltzmann_const
-    vtherm = (2. * k * T / cs.mass_H_atom) ** 0.5
+    vtherm = (2. * k * T / cs.mass_H_atom)**0.5
     s = nasv / (vtherm * Na)
     macs_val = s * 1.e27
     return macs_val
@@ -457,10 +459,10 @@ def mu_e(X):
     '''
 
     try:
-        mu_el = 2. / (1. + X)
+        mu_el = 2. / (1.+X)
     except TypeError:
         X = np.array([X])
-        mu_el = 2. / (1. + X)
+        mu_el = 2. / (1.+X)
 
     return mu_el
 
@@ -491,12 +493,12 @@ def mu(X, Z, A):
         X = np.array(X)
 
     try:
-        mmu = 1. / sum(X * (1. + Z) / A)
+        mmu = 1. / sum(X * (1.+Z) / A)
     except TypeError:
         X = np.array([X])
         A = np.array([A])
         Z = np.array([Z])
-        mmu = 1. / sum(X * (1. + Z) / A)
+        mmu = 1. / sum(X * (1.+Z) / A)
 
     return mmu
 
@@ -517,7 +519,7 @@ def Trho_idrad(rho, mmu):
 
     '''
 
-    T = cs.idrad_const * (rho / mmu) ** (1. / 3.)
+    T = cs.idrad_const * (rho/mmu)**(1./3.)
     return T
 
 
@@ -539,5 +541,5 @@ def Trho_iddeg(rho, mmu, mu_el):
 
     '''
 
-    T = cs.iddeg_const * rho ** (2. / 3.) * mmu / mu_el ** (5. / 3.)
+    T = cs.iddeg_const * rho**(2./3.) * mmu / (mu_el**(5./3.))
     return T

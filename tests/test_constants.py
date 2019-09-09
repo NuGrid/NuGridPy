@@ -2,6 +2,7 @@
 
 import unittest
 import random
+
 from nugridpy.constants import Constant
 
 

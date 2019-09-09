@@ -11,6 +11,7 @@ Classes
 Constant:
     Defines a physical constant for use in astronomical or physical computation.
     A Constant instance is defined by its value, description, and units attributes.
+
 """
 
 
