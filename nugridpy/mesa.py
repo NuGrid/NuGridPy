@@ -137,6 +137,7 @@ from matplotlib.patches import PathPatch
 import os
 import sys
 
+from pathlib import Path
 from . import astronomy as ast
 from . import ascii_table
 from . import utils as u
@@ -153,23 +154,8 @@ def set_nugrid_path(path):
     nugrid_path=path
 
 def set_nice_params():
-    fsize=18
-
-    params = {'axes.labelsize':  fsize,
-    #    'font.family':       'serif',
-    'font.family':        'Times New Roman',
-    'figure.facecolor':  'white',
-    'text.fontsize':     fsize,
-    'legend.fontsize':   fsize,
-    'xtick.labelsize':   fsize*0.8,
-    'ytick.labelsize':   fsize*0.8,
-    'ytick.minor.pad': 8,
-    'ytick.major.pad': 8,
-    'xtick.minor.pad': 8,
-    'xtick.major.pad': 8,
-    'text.usetex':       False,
-    'lines.markeredgewidth': 0}
-    pl.rcParams.update(params)
+    path = Path(__file__).parent / "nugrid_test.mplstyle"
+    matplotlib.style.use(str(path))
 
 class mesa_profile(DataPlot):
     """
