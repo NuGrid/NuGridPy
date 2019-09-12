@@ -1,6 +1,0 @@
-PPM
-===
-
-.. automodule::	
-    :members:
-    ppmpy.ppm

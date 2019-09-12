@@ -1,7 +1,7 @@
 """
-===================
-ASTRONOMY CONSTANTS
-===================
+============
+constants.py
+============
 
 Physical constants for astronomy & astrophysics
 
