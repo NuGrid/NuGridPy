@@ -22,13 +22,7 @@ directly through their GitHub accounts.
 Installation
 ------------
 
-You can install the latest release of NuGridPy through PyPI with:
-
-.. code::
-
-   pip install nugridpy
-
-Alternatively, you can install the source code via GitHub by cloning the NuGridPy
+You can install the source code via GitHub by cloning the NuGridPy
 repository. This can be done by issuing the following command in a git initialized
 directory:
 
@@ -73,8 +67,18 @@ in the source directory will initiate testing. In the second case, an XML report
 generated. You may require the :code:`nose` package if you haven't installed the 
 requirements as outlined above.
 
-Author(s)
----------
+Documentation
+-------------
+
+The Sphinx documentation can be built easily:
+
+.. code::
+
+   cd doc/
+   make html
+
+Authors
+-------
 
 The authors are the members of the NuGrid_ collaboration.
 
