@@ -1,13 +1,25 @@
 from setuptools import setup, find_packages
+import os
+
+def _get_version():
+    """"Convenient function to get the version of this package."""
+
+    ns = {}
+    version_path = os.path.join('nugridpy','version.py')
+    if not os.path.exists(version_path):
+        return None
+    with open(version_path) as version_file:
+        exec(version_file.read(), ns)
+
+    return ns['__version__']
+
 
 setup(name='NuGridpy',
-      version='0.7.4', 
+      version=_get_version(),
       description='Python tools for NuGrid',
-#      long_description=open('README.rst', 'r').read(), # get discription from README
-      # pandoc --from=markdown --to=rst --output=README.rst README.md
       author='NuGrid Team',
       author_email='fherwig@uvic.ca',
-      install_requires = ["numpy", "setuptools","future", "matplotlib","scipy","matplotlib","h5py","xlrd"],
+      install_requires = ["numpy", "setuptools","future", "matplotlib","scipy","h5py","xlrd"],
       url='https://nugrid.github.io/NuGridPy',
       py_modules=['ppn', 'nugridse', 'mesa', 'data_plot', 'utils',
                   'ascii_table', 'h5T','grain','astronomy'],
@@ -24,5 +36,5 @@ setup(name='NuGridpy',
                    'Topic :: Scientific/Engineering :: Visualization'],
       packages = find_packages(),
       license='BSD 3-clause',
-      platforms=['Linux', 'Windows', 'OS X'],
+      platforms=['Linux', 'OS X'],
       data_files=[('./NuGridpy', ['LICENSE', 'README.md', 'AUTHORS'])])
