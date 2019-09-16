@@ -1,85 +1,62 @@
-'''Constants and methods for astronomy & astrophysics'''
-from __future__ import division
-from __future__ import print_function
-from past.utils import old_div
+"""
+============
+astronomy.py
+============
 
-# Astronomy utilities module
+Useful functions for astronomy & astrophysics
+
+"""
+
+from functools import update_wrapper
 
 import numpy as np
-import scipy as sc
 from scipy import integrate
 
-
-# constants for astronomy
-rsun_cm = 6.9598e10
-rsun_cm_s = 'cm'
-lsun_erg_s = 3.8418e33
-lsun_erg_s_unit = 'erg/s'
-msun_g = 1.9892e33
-msun_unit = 'erg s^-1'
-mass_earth_g = 5.9764e27
+from . import constants as cs
 
 
-au_cm = 1.495978921e13
-au_cm_unit='cm'
+class ReadOnlyConstants:
+    """Callable class for attaching constants as read-only property to a function."""
 
-speed_light = 2.99792458e10
-speed_light_unit = 'cm s^-1'
-grav_const = 6.67428e-8
-grav_const_unit = 'cm^3 g^-1 s^-2'
+    def __init__(self, constants, func):
+        """Constructor that defines function and constants in class instance."""
+        self._constants = constants
+        self.func = func
 
-# constants for physics
-boltzmann_sigma = 5.670400e-5
-mass_H_atom=1.6726231e-24
-mass_H_atom_unit='g'
-mass_electron=9.1093826e-28
-mass_electron_unit='g'
-planck_constant_h=6.62606896E-27
-planck_constant_h_unit='erg s'
-atomic_mass_unit=1.660538782e-24
-atomic_mass_unit_unit='g'
-boltzmann_constant=1.3806504e-16
-boltzmann_constant_unit='erg K^-1'
-avogadro_constant=6.02214179e23
-avogadro_constant_unit='mol^-1'
-radiation_constant = 4*boltzmann_sigma/speed_light
-radiation_constant_unit = 'erg cm^-3 K^-4'
+    def __call__(self, *args, **kwargs):
+        """Defines the class as a callable and executes the decorated function."""
+        return self.func(*args, **kwargs)
+
+    @property
+    def constants(self):
+        """Returns constants as private attribute."""
+        return self._constants
 
 
-def f_screening_strong(Z1, Z2, rho, T, mu_e):
-    '''Strong screening according to Kippenhahn & Weigart textbook, Eqn 18.58
-    
-    Parameters
-    ----------
-    
-    Z1, Z2 : float
-       charge number of each reactant
+def attach_constants(*args):
+    """Decorator receives function constants first, then attaches them through a callable class."""
 
-    rho    : float
-       density
-       
-    T      : float
-       temperature
-    
-    mu_e   : float
-       mean molecular weight per electron fraction
-    '''
-    Ed_kT = 0.0205*((Z1+Z2)**(5/3.) -Z1**(5./3) -Z2**(5/3))*(rho*Mu_e)**(1/3.)/(T/1e7)
-    return exp(Ed_kT)
+    def attach(func):
+        function_with_constants = ReadOnlyConstants(args, func)
+        # inherit docstring and other magic info from original function
+        return update_wrapper(function_with_constants, func)
+
+    return attach
 
 
-def visc_mol_sol(T,rho,X):
-    '''
+@attach_constants(cs.visc_mol_const)
+def visc_mol_sol(T, rho, X):
+    """
     Molecular plasma viscosity (Spitzer 1962)
-    
+
     Parameters
     ----------
-    X : float
-       H mass fraction
     T : float
        temperature in K
     rho : float
        density in cgs
+    X : float
+       H mass fraction
 
     Returns
     -------
@@ -88,416 +65,464 @@ def visc_mol_sol(T,rho,X):
 
     Notes
     -----
-    According to Eq 22 in Schatzman (1977). Assume log Lambda = 15. 
+    According to Eq 22 in Schatzman (1977). Assume log Lambda = 15.
     (see Table 5.1), a H/He mix (for different mix use Eq. 5.54 in
-    Spitzer text book)
+    Spitzer textbook)
 
-    Examples
-    --------
-    see astronomy.visc_rad_kap_sc
-
-    '''
-    visc_mol = 1.84e-17*(1.+7.*X)*(old_div(T**2.5,rho))
+    """
+    visc_mol = cs.visc_mol_const * (1. + (7.*X)) * (T**2.5 / rho)
     return visc_mol
 
 
-def visc_rad_kap_sc(T,rho,X):
-    '''
+@attach_constants(cs.nu_rad_const)
+def visc_rad_kap_sc(T, rho, X):
+    """
     Radiative viscosity (Thomas, 1930) for e- scattering opacity
 
     Parameters
     ----------
-    X : float
-       H mass fraction
     T : float
        temperature in K
     rho : float
        density in cgs
+    X : float
+       H mass fraction
 
     Returns
     -------
     nu : float
        radiative diffusivity in [cm**2/s]
 
-    Examples
-    --------
-    >>> In [1]: import astronomy as ast
-    >>> In [2]: l = 100*1.e5 # 100km
-    >>> In [3]: v = 1.e5     # typical velocity
-    >>> In [4]: T   = 90.e6  # temperature
-    >>> In [5]: X   = 0.001  # H mass fraction
-    >>> In [6]: rho = 100.   # density
-    >>> In [7]: nu = ast.visc_rad_kap_sc(T,rho,X)
-    >>> In [8]: Re=v*l/nu
-    >>> In [9]: print "Re_rad = "+str('%g'%Re)
-    >>> Re_rad = 4.43512e+08
-
     Notes
     -----
-    Eqn. 14' in Schatzman, 1977, assume electron scattering opacity
+    Eqn. 14 in Schatzman, 1977, assume electron scattering opacity
     kappa_sc = 0.2*(1+X), Kippenhahn (2nd edn, Eqn 17.2)
 
-    '''
-    kappa = 0.2*(1.+X)
-    nu_rad = 6.88e-26*(old_div(T**4,(kappa*rho**2)))
+    """
+    kappa = 0.2 * (1.+X)
+    nu_rad = cs.nu_rad_const * (T**4 / (kappa * rho**2))
     return nu_rad
 
+
+@attach_constants()
 def Gamma1_gasrad(beta):
-    ''' 
+    """
     Gamma1 for a mix of ideal gas and radiation
 
     Hansen & Kawaler, page 177, Eqn. 3.110
-    
+
     Parameters
     ----------
     beta : float
         Gas pressure fraction Pgas/(Pgas+Prad)
 
-    '''
-    Gamma3minus1 = (old_div(2.,3.))*(4.-3.*beta)/(8.-7.*beta) 
-    Gamma1 = beta + (4.-3.*beta) * Gamma3minus1
+    """
+    Gamma3minus1 = (2./3.) * (4. - (3.*beta)) / (8. - (7.*beta))
+    Gamma1 = beta + (4. - (3.*beta)) * Gamma3minus1
     return Gamma1
 
-def Pgas(rho,T,mu):
-    ''' 
+
+@attach_constants(cs.boltzmann_const, cs.atomic_mass_unit)
+def Pgas(rho, T, mmu):
+    """
     P = R/mu * rho * T
 
     Parameters
     ----------
-    mu : float
-        Mean molecular weight
     rho : float
         Density [cgs]
     T : float
         Temperature [K]
+    mmu : float
+        Mean molecular weight
 
-    '''
-    R = old_div(boltzmann_constant, atomic_mass_unit)
-    return (old_div(R,mu)) * rho * T
+    Returns
+    --------
+    Gas pressure
 
-def Prad(T,mu):
-    ''' 
-    P = a/3 * T**4
+    """
+    R = cs.boltzmann_const / cs.atomic_mass_unit
+    return (R/mmu) * rho * T
+
+
+@attach_constants(cs.rad_const)
+def Prad(T):
+    """
+    P = cs.rad_const/3 * T**4
 
     Parameters
     ----------
-    a : float
-        Radiation constant [erg cm^-3 K^-4].
     T : float
-        Temperature [K].
+        Temperature [K]
 
-    '''
-    return (old_div(radiation_constant,3.)) * T**4
+    Returns
+    --------
+    Radiation pressure
 
+    """
+    return (cs.rad_const / 3.) * T**4
+
+
+@attach_constants(cs.mimf_coeff_6, cs.mimf_coeff_5, cs.mimf_coeff_4,
+                  cs.mimf_coeff_3, cs.mimf_coeff_2, cs.mimf_coeff_1, cs.mimf_coeff_0)
 def mimf_ferrario(mi):
-    ''' Curvature MiMf from Ferrario etal. 2005MNRAS.361.1131.'''
-    
-    mf=-0.00012336*mi**6+0.003160*mi**5-0.02960*mi**4+\
-      0.12350*mi**3-0.21550*mi**2+0.19022*mi+0.46575
+    """ Curvature MiMf from Ferrario et al. 2005MNRAS.361.1131."""
+
+    mf = ((cs.mimf_coeff_6 * (mi**6)) + (cs.mimf_coeff_5 * (mi**5))
+          - (cs.mimf_coeff_4 * (mi**4)) + (cs.mimf_coeff_3 * (mi**3))
+          - (cs.mimf_coeff_2 * (mi**2)) + (cs.mimf_coeff_1 * mi) + cs.mimf_coeff_0)
     return mf
 
+
+@attach_constants(cs.core_mass_coeff, cs.core_mass_offset)
 def core_mass_L(MH):
-    ''' 
-    Core-mass luminosity relationship from Bloecker (1993).
+    """
+    Core-mass luminosity relationship from Bloecker (1993)
 
     Parameters
     ----------
     MH : float
-        Core mass in Msun.
+        Core mass in Msun
 
     Returns
     -------
     L
         Luminosity in Lsun
 
-    '''
-    return 62200*(MH-0.487)
+    """
+    return cs.core_mass_coeff*(MH - cs.core_mass_offset)
 
+
+@attach_constants(cs.imf_m1, cs.imf_m2, cs.imf_a1, cs.imf_a2, cs.imf_a3)
 def imf(m):
-    ''' 
+    """
+    Initial mass function from Kroupa
+
+    Parameters
+    -------
+    m : float
+        mass (g)
+
     Returns
     -------
     N(M)dM
-        for given mass according to Kroupa IMF, vectorization
-        available via vimf() 
+        for given mass according to Kroupa IMF
 
-    '''
+    """
 
-    m1 = 0.08; m2 = 0.50
-    a1 = 0.30; a2 = 1.30; a3 = 2.3
-    const2 = m1**-a1 -m1**-a2 
-    const3 = m2**-a2 -m2**-a3 
+    const2 = cs.imf_m1**(-cs.imf_a1) - cs.imf_m1**(-cs.imf_a2)
+    const3 = cs.imf_m2**(-cs.imf_a2) - cs.imf_m2**(-cs.imf_a3)
 
-    if m < 0.08:
-        alpha = 0.3
-        const = -const2 -const3
-    elif m < 0.50:
-        alpha = 1.3
+    if m < cs.imf_m1:
+        alpha = cs.imf_a1
+        const = -const2 - const3
+    elif m < cs.imf_m2:
+        alpha = cs.imf_a2
         const = -const3
     else:
-        alpha = 2.3
-        const = 0.0
-    # print m,alpha, const, m**-alpha + const 
-    return m**-alpha + const 
+        alpha = cs.imf_a3
+        const = 0.
+    return m**(-alpha) + const
 
-    
-vimf = np.vectorize(imf)
 
-def int_imf_dm(m1,m2,m,imf,bywhat='bymass',integral='normal'):
-    ''' 
-    Integrate IMF between m1 and m2.
+@attach_constants()
+def int_imf_dm(m1, m2, m, imf_ar, bywhat='bymass', integral='normal'):
+    """
+    Integrate IMF between m1 and m2
 
     Parameters
     ----------
     m1 : float
-        Min mass
+        Lower mass integration bound
     m2 : float
-        Max mass
-    m : float
+        Upper mass integration bound
+    m : array
         Mass array
-    imf : float
-        IMF array
+    imf_ar : array
+        Array of IMF values corresponding to mass array
     bywhat : string, optional
         'bymass' integrates the mass that goes into stars of
         that mass interval; or 'bynumber' which integrates the number
         of stars in that mass interval.  The default is 'bymass'.
     integrate : string, optional
-        'normal' uses sc.integrate.trapz; 'cum' returns cumulative
+        'normal' uses scipy.integrate.trapz; 'cum' returns cumulative
         trapezoidal integral.  The default is 'normal'.
 
-    '''
+    Returns
+    ---------
+    Integrated initial mass function for given bounds
 
+    """
 
-    ind_m = (m >= min(m1,m2)) & (m <= max(m1,m2))
-    if integral is 'normal':
-        int_func = sc.integrate.trapz
-    elif integral is 'cum':
-        int_func = sc.integrate.cumtrapz
+    ind_m = (m >= min(m1, m2)) & (m <= max(m1, m2))
+
+    if integral == 'normal':
+        int_func = integrate.trapz
+    elif integral == 'cum':
+        int_func = integrate.cumtrapz
     else:
-        print("Error in int_imf_dm: don't know how to integrate")
-        return 0
-       
-    if bywhat is 'bymass':
-        return int_func(m[ind_m]*imf[ind_m],m[ind_m])
-    elif bywhat is 'bynumber':
-        return int_func(imf[ind_m],m[ind_m])
-    else:
-        print("Error in int_imf_dm: don't know by what to integrate")
-        return 0
+        raise ValueError(
+            "Error in int_imf_dm: don't know how to integrate (normal or cum)")
 
-def am_orb(m1,m2,a,e):
-    ''' 
-    orbital angular momentum.
+    if bywhat == 'bymass':
+        return int_func(m[ind_m] * imf_ar[ind_m], m[ind_m])
+    elif bywhat == 'bynumber':
+        return int_func(imf_ar[ind_m], m[ind_m])
+    raise ValueError(
+        "Error in int_imf_dm: Need integration type (bymass or bynumber)")
 
-    e.g Ge etal2010
-    
+
+@attach_constants(cs.r_sun, cs.m_sun, cs.grav_const)
+def am_orb(m1, m2, a, e):
+    """
+    Orbital angular momentum equation
+
+    e.g. Ge et al 2010
+
     Parameters
     ----------
     m1, m2 : float
-        Masses of both stars in Msun.
-    A : float 
-        Separation in Rsun.
+        Masses of both stars in Msun
+    A : float
+        Separation in Rsun
     e : float
         Eccentricity
-        
-    '''
 
-    a_cm  = a * rsun_cm
-    m1_g = m1 * msun_g
-    m2_g = m2 * msun_g
+    Returns
+    --------
+    Orbital angular momentum
 
-    J_orb=np.sqrt(grav_const*a_cm*(old_div((m1_g**2*m2_g**2),(m1_g+m2_g))))*(1-e**2)
+    """
+
+    a_cm = a * cs.r_sun
+    m1_g = m1 * cs.m_sun
+    m2_g = m2 * cs.m_sun
+    J_orb = np.sqrt(cs.grav_const * a_cm * ((m1_g**2 * m2_g**2) / (m1_g + m2_g))) * (1 - e**2)
     return J_orb
 
-def mass_loss_loon05(L,Teff):
-    ''' 
-    mass loss rate van Loon etal (2005).
+
+@attach_constants(cs.van_loon_1, cs.van_loon_2, cs.van_loon_3)
+def mass_loss_loon05(L, Teff):
+    """
+    Mass loss rate from van Loon et al (2005)
 
     Parameters
     ----------
     L : float
-        L in L_sun.
+        L in L_sun
     Teff : float
-        Teff in K.
-        
+        Teff in K
+
     Returns
     -------
     Mdot
         Mdot in Msun/yr
-    
+
     Notes
     -----
     ref: van Loon etal 2005, A&A 438, 273
-    
-    '''
-    
-    Mdot = -5.65 + np.log10(old_div(L,10.**4)) -6.3*np.log10(old_div(Teff,3500.))
+
+    """
+
+    Mdot = (cs.van_loon_1 + np.log10(L / 10.**4) -
+            cs.van_loon_2 * np.log10(Teff / cs.van_loon_3))
     return Mdot
 
-def energ_orb(m1,m2,r):
-    ''' 
+
+@attach_constants(cs.grav_const, cs.m_sun, cs.r_sun)
+def energ_orb(m1, m2, r):
+    """
+    Orbital potential energy equation
+
     Parameters
     ----------
     m1, m2 : float
-        M in Msun.
+        M in Msun
     r : float
-        Distance in Rsun.
-        
+        Distance in Rsun
+
     Returns
     -------
     Epot
-        Epot in erg.
-        
-    '''
-    epo = -grav_const * m1 * m2 * msun_g**2 / (r * rsun_cm)
+        Epot in erg
+
+    """
+    epo = -cs.grav_const * m1 * m2 * cs.m_sun**2 / (r * cs.r_sun)
     return epo
 
 
-def period(A,M1,M2):
-    """ 
-    calculate binary period from separation. 
+@attach_constants(cs.r_sun, cs.grav_const, cs.m_sun, cs.day_secs)
+def period(A, M1, M2):
+    """
+    Calculate binary period from separation.
 
     Parameters
     ----------
     A : float
-        separation A Rsun.
+        separation A Rsun
     M1, M2 : float
-        M in Msun.
+        M in Msun
 
     Returns
     -------
     p
-        period in days.
+        period in days
 
     """
 
-    A *= rsun_cm
-    print(A)
-    velocity = np.sqrt(grav_const*msun_g*(M1+M2)/A)
-    print(old_div(velocity,1.e5))
-    
-    p = 2.*np.pi * A / velocity
-
-    p  /= (60*60*24.)
+    A *= cs.r_sun
+    velocity = np.sqrt(cs.grav_const * cs.m_sun * (M1+M2) / A)
+    p = ((2. * np.pi * A) / velocity) / cs.day_secs
     return p
 
-def escape_velocity(M,R):
-    """ 
-    escape velocity.
-    
+
+@attach_constants(cs.grav_const, cs.m_sun, cs.r_sun)
+def escape_velocity(M, R):
+    """
+    Escape velocity
+
     Parameters
     ----------
     M : float
-        Mass in solar masses.
+        Mass in solar masses
     R : float
-        Radius in solar radiu.
+        Radius in solar radii
 
     Returns
     -------
     v_escape
-        in km/s.
-        
+        in km/s
+
     """
 
-    ve = np.sqrt(2.*grav_const*M*msun_g/(R*rsun_cm))
-    ve = ve*1.e-5
+    ve = np.sqrt(2. * cs.grav_const * M * cs.m_sun / (R * cs.r_sun))
+    ve = ve * 1.e-5
     return ve
 
 
-def Nasv(macs,T):
-    ''' 
+@attach_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
+def Nasv(macs_val, T):
+    """
+    Parameters
+    ----------
+    macs_val : float
+        MACS [mb] at T [K]
+    T : float
+        Temperature [K}
+
     Returns
     -------
     Na*<sigma v>
-        for MACS [mb] at T [K].
-        
-    '''
+        for MACS [mb] at T [K]
 
-    Na = avogadro_constant
-    k  = boltzmann_constant
-    vtherm=(2.*k*T/mass_H_atom)**0.5
+    """
 
-    s  = macs*1.e-27
-    Nasv = s*vtherm*Na
-    return Nasv
+    Na = cs.avogadro_const
+    k = cs.boltzmann_const
+    vtherm = (2. * k * T / cs.mass_H_atom)**0.5
+    s = macs_val * 1.e-27
+    Nasv_val = s * vtherm * Na
+    return Nasv_val
 
-def macs(nasv,T):
-    ''' 
+
+@attach_constants(cs.avogadro_const, cs.boltzmann_const, cs.mass_H_atom)
+def macs(nasv, T):
+    """
+    Parameters
+    ----------
+    nasv : float
+        nasv value
+    T : float
+        Temperature [K]
+
     Returns
     -------
     MACS
-        [mb] at T [K] from Na*<sigma v>.
-                                        
-    '''
+        [mb] at T [K] from Na*<sigma v>
 
-    Na = avogadro_constant
-    k  = boltzmann_constant
-    vtherm=(2.*k*T/mass_H_atom)**0.5
+    """
 
-    s      = old_div(nasv,(vtherm*Na))
-    macs   = s*1.e27
-    return macs
-
+    Na = cs.avogadro_const
+    k = cs.boltzmann_const
+    vtherm = (2. * k * T / cs.mass_H_atom)**0.5
+    s = nasv / (vtherm * Na)
+    macs_val = s * 1.e27
+    return macs_val
 
 
+@attach_constants()
 def mu_e(X):
-    ''' 
-    mean molecular weight per free electron, assuming full ionisation, and
+    """
+    Mean molecular weight per free electron, assuming full ionisation, and
     approximating mu_i/Z_i ~ 2 for all elements heavier then Helium.
-    
+
     (Kippenhahn & Weigert, Ch 13.1, Eq. 13.8)
-    
+
     Parameters
     ----------
     X : float
-        Mass fraction of H.
-    
-    '''
+        Mass fraction of H
+
+    Returns
+    -------
+    mu_el : float
+        Free electron mean molecular weight
+
+    """
 
     try:
-        mu_e = old_div(2.,(1.+X))
+        mu_el = 2. / (1.+X)
     except TypeError:
-        X=np.array([X])
-        mu_e = old_div(2.,(1.+X))
+        X = np.array([X])
+        mu_el = 2. / (1.+X)
 
-    return mu_e
+    return mu_el
 
-def mu(X,Z,A):
-    ''' 
-    mean molecular weight assuming full ionisation.
+
+@attach_constants()
+def mu(X, Z, A):
+    """
+    Mean molecular weight assuming full ionisation.
 
     (Kippenhahn & Weigert, Ch 13.1, Eq. 13.6)
-    
+
     Parameters
     ----------
-    X : float
-        Mass fraction vector.
-    Z : float
-        Charge number vector.
-    A : float
-        Mass number vector.
-        
-    '''
-    
-    if not isinstance(Z,np.ndarray):
+    X : float or array
+        Mass fraction vector
+    Z : float or array
+        Charge number vector
+    A : float or array
+        Mass number vector
+
+    Returns
+    -------
+    mmu : float
+        Mean molecular weight at full ionization
+
+    """
+
+    if not isinstance(Z, np.ndarray):
         Z = np.array(Z)
-    if not isinstance(A,np.ndarray):
+    if not isinstance(A, np.ndarray):
         A = np.array(A)
-    if not isinstance(X,np.ndarray):
+    if not isinstance(X, np.ndarray):
         X = np.array(X)
-    	
+
     try:
-        mu = old_div(1.,sum(X*(1.+Z)/A))
+        mmu = 1. / sum(X * (1.+Z) / A)
     except TypeError:
-        X=np.array([X])
-        A=np.array([A])
-        Z=np.array([Z])
-        mu = old_div(1.,sum(X*(1.+Z)/A))
+        X = np.array([X])
+        A = np.array([A])
+        Z = np.array([Z])
+        mmu = 1. / sum(X * (1.+Z) / A)
 
-    return mu
+    return mmu
 
-def Trho_idrad(rho,mu):
-    ''' 
+
+@attach_constants(cs.idrad_const)
+def Trho_idrad(rho, mmu):
+    """
     T(rho) that separates P_rad from P_gas dominated regions.
 
     Kippenhahn & Weigert, Eq. 16.10
@@ -505,17 +530,24 @@ def Trho_idrad(rho,mu):
     Parameters
     ----------
     rho : float
-        Density array [cgs].
+        Density array [cgs]
     mu : float
-        Mean molecular weight.
+        Mean molecular weight
 
-    '''
+    Returns
+    -------
+    T : float
+        Temperature at boundary
 
-    T = 3.2E7 * (old_div(rho,mu))**(old_div(1.,3.))
+    """
+
+    T = cs.idrad_const * (rho/mmu)**(1./3.)
     return T
-    
-def Trho_iddeg(rho,mu,mu_e):
-    ''' 
+
+
+@attach_constants(cs.iddeg_const)
+def Trho_iddeg(rho, mmu, mu_el):
+    """
     T(rho) that separates ideal gas and degenerate pressure dominated regions.
 
     Kippenhahn & Weigert, Eq. 16.6
@@ -523,14 +555,18 @@ def Trho_iddeg(rho,mu,mu_e):
     Parameters
     ----------
     rho : float
-        Density array [cgs].
-    mu : float
-        Mean molecular weight.
-    mu_e : float
-        Mean molecular weight per free electron.
-        
-    '''
+        Density array [cgs]
+    mmu : float
+        Mean molecular weight
+    mu_el : float
+        Mean molecular weight per free electron
 
-    T = 1.207E5 * rho**(old_div(2.,3.)) * mu / mu_e**(old_div(5.,3.))
+    Returns
+    -------
+    T : float
+        Temperature at boundary
+
+    """
+
+    T = cs.iddeg_const * rho**(2./3.) * mmu / (mu_el**(5./3.))
     return T
-    
