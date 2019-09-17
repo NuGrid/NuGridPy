@@ -11,6 +11,7 @@ Welcome to NuGridPy's documentation!
    :caption: Contents:
 
    pages/astro-const
+   pages/data-handling
 
 NuGridPy is a set of Python tools for the NuGrid community that allows
 for interactive analysis, visualization, computation, reading/writing, and other

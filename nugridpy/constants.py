@@ -48,8 +48,7 @@ class Constant(float):
         return instance
 
     def __repr__(self):
-        # Ensures constants are represented by a custom long-form description,
-        # not just values
+        # Ensures constants are represented by a long-form description, not just values
         return 'Constant({self.value}, {self.description}, {self.units})'.format(self=self)
 
 
