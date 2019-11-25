@@ -123,6 +123,28 @@ If a directory structure is required for your read-in, you'll
 need to do a bit more and define a mediating class that defines
 this structure, as is the case with :code:`class MesaData`.
 
+To read in a particular file as a data object, e.g., a
+trajectory, simply execute the following:
+
+.. code:: python
+
+    my_data = data.Trajectory('path/to/trajectory.input')
+
+Or, in the case of a MESA data instance, where more than one
+file is to be read in, you can pass in a directory structure:
+
+.. code:: python
+
+    my_mesa = data.MesaData('path/to/MESA_DIR/')
+
+Note that in the case of MESA data, files (such as history data)
+in your data directory are assumed to have a default filename. If
+your files have a custom name, you'll need to input it as an
+argument, e.g., :code:`MesaData('/DIR/', history_name='my_file')`.
+
+To see a list of available filetypes, you can print the
+:code:`data.FileIn.filetypes` attribute.
+
 References
 ----------
 

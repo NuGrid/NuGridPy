@@ -2,12 +2,19 @@
 
 import numpy
 import os
+import pkg_resources
 import random
 import tempfile
 import unittest
 
+import h5py
+
 from nugridpy import data, io
 from .fixtures import random_string
+
+
+DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
+HDF5_FILE = pkg_resources.resource_filename('tests', 'data/read-write/M2.00Z0.020.0000001.surf.h5')
 
 class TestAscii(unittest.TestCase):
     """Test ascii i/o capabilities."""
@@ -27,6 +34,7 @@ class TestAscii(unittest.TestCase):
         self.row_width = random.randint(2, 10)
         self.col_height = random.randint(2, 99)
 
+        # Create a test filetype
         self.TEST_DATA = {
             'name': 'TEST_DATA',
             'parser': None,
@@ -94,3 +102,46 @@ class TestAscii(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Some errors were detected !'):
                 test_badf.seek(0)
                 _ = io.TextFile.readfile(test_badf.name, self.TEST_DATA)
+
+
+class TestHdf5(unittest.TestCase):
+    """Test hdf5 i/o capabilities."""
+
+    def setUp(self):
+        """Test setup."""
+        # Assign the class variables for testing (only 1 for now but more later)
+        self.nugrid_classvar = io.Hdf5File.NUGRID
+
+        # Set up a readfile object and a bad filename for error testing
+        self.test_read = io.Hdf5File.readfile(HDF5_FILE, self.nugrid_classvar)
+        self.bad_filename = random_string()
+
+    def test_classvars(self):
+        """Test the hdf5 class variables."""
+        # Test the classvars
+        self.assertIsInstance(self.nugrid_classvar, dict)
+        self.assertEqual(len(self.nugrid_classvar), 3)
+
+    def test_readfile(self):
+        """Test the hdf5 readfile method."""
+        # Test the readfile object
+        self.assertEqual(len(self.test_read), 4)
+        self.assertIsInstance(self.test_read[0], h5py.AttributeManager)
+        self.assertFalse(any(type(x) != dict for x in self.test_read[1:]))
+
+        # Test the returned dict objects
+        for key in self.test_read[1].keys():
+            self.assertIsInstance(self.test_read[1][key], h5py.Dataset)
+
+        for key in self.test_read[2].keys():
+            self.assertIsInstance(self.test_read[2][key], h5py.AttributeManager)
+
+        for key in self.test_read[3].keys():
+            self.assertIsInstance(self.test_read[3][key], numpy.ndarray)
+
+        # Test the right errors are being raised
+        with self.assertRaises(TypeError):
+            _ = io.Hdf5File.readfile(self.bad_filename)
+
+        with self.assertRaises(OSError):
+            _ = io.Hdf5File.readfile(self.bad_filename, io.Hdf5File.NUGRID)

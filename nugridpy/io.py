@@ -2,7 +2,13 @@
 I/O module
 """
 
+import logging
 import numpy as np
+
+import h5py
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 def parse_history(filename):
@@ -21,7 +27,7 @@ def parse_history(filename):
     """
     # Read the header data using specific file structure
     header_data = np.genfromtxt(filename, dtype=None, skip_header=1,
-        names=True, invalid_raise=True, max_rows=1, encoding=None)
+                                names=True, invalid_raise=True, max_rows=1, encoding=None)
 
     # Return header data as a numpy structured array
     return header_data
@@ -32,8 +38,8 @@ def parse_trajectory(filename):
     For parsing trajectory files.
     """
     # Read in the header data as an array (returns unstructured)
-    traj = np.genfromtxt(filename, dtype=None, max_rows=4, invalid_raise=True, 
-        encoding=None, delimiter='=', autostrip=True)
+    traj = np.genfromtxt(filename, dtype=None, max_rows=4, invalid_raise=True,
+                         encoding=None, delimiter='=', autostrip=True)
 
     # Make a structured dtype for this file
     traj_dtype = np.dtype([(el[0], traj.dtype) for el in traj])
@@ -62,27 +68,27 @@ class TextFile:
         'parser': parse_history,
         'skip_header': 5,
         'names': None
-        }
+    }
 
     PROFILES_INDEX = {
         'name': 'PROFILES_INDEX',
         'parser': None,
         'skip_header': 1,
         'names': ['model number', 'priority', 'log file number']
-        }
+    }
 
     TRAJECTORY = {
         'name': 'TRAJECTORY',
         'parser': parse_trajectory,
         'skip_header': 7,
         'names': ['time', 'T', 'rho']
-        }
+    }
 
     FILE_TYPES = (
         MESA_DATA,
         PROFILES_INDEX,
         TRAJECTORY
-        )
+    )
 
     @classmethod
     def readfile(cls, filename, filetype):
@@ -106,8 +112,54 @@ class TextFile:
 
         # Declare the column data
         data = np.genfromtxt(filename, dtype=None,
-            skip_header=filetype['skip_header'], names=filetype['names'] or True,
-            invalid_raise=True, encoding=None)
+                             skip_header=filetype['skip_header'], names=filetype['names'] or True,
+                             invalid_raise=True, encoding=None)
 
         # Return the header data and column data together
         return header_data, data
+
+
+class Hdf5File:
+    """
+    Class containing the HDF5 I/O functionality. Structure mirrors the Textfile
+    class, and a similar readfile class method is implemented. Class variables
+    are used to represent the different sources of HDF5 file that may be
+    read in.
+    """
+
+    NUGRID = {
+        'default_dataset_name': 'data',
+        'group_default_dataset_name': 'SE_DATASET',
+        'group_prefix': 'cycle'
+    }
+
+    @classmethod
+    def readfile(cls, filename, filetype):
+        """
+        Reads in HDF5 files.
+        Returns metadata, data objects from file, and more?
+        """
+        logging.info('Reading {}...'.format(filename))
+        file_object = h5py.File(filename, 'r')
+
+        # Metadata
+        metadata = file_object.attrs
+
+        groups, headers, datasets = {}, {}, {}
+        # Get all groups and datasets
+        for key in file_object.keys():
+            extracted_data = file_object[key]
+
+            # Check if it is a group that should contain a single dataset or a dataset
+            if isinstance(extracted_data, h5py.Dataset):
+                datasets[key] = extracted_data[filetype['default_dataset_name']]
+            elif isinstance(extracted_data, h5py.Group):
+                # Extract cycle number from name
+                cycle_number = str(int(key.strip(filetype['group_prefix'])))
+                groups[cycle_number] = extracted_data[filetype['group_default_dataset_name']]
+                headers[cycle_number] = extracted_data.attrs
+            else:
+                raise RuntimeError("HDF5 file appears to be unsupported...")
+
+        # Return the data structures
+        return metadata, groups, headers, datasets
