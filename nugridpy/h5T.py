@@ -67,7 +67,6 @@ except ImportError :
     os.system('HDF5_DISABLE_VERSION_CHECK=1')
     import h5py as mrT
 
-
 class Files(threading.Thread):
     '''
     Changes made by Daniel Conti
@@ -159,34 +158,34 @@ class Files(threading.Thread):
     .(surf/out.h5)
 
     '''
-    preprocName = 'h5Preproc.txt'  #filename of the preprocessor file
-    preprocExists = False  #Boolean of if the preprocessor file exists
+    preprocName='h5Preproc.txt' #filename of the preprocessor file
+    preprocExists=False         #Boolean of if the preprocessor file exists
     h5files = []
-    h5s = []  #list of h5File threads, for each of the file names
+    h5s = []                    #list of h5File threads, for each of the file names
     cycles = []
-    ages = []
+    ages =     []
     hattrs = []
     cattrs = []
     Tables = []
-    dcols = []
+    dcols =     []
     filepaths = []
     isotopes = []
     isomeric_states = []
     A = []
     Z = []
-    groundState = 1  #The identifyer for ground state
-    excitedState = 2  #The
-    isomerDelimiter = 'm'  #The chartacter string thet we use to seperate the isomer
+    groundState=1      #The identifyer for ground state
+    excitedState=2     #The
+    isomerDelimiter='m'#The chartacter string thet we use to seperate the isomer
                        #identifer from the rest of the isotope name
-    h5sStarted = []  #A list of booleans of if the thread in h5files has had its
+    h5sStarted=[]      #A list of booleans of if the thread in h5files has had its
                         #start and join methods called
     #    This is a list of isos to match to.
-    isos = ['Neutron', 'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', 'Mg', 'Al',
-    'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni',
-    'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc',
-    'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce',
-    'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta',
-    'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At']
+    isos = ['Neutron','H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al',
+    'Si','P','S','Cl','Ar','K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni',
+    'Cu','Zn','Ga','Ge','As','Se','Br','Kr','Rb','Sr','Y','Zr','Nb','Mo','Tc',
+    'Ru','Rh','Pd','Ag','Cd','In','Sn','Sb','Te', 'I','Xe','Cs','Ba','La','Ce',
+    'Pr','Nd','Pm','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb','Lu','Hf','Ta',
+    'W','Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po','At']
 
     def findCycle(self, cycNum):
         '''
@@ -199,29 +198,32 @@ class Files(threading.Thread):
             int of the cycle desired cycle.
 
         '''
-        cycNum = int(cycNum)
-        i = 0
+        cycNum=int(cycNum)
+        i=0
 
         while i < len(self.cycles):
             if cycNum < int(self.cycles[i]):
                 break
-            i += 1
+            i+=1
 
-        if i == 0:
+        if i ==0:
             return self.cycles[i]
         elif i == len(self.cycles):
-            return self.cycles[i - 1]
-        lower = int(self.cycles[i - 1])
-        higher = int(self.cycles[i])
+            return self.cycles[i-1]
+        lower=int(self.cycles[i-1])
+        higher=int(self.cycles[i])
 
-        if higher - cycNum >= cycNum - lower:
-            return self.cycles[i - 1]
+        if higher- cycNum >= cycNum-lower:
+            return self.cycles[i-1]
         else:
             return self.cycles[i]
 
+
+
+
     #    Upon initialization of an h5fileholder, the h5 files are defined (in their own wrapper-see below)
     #    and gathers some important data from the files.
-    def __init__(self , path='.', fName=None, pattern='*', rewrite=False, verbose=False):
+    def __init__(self ,path='.', fName=None, pattern='*', rewrite=False, verbose=False):
         '''
         Init method
 
@@ -249,28 +251,28 @@ class Files(threading.Thread):
         self.h5files = []
         self.h5s = []
         self.cycles = []
-        self.ages = []
+        self.ages =     []
         self.hattrs = []
         self.cattrs = []
         self.Tables = []
-        self.dcols = []
+        self.dcols =     []
         self.filepaths = []
         self.isotopes = []
         self.elements = []
         self.isomeric_states = []
         self.A = []
         self.Z = []
-        self.h5sStarted = []
-        self.verbose = verbose
+        self.h5sStarted=[]
+        self.verbose=verbose
 
-        if fName == None and pattern == '*':
+        if fName==None and pattern=='*':
             self.filename = path
             self.files = os.listdir(self.filename)
 
             for fil in self.files:
                 if os.path.isfile(self.filename + os.sep + fil) and fil.count('.h5'):
                     self.h5files.append(self.filename + os.sep + fil)
-        elif pattern == '*':
+        elif pattern=='*':
             self.filename = path
             if self.filename[-1] == os.sep:
                 self.filename = self.filename[:-1]
@@ -281,15 +283,15 @@ class Files(threading.Thread):
                 temps = [temps]
             for arg in temps:
                 self.h5files.append(self.filename + os.sep + arg)
-        elif fName == None:
+        elif fName==None:
             self.filename = path
             if not pattern.endswith('*'):
-                pattern = pattern + '*'
+                pattern=pattern+'*'
             if not pattern.startswith('*'):
-                pattern = '*' + pattern
-            self.files = glob.glob(self.filename + os.sep + pattern)
+                pattern='*'+pattern
+            self.files=glob.glob(self.filename + os.sep +pattern)
             for i in range(len(self.files)):
-                self.files[i] = self.files[i].split(os.sep)[-1]
+                self.files[i]=self.files[i].split(os.sep)[-1]
 
             for fil in self.files:
                 if os.path.isfile(self.filename + os.sep + fil) and fil.count('.h5'):
@@ -297,15 +299,15 @@ class Files(threading.Thread):
 
         #preprocessor stuff
         if self.preprocName.endswith('/'):
-            preprocName = str(self.filename) + self.preprocName
+            preprocName = str(self.filename)+self.preprocName
 
         else:
-            preprocName = str(self.filename) + '/' + self.preprocName
+            preprocName = str(self.filename)+'/'+self.preprocName
 
-        self.preprocExists = os.path.exists(preprocName)
+        self.preprocExists=os.path.exists(preprocName)
         if rewrite:
-            self.preprocExists = False
-        self.preprocExisted = self.preprocExists  # to know whether or not the preproc was
+            self.preprocExists=False
+        self.preprocExisted=self.preprocExists # to know whether or not the preproc was
                 # there in the first place (SJONES)
 
         if self.h5files == []:
@@ -316,12 +318,13 @@ class Files(threading.Thread):
                 self.h5sStarted.append(False)
             # SJONES: here, i also now pass whether preprocExisted:
             #self.h5s.append(h5File(self.h5files[0],True, True))
-            self.h5s.append(h5File(self.h5files[0], True, True, self.preprocExisted))
+            self.h5s.append(h5File(self.h5files[0],True, True, self.preprocExisted))
 
             self.h5s[0].start()
             self.h5s[0].join()
-            self.h5sStarted[0] = True
+            self.h5sStarted[0]=True
             self.start()
+
 
             self.join()
             #print self.h5s
@@ -334,10 +337,10 @@ class Files(threading.Thread):
             self.cycles.extend(self.h5s[0].cycle)
             self.ages.extend(self.h5s[0].age)
         self.hattrs = self.h5s[0].hattr
-        self.cattrs = self.h5s[0].cattr
-        self.Tables = self.h5s[0].Table
-        self.dcols = self.h5s[0].dcol
-        self.cycle_header = self.h5s[0].cycle_header  #This string handles the name of the cycle
+        self.cattrs =   self.h5s[0].cattr
+        self.Tables    =   self.h5s[0].Table
+        self.dcols     =   self.h5s[0].dcol
+        self.cycle_header = self.h5s[0].cycle_header    #This string handles the name of the cycle
         try:
             self.A = self.h5s[0].A[0]
         except IndexError:
@@ -351,70 +354,62 @@ class Files(threading.Thread):
         except IndexError:
             print("Sorry, there is no isomeric state vector. Continue...")
 
-        new = self.h5s[0].new  #    This boolean handles the changes to the cycle nomenclature format
+        new = self.h5s[0].new    #    This boolean handles the changes to the cycle nomenclature format
 
         if self.filename.endswith(os.sep):
-            b = str(self.filename) + str(self.preprocName)
+            b = str(self.filename)+str(self.preprocName)
         else:
-            b = str(self.filename) + os.sep + str(self.preprocName)
+            b = str(self.filename)+os.sep+str(self.preprocName)
 
-        # Jean-Claude Passy: fix/pre-processing-implementation
-        # Temporary fix: pre-processing does not work now
-        # so I believe this is safer to turn it off until we get a real look it
-        print('NOTE: Pre-processing disabled.')
+        if self.preprocExists:
+            preprocTable=readTable(self.preprocName,self.filename)
+            if int(preprocTable.hattrs[0])<len(self.h5files):
+                self.preprocExists=False
+                print('A File was added, rewriteing preprocessor file')
 
-        # We ignore everything thas has to do with pre-processing
-        # BTW, this is called readTable, not ascii_table anymore!
-        if False:
             if self.preprocExists:
-                preprocTable = ascii_table(self.preprocName, self.filename)
-                if int(preprocTable.hattrs[0]) < len(self.h5files):
-                    self.preprocExists = False
-                    print('A File was added, rewriteing preprocessor file')
+                for i in range(len(self.h5files)):
+                    if os.path.basename(self.h5files[i])+'-cyc' not in preprocTable.dcols and self.preprocExists:
+                        print('A File was renamed, rewriteing preprocessor file')
+                        if self.verbose:
+                            print(preprocTable.dcols[i], os.path.basename(self.h5files[i])+'-cyc')
+                        self.preprocExists=False
 
-                if self.preprocExists:
-                    for i in range(len(self.h5files)):
-                        if os.path.basename(self.h5files[i]) + '-cyc' not in preprocTable.dcols and self.preprocExists:
-                            print('A File was renamed, rewriteing preprocessor file')
-                            if self.verbose:
-                                print(preprocTable.dcols[i], os.path.basename(self.h5files[i]) + '-cyc')
-                            self.preprocExists = False
-
-            if not self.preprocExists and os.path.exists(b):
-                os.system('rm ' + b)
+        if not self.preprocExists and os.path.exists(b):
+            os.system('rm '+b)
 
 # create list of isotopes stored in this h5 file
         try:
             for x in range(len(self.Tables[0])):
-                if self.isomeric_states[x] == 1:
-                    self.isotopes.append(self.isos[int(self.Tables[1][x])] + '-' + str(int(self.Tables[0][x])))
+                if self.isomeric_states[x] ==1:
+                    self.isotopes.append(self.isos[int(self.Tables[1][x])]+'-' +str(int(self.Tables[0][x])))
                 else:
-                    self.isotopes.append(self.isos[int(self.Tables[1][x])] + '-' + str(int(self.Tables[0][x])) + \
-                    self.isomerDelimiter + str(self.isomeric_states[x] - 1))
+                    self.isotopes.append(self.isos[int(self.Tables[1][x])]+'-' +str(int(self.Tables[0][x]))+\
+                    self.isomerDelimiter+str(self.isomeric_states[x]-1))
         except IndexError:
             print('This file does not contain any tables.  Isotopic data must be contained elsewhere.')
         t1 = time.time()
 
 # create list of elements stored in this h5 file
-        asaved = ''
+        asaved=''
         for atmp in self.Z:
             if atmp != asaved:
                 self.elements.append(self.isos[int(atmp)])
-                asaved = atmp
+                asaved=atmp
 
         thread_list = []
         if self.verbose:
             print(self.h5s[0].filename)
-        for x in range(len(self.h5files) - 1):
+        for x in range(len(self.h5files)-1):
             # SJONES: here, i also now pass whether preprocExisted:
             #thread_list.append(self.h5s.append(h5File(self.h5files[x+1],False, new)))
-            thread_list.append(self.h5s.append(h5File(self.h5files[x + 1], False, new, self.preprocExisted)))
+            thread_list.append(self.h5s.append(h5File(self.h5files[x+1],False, new, self.preprocExisted)))
             if self.verbose:
-                print(self.h5s[x + 1].filename)
+                print(self.h5s[x+1].filename)
             if not self.preprocExists:
-                self.h5s[x + 1].start()
-                self.h5s[x + 1].join()
-                self.h5sStarted[x + 1] = True
+                self.h5s[x+1].start()
+                self.h5s[x+1].join()
+                self.h5sStarted[x+1]=True
             #self.h5s[x+1].run()
             #print('Active '+ str(threading.active_count()))
 
@@ -423,118 +418,114 @@ class Files(threading.Thread):
         #    print(thread)
         #    thread.join()
 
-        # Disabling pre-processing
-        if False:
-            if not self.preprocExists:
+        if not self.preprocExists:
+            for x in range(len(self.h5files)-1):
+                self.cycles.extend(self.h5s[x+1].cycle)
+                self.ages.extend(self.h5s[x+1].age)
+            header=[str(len(self.h5files)),'This is a preprocessor file for the directory: '+str(self.filename),\
+            'At the time of the creation of this file there were '+str(len(self.h5files))+\
+            ' h5 files.']
 
-                for x in range(len(self.h5files) - 1):
-                    self.cycles.extend(self.h5s[x + 1].cycle)
-                    self.ages.extend(self.h5s[x + 1].age)
-                header = [str(len(self.h5files)), 'This is a preprocessor file for the directory: ' + str(self.filename), \
-                'At the time of the creation of this file there were ' + str(len(self.h5files)) + \
-                ' h5 files.']
+            try:
+                self.cycles = sorted(self.cycles, key=int)
+            except TypeError:
+                print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
 
-                try:
-                    self.cycles = sorted(self.cycles, key=int)
-                except TypeError:
-                    print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
+            try:
+                self.ages = sorted(self.ages, key=int)
+            except TypeError:
+                None
 
-                try:
-                    self.ages = sorted(self.ages, key=int)
-                except TypeError:
-                    None
+            print('Writing preprocessor files')
+            data=[]
+            dcols=[]
+            length=0
+            for i in range(len(self.h5s)):
+                print(self.h5s[i].filename.rpartition('/')[2])
+                dcols.append(os.path.basename(self.h5s[i].filename)+'-cyc')
+                dcols.append(os.path.basename(self.h5s[i].filename)+'-age')
+                data.append(self.h5s[i].cycle)
+                data.append(self.h5s[i].age)
+                if len(self.h5s[i].cycle)>length:
+                    length=len(self.h5s[i].cycle)
+                if len(self.h5s[i].age)>length:
+                    length=len(self.h5s[i].age)
 
-                print('Writing preprocessor files')
-                data = []
-                dcols = []
-                length = 0
-                for i in range(len(self.h5s)):
-                    print(self.h5s[i].filename.rpartition('/')[2])
-                    dcols.append(os.path.basename(self.h5s[i].filename) + '-cyc')
-                    dcols.append(os.path.basename(self.h5s[i].filename) + '-age')
-                    data.append(self.h5s[i].cycle)
-                    data.append(self.h5s[i].age)
-                    if len(self.h5s[i].cycle) > length:
-                        length = len(self.h5s[i].cycle)
-                    if len(self.h5s[i].age) > length:
-                        length = len(self.h5s[i].age)
+            for i in range(len(data)):
+                for j in range(length-len(data[i])):
+                    data[i].append(3.14159265)
 
-                for i in range(len(data)):
-                    for j in range(length - len(data[i])):
-                        data[i].append(3.14159265)
+            write(self.preprocName,header,dcols,data,sldir=self.filename)
 
-                write(self.preprocName, header, dcols, data, sldir=self.filename)
+        else:
+#            print 'Reading preprocessor files'
+#            preprocTable=readTable(self.preprocName,self.filename)
+#            for i in xrange(len(self.h5s)-1):
+#                dat=preprocTable.get(os.path.basename(self.h5s[i+1].filename)+'-cyc')
+#                dat1=[]
+#                for j in xrange(len(dat)):
+#                    if dat[j]!=3.14159265:
+#                        dat1.append(dat[j])
+#
+#                dat=dat1
+#                for j in xrange(len(dat)):
+#                    dat[j]=str(int(dat[j]))
+#                    for k in xrange(10-len(dat[j])):
+#                        dat[j]='0'+dat[j]
+#
+#                for j in xrange(len(dat)):
+#                    self.cycles.append(dat[j])
+#                self.h5s[i+1].cycle=dat
+#                dat=preprocTable.get(os.path.basename(self.h5s[i+1].filename)+'-age')
+#                dat1=[]
+#                for j in xrange(len(dat)):
+#                    if dat[j]!=3.14159265:
+#                        dat1.append(dat[j])
+#                dat=dat1
+#                self.h5s[i+1].age=dat
+#                for j in xrange(len(dat)):
+#                    self.ages.append(dat[j])
+            print('Reading preprocessor files')
+            preprocTable=readTable(self.preprocName,self.filename)
+            for i in range(len(self.h5s)):
+                dat=preprocTable.get(os.path.basename(self.h5s[i].filename)+'-cyc')
+                dat1=[]
+                for j in range(len(dat)):
+                    if dat[j]!=3.14159265:
+                        dat1.append(dat[j])
 
-            else:
-    #            print 'Reading preprocessor files'
-    #            preprocTable=ascii_table(self.preprocName,self.filename)
-    #            for i in xrange(len(self.h5s)-1):
-    #                dat=preprocTable.get(os.path.basename(self.h5s[i+1].filename)+'-cyc')
-    #                dat1=[]
-    #                for j in xrange(len(dat)):
-    #                    if dat[j]!=3.14159265:
-    #                        dat1.append(dat[j])
-    #
-    #                dat=dat1
-    #                for j in xrange(len(dat)):
-    #                    dat[j]=str(int(dat[j]))
-    #                    for k in xrange(10-len(dat[j])):
-    #                        dat[j]='0'+dat[j]
-    #
-    #                for j in xrange(len(dat)):
-    #                    self.cycles.append(dat[j])
-    #                self.h5s[i+1].cycle=dat
-    #                dat=preprocTable.get(os.path.basename(self.h5s[i+1].filename)+'-age')
-    #                dat1=[]
-    #                for j in xrange(len(dat)):
-    #                    if dat[j]!=3.14159265:
-    #                        dat1.append(dat[j])
-    #                dat=dat1
-    #                self.h5s[i+1].age=dat
-    #                for j in xrange(len(dat)):
-    #                    self.ages.append(dat[j])
-                print('Reading preprocessor files')
-                preprocTable = ascii_table(self.preprocName, self.filename)
-                for i in range(len(self.h5s)):
-                    dat = preprocTable.get(os.path.basename(self.h5s[i].filename) + '-cyc')
-                    dat1 = []
-                    for j in range(len(dat)):
-                        if dat[j] != 3.14159265:
-                            dat1.append(dat[j])
+                dat=dat1
+                for j in range(len(dat)):
+                    dat[j]=str(int(dat[j]))
+                    for k in range(10-len(dat[j])):
+                        dat[j]='0'+dat[j]
 
-                    dat = dat1
-                    for j in range(len(dat)):
-                        dat[j] = str(int(dat[j]))
-                        for k in range(10 - len(dat[j])):
-                            dat[j] = '0' + dat[j]
+                for j in range(len(dat)):
+                    self.cycles.append(dat[j])
+                self.h5s[i].cycle=dat
+                dat=preprocTable.get(os.path.basename(self.h5s[i].filename) + '-age')
+                dat1=[]
+                for j in range(len(dat)):
+                    if dat[j]!=3.14159265:
+                        dat1.append(dat[j])
+                dat=dat1
+                self.h5s[i].age=dat
+                for j in range(len(dat)):
+                    self.ages.append(dat[j])
+### end of new section ###
+            try:
+                self.cycles = sorted(self.cycles, key=int)
+            except TypeError:
+                print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
 
-                    for j in range(len(dat)):
-                        self.cycles.append(dat[j])
-                    self.h5s[i].cycle = dat
-                    dat = preprocTable.get(os.path.basename(self.h5s[i].filename) + '-age')
-                    dat1 = []
-                    for j in range(len(dat)):
-                        if dat[j] != 3.14159265:
-                            dat1.append(dat[j])
-                    dat = dat1
-                    self.h5s[i].age = dat
-                    for j in range(len(dat)):
-                        self.ages.append(dat[j])
-    ### end of new section ###
-                try:
-                    self.cycles = sorted(self.cycles, key=int)
-                except TypeError:
-                    print("There was a problem sorting the cycles.\nYou may have problems later.\nPlease consider reloading(h5T) and trying again.\n")
-
-                try:
-                    self.ages = sorted(self.ages, key=int)
-                except TypeError:
-                    None
-
+            try:
+                self.ages = sorted(self.ages, key=int)
+            except TypeError:
+                None
         print('File search complete.')
         t2 = time.time()
         if self.verbose:
-            print("Total duration is " + str(t2 - t1) + " seconds.")
+            print("Total duration is " + str(t2-t1) + " seconds.")
         return
 
     '''
@@ -606,7 +597,7 @@ class Files(threading.Thread):
         '''
 
 #    Check out the inputs
-        t1 = time.time()
+        t1=time.time()
         isotopes_of_interest = []
 
         nested_list = False
@@ -618,20 +609,22 @@ class Files(threading.Thread):
                 if len(cycle_list) == 1:
                     nested_list = True
             except TypeError:
-                pass  #leave nested_list as false
+                pass #leave nested_list as false
         if isinstance(dataitem, basestring):
             dataitem = [dataitem]
         if isinstance(isotope, basestring):
             isotope = [isotope]
 
-        if dataitem == None and isotope == None:
+
+
+        if dataitem==None and isotope==None:
             option_ind = 1
             dataitem = cycle_list
 
             if not any([item in self.hattrs for item in dataitem]):
                 cycle_list = self.cycles
             else:
-                first_file = mrT.File(self.h5s[0].filename, 'r')
+                first_file = mrT.File(self.h5s[0].filename,'r')
                 dat = []
                 # get all dataitems from header attributes
                 for item in dataitem:
@@ -639,7 +632,7 @@ class Files(threading.Thread):
                     try:
                         if len(tmp) == 1:
                             tmp = tmp[0]
-                    except TypeError:  #if a scaler is returned do nothing
+                    except TypeError: #if a scaler is returned do nothing
                         pass
                     dat.append(tmp)
                 # if only one header attribute is required dont return as a list
@@ -648,8 +641,8 @@ class Files(threading.Thread):
                 first_file.close()
                 return dat
             if any([item.split('-')[0] in self.isos for item in dataitem]):
-                return self.get(cycle_list, dataitem, sparse=sparse)
-        elif isotope == None:
+                return self.get(cycle_list,dataitem,sparse=sparse)
+        elif isotope==None:
             option_ind = 2
             cycle_list = cycle_list
             dataitem = dataitem
@@ -666,9 +659,9 @@ class Files(threading.Thread):
             if len(new_isotopes) != 0:
                 tmp = []
                 try:
-                    tmp = self.get(cycle_list, new_dataitem + ['iso_massf'], new_isotopes, sparse=sparse)
-                except:  # in some old se files there maybe still yps as the name for the abundance arrays
-                    tmp = self.get(cycle_list, new_dataitem + ['yps'], new_isotopes, sparse=sparse)
+                    tmp = self.get(cycle_list,new_dataitem + ['iso_massf'],new_isotopes,sparse=sparse)
+                except: # in some old se files there maybe still yps as the name for the abundance arrays
+                    tmp =  self.get(cycle_list,new_dataitem + ['yps'],new_isotopes,sparse=sparse)
                 # modify the dat list so dat is structured like dataitems
                 dat = []
                 #make sure tmp containes the data as a list of cycles
@@ -710,14 +703,14 @@ class Files(threading.Thread):
 # a one row array, as - for example- in the surf.h5 files
             # SJONES: I think here we only need to look at the first shellnb(!)
             #shellnb=self.get(cycle_list,'shellnb')
-            try:  #check if cycle_list is not a list
+            try: #check if cycle_list is not a list
                 cycle_list[0]
-            except (TypeError, IndexError):
+            except (TypeError,IndexError):
                 cycle_list = [cycle_list]
-            shellnb = self.get(cycle_list[0], 'shellnb')
+            shellnb=self.get(cycle_list[0],'shellnb')
 
-        if sparse < 1:
-            sparse = 1
+        if sparse <1:
+            sparse=1
 
         #    Just in case the user inputs integers
         try:
@@ -728,41 +721,41 @@ class Files(threading.Thread):
 
         if option_ind != 1:
 
-            try:  #if it is a single cycle make sure its formatted correctly
+            try: #if it is a single cycle make sure its formatted correctly
                 if cycle_list.isdigit():
                     cycle_list = [cycle_list]
                     for cycle in cycle_list:
                         if len(cycle) != len(self.cycles[0]):
                                 #print "a"
-                            diff = len(self.cycles[0]) - len(cycle)
+                            diff = len(self.cycles[0])-len(cycle)
                             OO = ''
-                            while diff >= 1:
-                                OO += '0'
+                            while diff >=1:
+                                OO+='0'
 
-                            cycle = OO + cycle
+                            cycle = OO+cycle
 
-            except AttributeError:  ##if it is a list of cycles make sure its formatted correctly
+            except AttributeError: ##if it is a list of cycles make sure its formatted correctly
                 if cycle_list[0].isdigit():
 
                     for x in range(len(cycle_list)):
                         if len(str(cycle_list[x])) != len(str(self.cycles[0])):
                             #print "b"
-                            diff = len(str(self.cycles[0])) - len(str(cycle_list[x]))
+                            diff = len(str(self.cycles[0]))-len(str(cycle_list[x]))
 
                             OO = ''
-                            while diff >= 1:
-                                OO += '0'
-                                diff -= 1
+                            while diff >=1:
+                                OO+='0'
+                                diff-=1
 
                             try:
-                                cycle_list[x] = OO + cycle_list[x]
+                                cycle_list[x] = OO+cycle_list[x]
                             except TypeError:
-                                cycle_list[0] = OO + cycle_list[0]
+                                cycle_list[0] = OO+cycle_list[0]
 
         dat = []
         cycle_list.sort()
 
-        cyclelist = np.array(list(map(int, cycle_list)))
+        cyclelist=np.array(list(map(int, cycle_list)))
 
         # cycles_requested is a list of indices from cyclelist
         # The index of the larges and smallest indices should be stored
@@ -773,14 +766,14 @@ class Files(threading.Thread):
 
         # Sometimes bad data or last restart.h5 files contain no cycles,
         # causing the code to crash. Do a simple try/except here:
-        file_min = []
-        file_max = []
+        file_min=[]
+        file_max=[]
         try:
             for h5 in self.h5s:
                 file_min.append(int(h5.cycle[0]))
                 file_max.append(int(h5.cycle[-1]))
         except IndexError:
-            print('File ' + h5.filename + ' contains no data, please remove or rename it')
+            print('File '+h5.filename+' contains no data, please remove or rename it')
             print('Once the file has been removed or renamed, the preprocessor file must be re-written. Do this by either removing the file h5Preproc.txt from the data directory or by invoking the se instance with rewrite=True')
             print('At present, h5T cannot check for empty files since the overhead using the mounted VOSpace would be too great.')
             raise IOError('Cycle-less file encountered')
@@ -793,8 +786,8 @@ class Files(threading.Thread):
             max_file = int(h5.cycle[-1])
             min_list = int(cyclelist[0])
             max_list = int(cyclelist[-1])
-            index_min = None  #if None start at begining
-            index_max = None  #if None finish at end
+            index_min = None #if None start at begining
+            index_max = None #if None finish at end
 
             # SJONES Now we need to add the case that the set only contains one file:
             if len(file_min) == 1:
@@ -805,14 +798,14 @@ class Files(threading.Thread):
                 if file_index == 0:
                     if min_list - 1 < min_file:
                         min_file = min_list - 1
-                    max_file = (file_min[file_index + 1] + max_file) // 2
+                    max_file = (file_min[file_index + 1] + max_file)//2
                 elif file_index == len(file_min) - 1:
-                    min_file = (file_max[file_index - 1] + min_file) // 2 + 1
+                    min_file = (file_max[file_index - 1] + min_file)//2 + 1
                     if max_list + 1 > max_file:
                         max_file = max_list + 1
                 else:
-                    min_file = (file_max[file_index - 1] + min_file) // 2 + 1
-                    max_file = (file_min[file_index + 1] + max_file) // 2
+                    min_file = (file_max[file_index - 1] + min_file)//2 + 1
+                    max_file = (file_min[file_index + 1] + max_file)//2
 
             # calculate the left and right limits of the intersection
             # of the lists h5.cycle and cyclelist
@@ -852,7 +845,7 @@ class Files(threading.Thread):
 
             # if the new request overlabs older request remove them
             del cycles_requested[request_min:request_max]
-            if ((request_max - request_min) % 2) == 1:
+            if ((request_max-request_min) % 2) ==1:
                 # new and old request overlaped on one edge only
                 if request_min % 2 == 0:
                     # add new starting index
@@ -873,29 +866,29 @@ class Files(threading.Thread):
             if not self.h5sStarted[self.h5s.index(h5)]:
                 h5.start()
                 h5.join()
-                temp = h5.fetch_data_sam(dataitem, cycle_list[index_min:index_max], len(cycle_list), len(dat))
-                self.h5sStarted[self.h5s.index(h5)] = True
+                temp = h5.fetch_data_sam(dataitem,cycle_list[index_min:index_max],len(cycle_list),len(dat))
+                self.h5sStarted[self.h5s.index(h5)]=True
             else:
-                temp = h5.fetch_data_sam(dataitem, cycle_list[index_min:index_max], len(cycle_list), len(dat))
+                temp = h5.fetch_data_sam(dataitem,cycle_list[index_min:index_max],len(cycle_list),len(dat))
 
             temp_dat = []
             for temp_num, temp_cycle in enumerate(temp):
                 temp_dataforcycle = []
                 for dataitem_num, temp_dataitem in enumerate(temp_cycle):
                     # identify what cycle the temp data was collected from
-                    temp_dataitem = self.red_dim(temp_dataitem)
+                    temp_dataitem=self.red_dim(temp_dataitem)
 #                    if option_ind == 3 and isotopes_of_interest != []:
                     if (dataitem[dataitem_num] == 'iso_massf' or dataitem[dataitem_num] == 'yps') and isotopes_of_interest != []:
                     #    Figure out the index
                         index = []
                         iso_tmp = []
 
-                        if 'iso' in dataitem[dataitem_num]:  #if we are looking at an isotope
+                        if 'iso' in dataitem[dataitem_num]: #if we are looking at an isotope
                             iso_tmp = self.isotopes
                         else:
                             iso_tmp = self.elements
 
-                        for iso in isotopes_of_interest:  #finds the location of the isotope
+                        for iso in isotopes_of_interest: #finds the location of the isotope
                             x = iso_tmp.index(iso)
                             index.append(x)
 
@@ -904,10 +897,10 @@ class Files(threading.Thread):
                             # then the index defaults to [0], so that the loop
                             # will still try to acess the data in t.
                             index = [0]
-                        islist = True
+                        islist=True
 
-                        if len(cycle_list) == 1:
-                            islist = False
+                        if len(cycle_list)==1:
+                            islist=False
 
 #                        shellnb_index = 0
 #                        if index_min == None:
@@ -918,31 +911,31 @@ class Files(threading.Thread):
                         for i in index:
 #                            if islist:
 #                                if shellnb[shellnb_index] == 1:    # again take care of 1-row 2D arrays
-                                if shellnb == 1:  # again take care of 1-row 2D arrays
+                                if shellnb == 1:    # again take care of 1-row 2D arrays
                                     temp_multicyc.append(temp_dataitem[i])
                                 else:
-                                    temp_multicyc.append(temp_dataitem[:, i])
+                                    temp_multicyc.append(temp_dataitem[:,i])
 #                            else:
 #                                if shellnb == 1:    # again take care of 1-row 2D arrays
 #                                    temp_multicyc.append(temp_dataitem[i])
 #                                else:
 #                                    temp_multicyc.append(temp_dataitem[:,i])
-                        if len(temp_multicyc) == 1:  # agian take care of 1-row arrays
+                        if len(temp_multicyc) == 1: # agian take care of 1-row arrays
                             temp_multicyc = temp_multicyc[0]
                         temp_dataitem = temp_multicyc
                     temp_dataforcycle.append(temp_dataitem)
-                if len(temp_dataforcycle) == 1:  # agian take care of 1-row arrays
+                if len(temp_dataforcycle) == 1: # agian take care of 1-row arrays
                     temp_dataforcycle = temp_dataforcycle[0]
                 # Now add the information to the list we pass back
                 temp_dat.append(temp_dataforcycle)
             # calculate the proper insertion point for the data colected from
             # the file h5 in self.h5s
             insert_pnt = 0
-            if index_min is not None:  #alex: in py2: x < None == False
+            if index_min is not None: #alex: in py2: x < None == False
                 for i in range(len(cycles_requested)):
                     if i % 2 == 1:
                         if cycles_requested[i] < index_min:
-                            insert_pnt += cycles_requested[i] - cycles_requested[i - 1]
+                            insert_pnt += cycles_requested[i] - cycles_requested[i-1]
                         elif cycles_requested[i - 1] < index_min:
                             insert_pnt += index_min - cycles_requested[i - 1]
             # insert the cycle data from the current file into the apropiat place
@@ -983,7 +976,7 @@ class Files(threading.Thread):
             None
         except IndexError:
             None
-        t2 = time.time()
+        t2=time.time()
         return dat
 
     #    uses the index information to build list of isos from tables A,Z
@@ -995,6 +988,7 @@ class Files(threading.Thread):
         except IndexError:
             None
         return isos
+
 
     def red_dim(self, array):
         """
@@ -1018,7 +1012,6 @@ class Files(threading.Thread):
 #    upon inmitialization the h5 file is opened and certain bits of data is read.
 #    This class also interacts with the h5fileholder class to access needed data.
 
-
 class h5File(threading.Thread):
     h5 = None
     filename = None
@@ -1030,17 +1023,19 @@ class h5File(threading.Thread):
     ver = ''
     classname = ''
     hattr = []
-    cattr = []
+    cattr=[]
     Table = []
     isomeric_state = []
     A = []
     Z = []
     new = True
 
+
+
     #    Initialize the class
     # SJONES added whether proprocExisted here:
     #def __init__(self, filepath,deep_search, new):
-    def __init__(self, filepath, deep_search, new, waspreprocthere):
+    def __init__(self, filepath,deep_search, new, waspreprocthere):
         threading.Thread.__init__(self)
         #    Instantiate
         self.h5 = None
@@ -1053,7 +1048,7 @@ class h5File(threading.Thread):
         self.ver = ''
         self.classname = ''
         self.hattr = []
-        self.cattr = []
+        self.cattr=[]
         self.Table = []
         self.isomeric_state = []
         self.A = []
@@ -1065,6 +1060,7 @@ class h5File(threading.Thread):
         self.new = new
         self.filename = filepath
         self.deep_search = deep_search
+
 
         if self.new:
             self.cycle_header = 'cycle'
@@ -1087,16 +1083,16 @@ class h5File(threading.Thread):
         return None
 
     #    Fetches a single category of information
-    def fetch_data_one(self, dataitem, cycle):
-        self.h5 = mrT.File(self.filename, 'r')
+    def fetch_data_one(self,dataitem,cycle):
+        self.h5 = mrT.File(self.filename,'r')
 
         try:
-            data = self.h5[self.cycle_header + str(cycle)]['SE_DATASET'][dataitem]
+            data = self.h5[self.cycle_header+str(cycle)]['SE_DATASET'][dataitem]
         except ValueError:
             try:
-                data = self.h5[self.cycle_header + str(cycle)].attrs.get(dataitem, None)
+                data = self.h5[self.cycle_header+str(cycle)].attrs.get(dataitem, None)
             except TypeError:
-                data = self.h5[self.cycle_header + str(cycle)][dataitem]
+                data = self.h5[self.cycle_header+str(cycle)][dataitem]
 
         try:
             while data.shape[0] < 2:
@@ -1104,54 +1100,55 @@ class h5File(threading.Thread):
         except (IndexError, AttributeError):
             None
 
+
         self.h5.close()
         return data
 
     def fetch_data_sam(self, dataitemlist, cyclelist, total_list_size,
                        current_list_size):
         #like fetch_data_one but it accepts a list of cycles and a list of data tiems
-        quiet = True  # flag for supressing info about replacing missing cycles. Should
+        quiet = True # flag for supressing info about replacing missing cycles. Should
                      # be integrated better eventually.
-        self.h5 = mrT.File(self.filename, 'r')
-        is_error = False
+        self.h5 = mrT.File(self.filename,'r')
+        is_error=False
         missing_cycles = np.array([])
-        actual_cycles_flt = np.array([float(cyc) for cyc in self.cycle])
-        data = []
+        actual_cycles_flt=np.array([float(cyc) for cyc in self.cycle])
+        data=[]
         old_percent = 0
         for cycle in cyclelist:
             current_list_size += 1
-            percent = int(current_list_size * 100 / total_list_size)
+            percent = int(current_list_size*100/total_list_size)
             if percent >= old_percent + 5:
                 sys.stdout.flush()
-                sys.stdout.write("\r reading " + str(dataitemlist) + "...%d%%" % percent)
+                sys.stdout.write("\r reading "+ str(dataitemlist) + "...%d%%" % percent)
                 old_percent = percent
 
             try:
                 dataitem_data = []
                 for dataitem in dataitemlist:
                     try:
-                        dataitem_data.append(self.h5[self.cycle_header + str(cycle)]['SE_DATASET'][dataitem])
+                        dataitem_data.append(self.h5[self.cycle_header+str(cycle)]['SE_DATASET'][dataitem])
                     except ValueError:
                         try:
-                            dataitem_data.append(self.h5[self.cycle_header + str(cycle)].attrs.get(dataitem, None))
+                            dataitem_data.append(self.h5[self.cycle_header+str(cycle)].attrs.get(dataitem, None))
                         except TypeError:
-                            dataitem_data.append(self.h5[self.cycle_header + str(cycle)][dataitem])
+                            dataitem_data.append(self.h5[self.cycle_header+str(cycle)][dataitem])
                 data.append(dataitem_data)
             except KeyError:
                 if not is_error:
                     is_error = True
                 missing_cycles = np.append(missing_cycles, str(cycle))
-                nearestidx = np.abs(actual_cycles_flt - float(cycle)).argmin()
-                cycledummy = self.cycle[nearestidx]
+                nearestidx=np.abs(actual_cycles_flt-float(cycle)).argmin()
+                cycledummy=self.cycle[nearestidx]
                 dataitem_data = []
                 for dataitem in dataitemlist:
                     try:
-                        dataitem_data.append(self.h5[self.cycle_header + str(cycledummy)]['SE_DATASET'][dataitem])
+                        dataitem_data.append(self.h5[self.cycle_header+str(cycledummy)]['SE_DATASET'][dataitem])
                     except ValueError:
                         try:
-                            dataitem_data.append(self.h5[self.cycle_header + str(cycledummy)].attrs.get(dataitem, None))
+                            dataitem_data.append(self.h5[self.cycle_header+str(cycledummy)].attrs.get(dataitem, None))
                         except TypeError:
-                            dataitem_data.append(self.h5[self.cycle_header + str(cycledummy)][dataitem])
+                            dataitem_data.append(self.h5[self.cycle_header+str(cycledummy)][dataitem])
                 data.append(dataitem_data)
 #                continue
 
@@ -1162,15 +1159,16 @@ class h5File(threading.Thread):
         self.h5.close()
         return data
 
+
     #    The typical search algirthm when a h5file class is initialized
     def search_shallow(self):
-        self.h5 = mrT.File(self.filename, 'r')
+        self.h5 = mrT.File(self.filename,'r')
         temp = list(self.h5.keys())
-        self.cycle = [str(k).replace('cycle', '').replace('-', '') for k in temp if 'cyc' in k]
+        self.cycle=[str(k).replace('cycle','').replace('-','') for k in temp if 'cyc' in k]
         try:
-            self.age = [float(self.h5[str(asd)].attrs.get("age", None)) for asd in temp if 'cyc' in asd]
+            self.age=[float(self.h5[str(asd)].attrs.get("age",None)) for asd in temp if 'cyc' in asd]
         except ValueError:
-            self.age = [self.h5[str(asd)].attrs.get("age", None)[0] for asd in temp if 'cyc' in asd]
+            self.age=[self.h5[str(asd)].attrs.get("age",None)[0] for asd in temp if 'cyc' in asd]
 
 # Old code that was getting cycles and ages is commented here below;
 # now instead the cycles are got much more effectively (above, and subject to testing!)
@@ -1195,8 +1193,10 @@ class h5File(threading.Thread):
 #                        self.cycle.sort()
 #                        self.age.sort()
 
+
+
     def search_deep(self):
-        self.h5 = mrT.File(self.filename, 'r')
+        self.h5 = mrT.File(self.filename,'r')
         temp = list(self.h5.keys())
 
         #    Handles the change in cycle nomenclature
@@ -1213,9 +1213,9 @@ class h5File(threading.Thread):
                     if te[5:].isdigit():
                         self.cycle.append(str(te[5:]))
                         try:
-                            self.age.append(self.h5[te].attrs.get("age", None)[0])
+                            self.age.append(self.h5[te].attrs.get("age",None)[0])
                         except TypeError:
-                            self.age.append(self.h5[te].attrs.get("age", None))
+                            self.age.append(self.h5[te].attrs.get("age",None))
                     else:
                         self.isomeric_state.append(self.h5[te]['data'])
                 else:
@@ -1241,9 +1241,9 @@ class h5File(threading.Thread):
                         self.isomeric_state.append(holder)
 
             try:
-                temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
+                temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
             except ValueError:
-                temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).dtype.__str__().split(',')
+                temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).dtype.__str__().split(',')
 
         else:
             self.cycle_header = 'cycle-'
@@ -1257,7 +1257,7 @@ class h5File(threading.Thread):
                         self.age.append(self.h5[te].attrs.get("age", None))
                 except IndexError:
 
-                    obj = self.h5[te].__iter__()
+                    obj =  self.h5[te].__iter__()
 
                     if str(te).count('A'):
                         holder = []
@@ -1283,12 +1283,13 @@ class h5File(threading.Thread):
         # This is kind of stupid, but I have not found a way to access this information directly.
 
             try:
-                temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
+                temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
             except ValueError:
-                temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).dtype.__str__().split(',')
+                temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).dtype.__str__().split(',')
+
 
         for tem in temp:
-            if tem.count('<') == 0:
+            if tem.count('<') ==0:
                 try:
                     self.dcol.append(tem.split('\'')[1])
                 except IndexError:
@@ -1297,10 +1298,10 @@ class h5File(threading.Thread):
         attrs = self.h5.attrs
         for at in attrs:
             self.hattr.append(at)
-        self.cattr = list(self.h5[self.cycle_header + str(self.cycle[0])].attrs.keys())
+        self.cattr = list(self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys())
 
         table = []
-        grp = self.h5[self.cycle_header + str(self.cycle[0])]
+        grp = self.h5[self.cycle_header+str(self.cycle[0])]
         for gr in grp:
             try:
                 table.append(float(gr[0]))
@@ -1311,44 +1312,44 @@ class h5File(threading.Thread):
         return None
 
     def search_deep_sam(self):
-        self.h5 = mrT.File(self.filename, 'r')
+        self.h5 = mrT.File(self.filename,'r')
         temp = list(self.h5.keys())
 
         # SJONES attempt to speed this up and not search through the file:
 
-        cyclenames = [t for t in temp if 'cyc' in t]
+        cyclenames=[t for t in temp if 'cyc' in t]
 
         if '-' in cyclenames[0]:
-            cycle_header = 'cycle='
+            cycle_header='cycle='
         else:
-            cycle_header = 'cycle'
+            cycle_header='cycle'
 
-        self.cycle = [str(k).replace('cycle', '').replace('-', '') for k in temp if 'cyc' in k]
+        self.cycle=[str(k).replace('cycle','').replace('-','') for k in temp if 'cyc' in k]
         # SJONES: Frustratingly, it will take more work to just take the age from the
         # preprocessor file, where it lives... but for now, we just do this for the first
         # file : (
         if self.preprocExisted:
-            self.age = None
+            self.age=None
         else:
             try:
-                self.age = [float(self.h5[str(asd)].attrs.get("age", None)) for asd in temp if 'cyc' in asd]
+                self.age=[float(self.h5[str(asd)].attrs.get("age",None)) for asd in temp if 'cyc' in asd]
             except ValueError:
-                self.age = [self.h5[str(asd)].attrs.get("age", None)[0] for asd in temp if 'cyc' in asd]
+                self.age=[self.h5[str(asd)].attrs.get("age",None)[0] for asd in temp if 'cyc' in asd]
 
-        others = []
+        others=[]
         for t in temp:
             if 'cyc' not in t:
                 others.append(t)
 
         for o in others:
-            obj = self.h5[o].__iter__()
-            if str(o) == 'A':
+            obj=self.h5[o].__iter__()
+            if str(o)=='A':
                 holder = []
                 for ob in obj:
                     holder.append(ob[0])
                 self.Table.append(holder)
                 self.A.append(holder)
-            elif str(o) == 'Z':
+            elif str(o)=='Z':
                 holder = []
                 for ob in obj:
                     holder.append(ob[0])
@@ -1366,12 +1367,12 @@ class h5File(threading.Thread):
         # This is kind of stupid, but I have not found a way to access this information directly.
 
         try:
-            temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
+            temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).__getitem__('SE_DATASET').dtype.__str__().split(',')
         except ValueError:
-            temp = self.h5.__getitem__(self.cycle_header + str(self.cycle[0])).dtype.__str__().split(',')
+            temp =  self.h5.__getitem__(self.cycle_header+str(self.cycle[0])).dtype.__str__().split(',')
 
         for tem in temp:
-            if tem.count('<') == 0:
+            if tem.count('<') ==0:
                 try:
                     self.dcol.append(tem.split('\'')[1])
                 except IndexError:
@@ -1380,10 +1381,10 @@ class h5File(threading.Thread):
         attrs = self.h5.attrs
         for at in attrs:
             self.hattr.append(at)
-        self.cattr = list(self.h5[self.cycle_header + str(self.cycle[0])].attrs.keys())
+        self.cattr = list(self.h5[self.cycle_header+str(self.cycle[0])].attrs.keys())
 
         table = []
-        grp = self.h5[self.cycle_header + str(self.cycle[0])]
+        grp = self.h5[self.cycle_header+str(self.cycle[0])]
         for gr in grp:
             try:
                 table.append(float(gr[0]))
