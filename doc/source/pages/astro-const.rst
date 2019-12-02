@@ -9,10 +9,10 @@ and constants necessary for doing astrophysics with NuGridPy.
 Constants
 ---------
 
-In the ``constants`` module, the :py:class:`Constant<nugridpy.constants.Constant>` class and its instances are defined.
-A variety of physical and astronomical constants are instantiated (e.g.,
-Planck's constant) with a value, description, and the constant's cgs
-units. The module can be imported with a standard import:
+In the ``constants`` module, the :py:class:`Constant<nugridpy.constants.Constant>` 
+class and its instances are defined. A variety of physical and astronomical 
+constants are instantiated (e.g., Planck's constant) with a value, description, 
+and the constant's cgs units. The module can be imported with a standard import:
 
 .. code:: python
 
@@ -35,8 +35,8 @@ Do not add permanent constants to :code:`constants.py` unless they would be used
 generally, either by users or by another module in the NuGridPy package (e.g.,
 the astronomy module).
 
-Astronomy Module
-----------------
+Astronomy
+---------
 
 The ``astronomy`` module contains functions for carrying
 out physical and astrophysical computations. It can be imported
