@@ -4656,7 +4656,7 @@ class DataPlot(object):
         pl.ylabel('$\log_{10}(\\rho\,/\,{\\rm g\,cm}^{-3})$')
 
     def abu_profile(self,ixaxis='mass',isos=None,ifig=None,fname=None,logy=False,
-                    colourblind=False):
+                    colourblind=False,markerstyle=None,ls_a=5,ls_b=5,legend=True):
         '''
         Plot common abundances as a function of either mass coordiate or radius.
 
@@ -4682,6 +4682,16 @@ class DataPlot(object):
         colourblind : boolean, optional
             do you want to use the colourblind colour palette from the NuGrid
             nuutils module?
+        markestyle : string
+            force markerstyle for all lines, useful for plotting several instances
+            with the same colors and linestyles but different markers, default 
+            is None
+        ls_a, ls_b : integer
+            arguments a, b to utils.linestylecb, a: Spacing of marks, b: Modulation 
+            in case of plotting many nearby lines
+        legend : boolean
+            plot legend, default is True, set to False when overplotting second instance
+            distinguished by markerstyle option
         '''
 
         pT=self._classTest()
@@ -4725,22 +4735,29 @@ class DataPlot(object):
         if ifig is not None:
             pl.figure(ifig)
         from . import utils as u
-        cb = u.colourblind
         lscb = u.linestylecb # colourblind linestyle function
         for i in range(len(risos)):
+            if markerstyle is None:
+                mk = lscb(i)[1]
+            else:
+                mk = markerstyle
             if logy:
                 y = np.log10(abunds if len(risos) < 2 else abunds[i])
             else:
                 y = abunds if len(risos) < 2 else abunds[i]
             if colourblind:
-                pl.plot(x,y,ls=lscb(i)[0],marker=lscb(i)[1],
-                        color=lscb(i)[2],markevery=u.linestyle(i)[1]*20,
+                pl.plot(x,y,ls=lscb(i)[0],marker=mk,color=lscb(i)[2],\
+                        markevery=u.linestyle(i,a=ls_a,b=ls_b)[1],
                         label=names[i],mec='None')
             else:
-                pl.plot(x,y,u.linestyle(i)[0],markevery=u.linestyle(i)[1]*20,
+                if markerstyle is None:
+                    linest = u.linestyle(i)[0][:-1]
+                else:
+                    linest = u.linestyle(i)[0][:-1]+markerstyle
+                pl.plot(x,y,linest,markevery=u.linestyle(i,a=ls_a,b=ls_b)[1],
                         label=names[i],mec='None')
 
-        pl.legend(loc='best').draw_frame(False)
+        if legend: pl.legend(loc='best').draw_frame(True)
         pl.xlabel(xlab)
         pl.ylabel('$\log(X)$')
 
