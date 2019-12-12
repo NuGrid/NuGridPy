@@ -394,9 +394,8 @@ def writeTraj(filename='trajectory.input', data=[], ageunit=0, tunit=0,
 
     write(filename,headers,['time','T','rho'],data,['YRS/SEC; T8K/T9K; CGS/LOG',"FORMAT: '(10x,A3)'"],trajectory=True)
 
-def write(filename, headers, dcols, data, headerlines=[],
-          header_char='H', sldir='.', sep='  ', trajectory=False,
-          download=False,data_fmt='{:.4f}'):
+def write(filename, headers, dcols, data, headerlines=[], header_char='H', sldir='.', sep='  ', trajectory=False,
+          download=False,data_fmt='{:.4f}', overwrite=False):
     '''
     Method for writeing Ascii files.
 
@@ -436,6 +435,8 @@ def write(filename, headers, dcols, data, headerlines=[],
         The default is False.
     data_fmt : string
         Data format string.
+    overwrite : boolean
+        Default False, if True overwrite existing file without asking
     '''
     if sldir.endswith(os.sep):
         filename = str(sldir)+str(filename)
@@ -448,15 +449,16 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     if os.path.exists(filename):
         print('Warning this method will overwrite '+ filename)
-        print('Would you like to continue? (y)es or (n)no?')
-        s = input('--> ')
-        if s=='Y' or s=='y' or s=='Yes' or s=='yes':
-            print('Yes selected')
-            print('Continuing as normal')
-        else:
-            print('No Selected')
-            print('Returning None')
-            return None
+        if not overwrite:
+            print('Would you like to continue? (y)es or (n)no?')
+            s = input('--> ')
+            if s=='Y' or s=='y' or s=='Yes' or s=='yes':
+                print('Yes selected')
+                print('Continuing as normal')
+            else:
+                print('No Selected')
+                print('Returning None')
+                return None
 
     if len(data)!=len(dcols):
         print('The number of data columns does not equal the number of Data attributes')
@@ -477,7 +479,7 @@ def write(filename, headers, dcols, data, headerlines=[],
     for i in range(icols): # Determine length of each columnn
         length=len(dcols[i])
         for j in range(len(data[i])): 
-            tmp1=data_fmt.format(data[i][j])
+            tmp1=data_fmt.format(float(data[i][j]))
             if len(tmp1)>length:
                 length=len(tmp1)
         lengthList.append(length)
@@ -503,7 +505,7 @@ def write(filename, headers, dcols, data, headerlines=[],
 
     for i in range(len(data[0])):
         for j in range(len(data)):
-            tmp1=data_fmt.format(data[j][i])
+            tmp1=data_fmt.format(float(data[j][i]))
             if len(tmp1) < lengthList[j]:
                 l=lengthList[j]-len(tmp1)
                 for k in range(l):
