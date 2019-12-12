@@ -4656,7 +4656,7 @@ class DataPlot(object):
         pl.ylabel('$\log_{10}(\\rho\,/\,{\\rm g\,cm}^{-3})$')
 
     def abu_profile(self,ixaxis='mass',isos=None,ifig=None,fname=None,logy=False,
-                    colourblind=False,markerstyle=None,ls_a=5,ls_b=5):
+                    colourblind=False,markerstyle=None,ls_a=5,ls_b=5,legend=True):
         '''
         Plot common abundances as a function of either mass coordiate or radius.
 
@@ -4689,6 +4689,9 @@ class DataPlot(object):
         ls_a, ls_b : integer
             arguments a, b to utils.linestylecb, a: Spacing of marks, b: Modulation 
             in case of plotting many nearby lines
+        legend : boolean
+            plot legend, default is True, set to False when overplotting second instance
+            distinguished by markerstyle option
         '''
 
         pT=self._classTest()
@@ -4754,7 +4757,7 @@ class DataPlot(object):
                 pl.plot(x,y,linest,markevery=u.linestyle(i,a=ls_a,b=ls_b)[1],
                         label=names[i],mec='None')
 
-        pl.legend(loc='best').draw_frame(False)
+        if legend: pl.legend(loc='best').draw_frame(True)
         pl.xlabel(xlab)
         pl.ylabel('$\log(X)$')
 
