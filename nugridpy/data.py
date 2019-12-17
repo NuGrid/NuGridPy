@@ -2,10 +2,15 @@
 Data handling
 """
 
+from contextlib import suppress
+import logging
 import os
 import re
 
 from . import io
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 class FileIn:
@@ -15,9 +20,9 @@ class FileIn:
     Attributes:
         filetypes (tuple): Provides a tuple containing the names of filetypes
             that can be read in as a FileIn object.
-        header_names (tuple): A tuple containing the string values of each 
+        header_names (tuple): A tuple containing the string values of each
             header name (e.g., 'model_number').
-        data_names (tuple): A tuple containing the string values of each 
+        data_names (tuple): A tuple containing the string values of each
             data column name (e.g., 'mass').
 
     Arguments:
@@ -49,7 +54,7 @@ class FileIn:
         # Prompt a data_names check if it doesn't contain request
         if data_name not in self.data_names:
             raise ValueError('No data exists with that header. Check data_names '
-                'for availability.')
+                             'for availability.')
 
         # Declare the value and return it
         value = self._data_object[data_name]
@@ -60,7 +65,7 @@ class FileIn:
         # Prompt a header_names check if requested name isn't contained in the namespace
         if header_name not in self.header_names:
             raise ValueError('No such header data exists. Check header_names for '
-                'availability.')
+                             'availability.')
 
         # The .item() syntax must be used for singletons in a numpy structured array
         if self._header_object[header_name].size == 1:
@@ -104,13 +109,13 @@ class MesaData:
     """
 
     def __init__(self, filedir, history_name='history.data', index_name='profiles.index',
-                    profile_prefix='profile', profile_suffix='.data', all_profiles=True, 
-                    history_only=False, profiles_only=False):
+                 profile_prefix='profile', profile_suffix='.data', all_profiles=True,
+                 history_only=False, profiles_only=False):
         """Constructs a MESA data instance."""
         # Raise error if both history_only and profiles_only are True simultaneously
         if history_only and profiles_only:
             raise ValueError('At least one of history_only and profiles_only must be '
-                'False.')
+                             'False.')
 
         # history.data read-in
         if not profiles_only:
@@ -119,7 +124,7 @@ class MesaData:
                 self.history_data = MesaFile(os.path.join(filedir, history_name))
             except IOError:
                 raise IOError('No file named {} could be found. Check filedir path or '
-                    'set history_name.'.format(history_name))
+                              'set history_name.'.format(history_name))
 
         # profiles.index read-in
         if not history_only:
@@ -128,7 +133,7 @@ class MesaData:
                 self.profiles_index = ProfilesIndex(os.path.join(filedir, index_name))
             except IOError:
                 raise IOError('No file named {} could be found. Check filedir or set '
-                    'index_name.'.format(index_name))
+                              'index_name.'.format(index_name))
 
             # Collect the profiles from filedir
             files = os.listdir(filedir)
@@ -139,9 +144,10 @@ class MesaData:
             # Read in all profiles to a user-facing list attribute
             if all_profiles:
                 print('Reading in {} profiles... set all_profiles to False to '
-                    'skip.'.format(prof_count))
+                      'skip.'.format(prof_count))
                 self.profiles = [MesaFile(os.path.join(filedir, prof))
-                                    for prof in self.profiles_in_dir]
+                                 for prof in self.profiles_in_dir]
+
 
 class MesaFile(FileIn):
     """Read in MESA data file in history/profile format."""
@@ -149,14 +155,91 @@ class MesaFile(FileIn):
     def __init__(self, filename):
         super().__init__(filename, io.TextFile.MESA_DATA)
 
+
 class ProfilesIndex(FileIn):
     """Read in a MESA profiles index file."""
 
     def __init__(self, filename):
         super().__init__(filename, io.TextFile.PROFILES_INDEX)
 
+
 class Trajectory(FileIn):
     """Read in a trajectory file and make a FileIn instance."""
 
     def __init__(self, filename):
         super().__init__(filename, io.TextFile.TRAJECTORY)
+
+
+class NugridData:
+    """
+    For reading in NuGrid HDF5 data.
+    """
+
+    def __init__(self, filedir, file_ext='.h5'):
+        # List files in filedir and collect all hdf5 files with regex
+        self.filedir = filedir
+        self.h5_in_dir = tuple(h5 for h5 in sorted(os.listdir(filedir))
+                               if re.match('.*\{}$'.format(file_ext), h5))
+
+        # List over all HDF5 files
+        for ind, h5 in enumerate(self.h5_in_dir):
+            # Filename
+            filename = os.path.join(filedir, h5)
+
+            # First file defines the metadata and datasets attributes
+            if not ind:
+                self._metadata, self._data, self._headers, datasets = io.Hdf5File.readfile(
+                    filename, io.Hdf5File.NUGRID)
+
+                # For the moment, we hard-code the creation of A, Z, and isomeric_state attributes
+                # Maybe later, we can create an attribute for each dataset found instead?
+                with suppress(KeyError):
+                    self.A = datasets['A']
+                    self.Z = datasets['Z']
+                    self.isomeric_state = datasets['isomeric_state']
+                    logging.info('Attributes for A, Z, and isomeric_state have been created.')
+
+            else:  # only care about groups
+                _, groups_data, header_data, _ = io.Hdf5File.readfile(
+                    filename, io.Hdf5File.NUGRID)
+
+                # We only need to stack the groups data
+                self._data.update(groups_data)
+                self._headers.update(header_data)
+
+        # Collect the relevant attributes of the hdf5 files into self vars
+        self.cycles = [key for key in self._data.keys()]
+        self.metadata_names = [name for name in self._metadata]
+        self.cycle_headers = [attr for attr in self._headers[self.cycles[0]]]
+        self.cycle_data = self._data[self.cycles[0]].dtype.names
+
+        # Collect important values from each cycle for self vars
+        self.ages = [self._headers[key]['age'].item() for key in self.cycles]
+
+    def get_metadata(self, name):
+        """Return metadata value(s)."""
+        try:
+            return self._metadata[name]
+        except KeyError:
+            raise KeyError('Cannot find attribute {} in metadata.'.format(name))
+
+    def _get_cycle(self, cycle):
+        """Return cycle dataset object."""
+        try:
+            return self._data[str(cycle)]
+        except KeyError:
+            raise KeyError('Cannot find cycle {} in the data.'.format(cycle))
+
+    def get_cycle_header(self, cycle, name):
+        """Return specific cycle header data."""
+        try:
+            return self._headers[str(cycle)][name]
+        except KeyError:
+            raise KeyError('Cannot find header {} in cycle.'.format(name))
+
+    def get_from_cycle(self, cycle, name):
+        """Return cycle data."""
+        try:
+            return self._get_cycle(cycle)[name]
+        except ValueError:
+            raise KeyError('Cannot find data {} in cycle.'.format(name))

@@ -11,6 +11,7 @@ from .fixtures import random_string
 
 DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
 
+
 class TestStarExplore(TestCase):
     """Test the functionality of the star_explore notebook."""
     
@@ -38,7 +39,7 @@ class TestStarExplore(TestCase):
         self.ngse_species = ['H-1','He-4','C-12','C-13','N-14','O-16']
 
     @patch('nugridpy.mesa.pyl.plot')
-    @patch('nugridpy.mesa.pl.plot', return_value=[MagicMock()])
+    @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
     @patch('nugridpy.mesa.pl.axes')
     def test_mesa(self, mocked_ax, mocked_pl, mocked_pyl):
         """Test the mesa object as used in star_explore."""
@@ -70,7 +71,7 @@ class TestStarExplore(TestCase):
             _ = self.kip_cont(outfile='{}f.png'.format(tdir), showfig=False)
             self.assertEqual(mocked_ax.call_count, 1)
 
-    @patch('nugridpy.mesa.pl.plot', return_value=[MagicMock()])
+    @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
     @patch('nugridpy.mesa.pl.axes')
     def test_se(self, mocked_ax, mocked_pl):
         """Test the nugridse.se object as used in star_explore."""
@@ -115,7 +116,7 @@ class TestStarExplore(TestCase):
 
         # Test the use of the abu_profile method
         _ = self.ngse_prof(fname=random.randint(1, 1000),
-                                isos=self.ngse_species)
+                           isos=self.ngse_species)
         self.assertEqual(mocked_pl.call_count, 6)
         mocked_pl.reset_mock()
 
@@ -145,7 +146,7 @@ class TestWeakIProcessTemplate(TestCase):
         self.el_abu = self.abu_vec.elemental_abund
         self.iso_abu = self.abu_vec.iso_abund
 
-    @patch('nugridpy.mesa.pl.plot', return_value=[MagicMock()])
+    @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
     def test_elem_abu(self, mocked_pl):
         """Test the elemental_abund method as used in the notebook."""
         # Test the method itself (single-cycle read-in so index is 0)
@@ -164,7 +165,7 @@ class TestWeakIProcessTemplate(TestCase):
         length = len(dcols[0])
         self.assertTrue(all(len(dcol) == length for dcol in dcols))
 
-    @patch('nugridpy.mesa.pl.plot', return_value=[MagicMock()])
+    @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
     def test_iso_abund(self, mocked_pl):
         """Test the iso_abund method as used in the notebook."""
         # Test the method call (1 cycle, index 0)
