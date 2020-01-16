@@ -139,7 +139,7 @@ class Hdf5File:
         Reads in HDF5 files.
         Returns metadata, data objects from file, and more?
         """
-        logging.info('Reading {}...'.format(filename))
+        logging.info('Reading %s...', filename)
         file_object = h5py.File(filename, 'r')
 
         # Metadata
@@ -155,7 +155,7 @@ class Hdf5File:
                 datasets[key] = extracted_data[filetype['default_dataset_name']]
             elif isinstance(extracted_data, h5py.Group):
                 # Extract cycle number from name
-                cycle_number = str(int(key.strip(filetype['group_prefix'])))
+                cycle_number = int(key.strip(filetype['group_prefix']))
                 groups[cycle_number] = extracted_data[filetype['group_default_dataset_name']]
                 headers[cycle_number] = extracted_data.attrs
             else:

@@ -7,19 +7,19 @@ import logging
 import os
 import re
 
-from . import io
+import numpy as np
 
+from .plot import StarPlotsMixin
+from .io import TextFile, Hdf5File
 
 logging.basicConfig(level=logging.INFO)
 
 
-class FileIn:
+class DataFromTextMixin:
     """
-    Receives a text file and creates a data object from its contents.
+    Abstract class for data extracted from text file.
 
     Attributes:
-        filetypes (tuple): Provides a tuple containing the names of filetypes
-            that can be read in as a FileIn object.
         header_names (tuple): A tuple containing the string values of each
             header name (e.g., 'model_number').
         data_names (tuple): A tuple containing the string values of each
@@ -27,7 +27,7 @@ class FileIn:
 
     Arguments:
         filename (str): File being read in.
-        filetype (dict): Filetype as read from io.TextFile.FILE_TYPES.
+        filetype (dict): Filetype as read from TextFile.FILE_TYPES.
 
     Methods:
         get(self, data_name): Receives a data_name string and returns the
@@ -36,58 +36,43 @@ class FileIn:
             returns the corresponding value.
     """
 
-    # Class variable to show which files are readable, generated from io filetypes
-    filetypes = tuple(ftype['name'] for ftype in io.TextFile.FILE_TYPES)
-
     def __init__(self, filename, filetype):
         """Constructs a data instance from a given file."""
         # These variables are not user-meaningful
-        self._header_object, self._data_object = io.TextFile.readfile(
+        self._header_object, self._data_object = TextFile.readfile(
             filename, filetype)
 
-        # These variables allow the user to see header and data names
-        self.header_names = self._header_object.dtype.names
-        self.data_names = self._data_object.dtype.names
+    @property
+    def header_names(self):
+        """List of header names."""
+        return self._header_object.dtype.names
 
-    def get(self, data_name):
-        """Basic get method. Returns data attribute requested."""
-        # Prompt a data_names check if it doesn't contain request
-        if data_name not in self.data_names:
-            raise ValueError('No data exists with that header. Check data_names '
-                             'for availability.')
+    @property
+    def data_names(self):
+        """List of data names."""
+        return self._data_object.dtype.names
 
-        # Declare the value and return it
-        value = self._data_object[data_name]
-        return value
+    def get_header(self, name):
+        """Get method for header object."""
+        return self._header_object[name].item()
 
-    def get_header(self, header_name):
-        """Get method for header data."""
-        # Prompt a header_names check if requested name isn't contained in the namespace
-        if header_name not in self.header_names:
-            raise ValueError('No such header data exists. Check header_names for '
-                             'availability.')
-
-        # The .item() syntax must be used for singletons in a numpy structured array
-        if self._header_object[header_name].size == 1:
-            value = self._header_object[header_name].item(0)
-        else:
-            value = self._header_object[header_name]
-
-        return value
+    def get(self, name):
+        """Get method for data object."""
+        return self._data_object[name]
 
 
-class MesaData:
+class MesaData(StarPlotsMixin):
     """
     For reading MESA data from a provided directory.
 
     Attributes:
-        history_data (data.FileIn): A FileIn instance that contains the data from a
+        history_data (DataFromTextMixin): A DataFromTextMixin instance that contains the data from a
             history.data file.
-        profiles_index (data.FileIn): A FileIn instance that contains the data from
+        profiles_index (DataFromTextMixin): A DataFromTextMixin instance that contains the data from
             a profiles.index file.
         profiles_in_dir (tuple): A tuple containing string filenames for each MESA
             profile found in filedir.
-        profiles (list): A list populated with one FileIn object for each profile
+        profiles (list): A list populated with one DataFromTextMixin object for each profile
             that is read in.
 
     Arguments:
@@ -121,7 +106,8 @@ class MesaData:
         if not profiles_only:
             # Try to read and alert user if file not present
             try:
-                self.history_data = MesaFile(os.path.join(filedir, history_name))
+                self.history_data = DataFromTextMixin(
+                    os.path.join(filedir, history_name), TextFile.MESA_DATA)
             except IOError:
                 raise IOError('No file named {} could be found. Check filedir path or '
                               'set history_name.'.format(history_name))
@@ -130,7 +116,8 @@ class MesaData:
         if not history_only:
             # Try to read and alert user if file not present
             try:
-                self.profiles_index = ProfilesIndex(os.path.join(filedir, index_name))
+                self.profiles_index = DataFromTextMixin(
+                    os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
             except IOError:
                 raise IOError('No file named {} could be found. Check filedir or set '
                               'index_name.'.format(index_name))
@@ -145,51 +132,66 @@ class MesaData:
             if all_profiles:
                 print('Reading in {} profiles... set all_profiles to False to '
                       'skip.'.format(prof_count))
-                self.profiles = [MesaFile(os.path.join(filedir, prof))
+                self.profiles = [DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
                                  for prof in self.profiles_in_dir]
 
+    @property
+    def cycles(self):
+        """List of cycles."""
+        return self.history_data.get('model_number')
 
-class MesaFile(FileIn):
-    """Read in MESA data file in history/profile format."""
+    def get_cycle_header(self, name, cycles=None):
+        """Return header data from specific cycles.
+
+        :param str name: Header name
+        :param int or list(int) cycles: cycle numbers. Default: all cycles
+        """
+        cycles = cycles or self.cycles
+        if isinstance(cycles, int):
+            return self.history_data.get(name)[cycles - 1]  # -1 because of arrays here, not dict
+        return np.array([self.history_data.get(name)[c - 1] for c in cycles])
+
+    def get_cycle_data(self, name, cycles):
+        """Return data from specific cycles.
+
+        :param str name: Data name
+        :param int or list(int) cycles: cycle numbers
+        """
+        if isinstance(cycles, int):
+            return self.profiles.get(name)[cycles - 1]
+        return [self.profiles.get(name)[c - 1] for c in cycles]
+
+
+class Trajectory(DataFromTextMixin):
+    """Read in a trajectory file and make a DataFromTextMixin instance."""
 
     def __init__(self, filename):
-        super().__init__(filename, io.TextFile.MESA_DATA)
+        super().__init__(filename, TextFile.TRAJECTORY)
 
 
-class ProfilesIndex(FileIn):
-    """Read in a MESA profiles index file."""
+class NugridData(StarPlotsMixin):
+    """Class representing NuGrid data."""
 
-    def __init__(self, filename):
-        super().__init__(filename, io.TextFile.PROFILES_INDEX)
-
-
-class Trajectory(FileIn):
-    """Read in a trajectory file and make a FileIn instance."""
-
-    def __init__(self, filename):
-        super().__init__(filename, io.TextFile.TRAJECTORY)
-
-
-class NugridData:
-    """
-    For reading in NuGrid HDF5 data.
-    """
+    # Names of the methods extracting header and cycle data
+    _get_data_from_headers_name = 'get_cycle_header'
+    _get_data_from_cycles_name = 'get_cycle_data'
 
     def __init__(self, filedir, file_ext='.h5'):
+
         # List files in filedir and collect all hdf5 files with regex
         self.filedir = filedir
-        self.h5_in_dir = tuple(h5 for h5 in sorted(os.listdir(filedir))
-                               if re.match('.*\{}$'.format(file_ext), h5))
+        self.files_in_dir = tuple(f for f in sorted(os.listdir(filedir))
+                                  if f.lower().endswith(file_ext))
 
         # List over all HDF5 files
-        for ind, h5 in enumerate(self.h5_in_dir):
+        for ind, h5 in enumerate(self.files_in_dir):
             # Filename
             filename = os.path.join(filedir, h5)
 
             # First file defines the metadata and datasets attributes
             if not ind:
-                self._metadata, self._data, self._headers, datasets = io.Hdf5File.readfile(
-                    filename, io.Hdf5File.NUGRID)
+                self._metadata, self._data, self._headers, datasets = Hdf5File.readfile(
+                    filename, Hdf5File.NUGRID)
 
                 # For the moment, we hard-code the creation of A, Z, and isomeric_state attributes
                 # Maybe later, we can create an attribute for each dataset found instead?
@@ -200,46 +202,95 @@ class NugridData:
                     logging.info('Attributes for A, Z, and isomeric_state have been created.')
 
             else:  # only care about groups
-                _, groups_data, header_data, _ = io.Hdf5File.readfile(
-                    filename, io.Hdf5File.NUGRID)
+                _, groups_data, header_data, _ = Hdf5File.readfile(
+                    filename, Hdf5File.NUGRID)
 
                 # We only need to stack the groups data
                 self._data.update(groups_data)
                 self._headers.update(header_data)
 
-        # Collect the relevant attributes of the hdf5 files into self vars
-        self.cycles = [key for key in self._data.keys()]
-        self.metadata_names = [name for name in self._metadata]
-        self.cycle_headers = [attr for attr in self._headers[self.cycles[0]]]
-        self.cycle_data = self._data[self.cycles[0]].dtype.names
-
         # Collect important values from each cycle for self vars
         self.ages = [self._headers[key]['age'].item() for key in self.cycles]
 
+    @property
+    def cycles(self):
+        """List of cycles."""
+        return tuple(self._data.keys())
+
+    @property
+    def metadata_names(self):
+        """List of metadata names."""
+        return tuple(self._metadata.keys())
+
+    @property
+    def cycle_headers(self):
+        """List of cycles headers."""
+        return tuple(self._headers[self.cycles[0]].keys())
+
+    @property
+    def cycle_data(self):
+        """List of cycles data."""
+        return tuple(self._data[self.cycles[0]].dtype.names)
+
     def get_metadata(self, name):
-        """Return metadata value(s)."""
+        """Return metadata value(s).
+
+        :param str name: Metadata name.
+        """
         try:
             return self._metadata[name]
         except KeyError:
             raise KeyError('Cannot find attribute {} in metadata.'.format(name))
 
-    def _get_cycle(self, cycle):
-        """Return cycle dataset object."""
+    def _get_cycle_header(self, name, cycle):
+        """Return data from a specific cycle header.
+
+        :param str name: Header name
+        :param int cycle: cycle number
+        """
         try:
-            return self._data[str(cycle)]
+            return self._headers[cycle][name].item()
+        except KeyError:
+            raise KeyError('Cannot find header {} in cycle {}.'.format(name, cycle))
+
+    def get_cycle_header(self, name, cycles=None):
+        """Return header data from specific cycles.
+
+        :param str name: Header name
+        :param int or list(int) cycles: cycle numbers. Default: all cycles
+        """
+        cycles = cycles or self.cycles
+        if isinstance(cycles, int):
+            return self._get_cycle_header(name, cycles)
+        return np.array([self._get_cycle_header(name, c) for c in cycles])
+
+    def _get_cycle(self, cycle):
+        """Return cycle dataset object.
+
+        :param int cycle: cycle number
+        """
+        try:
+            return self._data[cycle]
         except KeyError:
             raise KeyError('Cannot find cycle {} in the data.'.format(cycle))
 
-    def get_cycle_header(self, cycle, name):
-        """Return specific cycle header data."""
-        try:
-            return self._headers[str(cycle)][name]
-        except KeyError:
-            raise KeyError('Cannot find header {} in cycle.'.format(name))
+    def _get_cycle_data(self, name, cycle):
+        """Return data from a specific cycle.
 
-    def get_from_cycle(self, cycle, name):
-        """Return cycle data."""
+        :param str name: Data name
+        :param int or list(int) cycle: cycle number
+        """
         try:
             return self._get_cycle(cycle)[name]
-        except ValueError:
-            raise KeyError('Cannot find data {} in cycle.'.format(name))
+        except KeyError:
+            raise KeyError('Cannot find data {} in cycle {}.'.format(name, cycle))
+
+    def get_cycle_data(self, name, cycles):
+        """Return data from specific cycles.
+
+        :param str name: Data name
+        :param int or list(int) cycles: cycle numbers
+        """
+        if isinstance(cycles, int):
+            return self._get_cycle_data(name, cycles)
+        return [self._get_cycle_data(name, c) for c in cycles]

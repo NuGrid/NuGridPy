@@ -1,12 +1,16 @@
-import numpy as np
+
 import os
-import pkg_resources
 import random
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest import TestCase, skip
 
-from nugridpy import data, io
+import pkg_resources
+import numpy as np
+from matplotlib.figure import Figure
+
+from nugridpy.data import DataFromTextMixin, NugridData, MesaData
+from nugridpy.io import TextFile
 
 
 DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
@@ -20,18 +24,13 @@ class TestAsciiData(unittest.TestCase):
         # Set the test data path
         self.data_path = 'tests/data/read-write/'
 
-        # Get the FileIn filetypes
-        self.filetypes = data.FileIn.filetypes
+        # Make a user-facing data object with DataFromTextMixin
+        self.test_data = DataFromTextMixin(
+            os.path.join(self.data_path,
+                         'history.data'), TextFile.MESA_DATA)
 
-        # Make a user-facing data object with data.FileIn
-        self.test_data = data.FileIn(os.path.join(self.data_path,
-            'history.data'), io.TextFile.MESA_DATA)
-
-    def test_FileIn(self):
-        """Test the data.FileIn class."""
-        # Make sure the filetypes class variable is assigned/non-empty
-        self.assertIsInstance(self.filetypes, tuple)
-        self.assertGreater(len(self.filetypes), 0)
+    def test_DataFromTextMixin(self):
+        """Test the DataFromTextMixin class."""
 
         # Check the datacol/header names attributes are populated
         self.assertIsInstance(self.test_data.header_names, tuple)
@@ -40,7 +39,7 @@ class TestAsciiData(unittest.TestCase):
         self.assertGreater(len(self.test_data.data_names), 0)
 
     def test_MesaData(self):
-        """Test the data.MesaData class."""
+        """Test the MesaData class."""
         # Check that MesaData works and reads in a custom filename
         with tempfile.NamedTemporaryFile(prefix='star.log') as tmpf:
             # Write history.data to tempfile
@@ -49,12 +48,12 @@ class TestAsciiData(unittest.TestCase):
             hd.close()
 
             # Read the tempfile as a MesaData instance
-            test_alias = data.MesaData(tempfile.tempdir, history_name=tmpf.name, 
-                history_only=True)
+            test_alias = MesaData(tempfile.tempdir, history_name=tmpf.name,
+                                  history_only=True)
 
             # Ensure the instance was initialized properly
-            self.assertIsInstance(test_alias, data.MesaData)
-            self.assertIsInstance(test_alias.history_data, data.MesaFile)
+            self.assertIsInstance(test_alias, MesaData)
+            self.assertIsInstance(test_alias.history_data, DataFromTextMixin)
 
             # Ensure history_only worked properly, no profile data
             with self.assertRaises(AttributeError):
@@ -79,7 +78,7 @@ class TestHdf5Data(unittest.TestCase):
     def setUp(self):
         """Test setup."""
         # Create data object
-        self.test_data = data.NugridData(DATA_PATH)
+        self.test_data = NugridData(DATA_PATH)
 
         # Define some expected values and names for functional tests
         self.expected_num_cycles = 1000
@@ -118,9 +117,9 @@ class TestHdf5Data(unittest.TestCase):
                                     'elem_numf_decay']
 
     def test_NugridData(self):
-        """Testing the data.NugridData class."""
+        """Testing the NugridData class."""
         # Test data object
-        self.assertIsInstance(self.test_data, data.NugridData)
+        self.assertIsInstance(self.test_data, NugridData)
 
         # Declare the data object attribute lists
         test_cycles = self.test_data.cycles
@@ -151,11 +150,45 @@ class TestHdf5Data(unittest.TestCase):
             self.assertTrue(key in self.expected_metadata)
 
         for key in test_headers:
-            _ = self.test_data.get_cycle_header(test_cyc, key)
-            self.assertIsInstance(_, np.ndarray)
+            _ = self.test_data.get_cycle_header(key, test_cyc)
             self.assertTrue(key in self.expected_cycle_headers)
 
         for key in test_data_names:
-            _ = self.test_data.get_from_cycle(test_cyc, key)
+            _ = self.test_data.get_cycle_data(key, test_cyc)
             self.assertIsInstance(_, np.ndarray)
             self.assertTrue(key in self.expected_cycle_data)
+
+
+class TestMesaData(TestCase):
+    """Class for functional testing on the MesaData class."""
+
+    def setUp(self):
+        self.data = MesaData(DATA_PATH, history_only=True)
+
+    def test_hdr(self):
+        """Checks that we can plot an HRD."""
+        fig = self.data.hrd(show=False)
+        self.assertIsInstance(fig, Figure)
+
+    def test_kippenhahn(self):
+        """Checks that we can plot an Kippenhahn diagramm."""
+        fig = self.data.kippenhahn('star_age', show=False)
+        self.assertIsInstance(fig, Figure)
+
+
+@skip('bad data in tests folder')
+class TestNugridData(TestCase):
+    """Class for functional testing on the NugridData class."""
+
+    def setUp(self):
+        self.data = NugridData(DATA_PATH)
+
+    def test_hdr(self):
+        """Checks that we can plot an HRD."""
+        fig = self.data.hrd(show=False)
+        self.assertIsInstance(fig, Figure)
+
+    def test_kippenhahn(self):
+        """Checks that we can plot an Kippenhahn diagramm."""
+        fig = self.data.kippenhahn('star_age', show=False)
+        self.assertIsInstance(fig, Figure)
