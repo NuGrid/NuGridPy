@@ -1,11 +1,11 @@
-import os
-import pkg_resources
 import random
 from tempfile import TemporaryDirectory as tmpdir
-from unittest import TestCase, skip
-from unittest.mock import MagicMock, patch
 
-from nugridpy import ascii_table, h5T, mesa, nugridse, ppn, utils
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
+import pkg_resources
+
+from nugridpy import h5T, mesa, nugridse, ppn
 from .fixtures import random_string
 
 
@@ -14,7 +14,7 @@ DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
 
 class TestStarExplore(TestCase):
     """Test the functionality of the star_explore notebook."""
-    
+
     def setUp(self):
         """Set up the tests."""
         # Set up mesa star_log object and associated class methods
@@ -36,7 +36,7 @@ class TestStarExplore(TestCase):
         self.ngse_prof = self.ngse_in.abu_profile
         self.ngse_iso = self.ngse_in.iso_abund
         self.ngse_chart = self.ngse_in.abu_chart
-        self.ngse_species = ['H-1','He-4','C-12','C-13','N-14','O-16']
+        self.ngse_species = ['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16']
 
     @patch('nugridpy.mesa.pyl.plot')
     @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
@@ -44,40 +44,37 @@ class TestStarExplore(TestCase):
     def test_mesa(self, mocked_ax, mocked_pl, mocked_pyl):
         """Test the mesa object as used in star_explore."""
         # Test the mesa.kippenhahn_CO() method
-        _ = self.kip_CO(random.randint(1, 1000), 'model')
+        self.kip_CO(random.randint(1, 1000), 'model')
         self.assertEqual(mocked_pyl.call_count, 8)
         mocked_pyl.reset_mock()
 
-        _ = self.kip_CO(random.randint(1, 1000), 'time')
+        self.kip_CO(random.randint(1, 1000), 'time')
         self.assertEqual(mocked_pyl.call_count, 8)
         mocked_pyl.reset_mock()
 
         with self.assertRaises(UnboundLocalError):
-            _ = self.kip_CO(random.randint(1, 1000), random_string())
-
-        with self.assertRaisesRegex(TypeError, 'kippenhahn_CO()'):
-            _ = self.kip_CO()
+            self.kip_CO(random.randint(1, 1000), random_string())
 
         # Test the mesa.tcrhoc() method
-        _ = self.tcrhoc()
+        self.tcrhoc()
         self.assertEqual(mocked_pl.call_count, 1)
 
         # Test the mesa.hrd_new() method
-        _ = self.hrd_new()
+        self.hrd_new()
         self.assertEqual(mocked_pyl.call_count, 1)
 
         # Test the mesa.kip_cont() method
         with tmpdir() as tdir:
-            _ = self.kip_cont(outfile='{}f.png'.format(tdir), showfig=False)
+            self.kip_cont(outfile='{}f.png'.format(tdir), showfig=False)
             self.assertEqual(mocked_ax.call_count, 1)
 
     @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
     @patch('nugridpy.mesa.pl.axes')
-    def test_se(self, mocked_ax, mocked_pl):
+    def test_se(self, _mocked_ax, mocked_pl):
         """Test the nugridse.se object as used in star_explore."""
         # Test the se object
         self.assertIsInstance(self.ngse_se, h5T.Files)
-        
+
         # Test the se.hattrs object and get method
         self.assertIsInstance(self.ngse_hattrs, list)
 
@@ -87,7 +84,7 @@ class TestStarExplore(TestCase):
         # Test the se.cattrs object and get method
         self.assertIsInstance(self.ngse_cattrs, list)
         #import ipdb
-        #ipdb.set_trace()
+        # ipdb.set_trace()
 
         for cattr in self.ngse_cattrs:
             _ = self.ngse_se.get(cattr)
@@ -120,8 +117,8 @@ class TestStarExplore(TestCase):
         self.assertEqual(mocked_pl.call_count, 6)
         mocked_pl.reset_mock()
 
-        with self.assertRaisesRegex(OSError, 
-                    'Please provide the cycle number fname'):
+        with self.assertRaisesRegex(OSError,
+                                    'Please provide the cycle number fname'):
             _ = self.ngse_prof()
 
         # Test the use of the iso_abund method
@@ -147,7 +144,8 @@ class TestWeakIProcessTemplate(TestCase):
         self.iso_abu = self.abu_vec.iso_abund
 
     @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
-    def test_elem_abu(self, mocked_pl):
+    @patch('nugridpy.mesa.pl.show')
+    def test_elem_abu(self, _mocked_show, mocked_pl):
         """Test the elemental_abund method as used in the notebook."""
         # Test the method itself (single-cycle read-in so index is 0)
         _ = self.el_abu(0)
@@ -165,33 +163,13 @@ class TestWeakIProcessTemplate(TestCase):
         length = len(dcols[0])
         self.assertTrue(all(len(dcol) == length for dcol in dcols))
 
-    @patch('nugridpy.mesa.pl.plot', return_value=(MagicMock(),))
-    def test_iso_abund(self, mocked_pl):
+    @patch('nugridpy.data_plot.pl.plot', return_value=(MagicMock(),))
+    @patch('nugridpy.data_plot.pl.show')
+    def test_iso_abund(self, _mocked_show, mocked_pl):
         """Test the iso_abund method as used in the notebook."""
         # Test the method call (1 cycle, index 0)
         _ = self.iso_abu(0)
         self.assertEqual(mocked_pl.call_count, 85)
-        
+
         with self.assertRaisesRegex(TypeError, 'iso_abund()'):
             _ = self.iso_abu()
-
-
-class TestExtractTraj(TestCase):
-    """Test the Extract_trajectory notebook."""
-
-    def setUp(self):
-        """Set up the trajectory notebook tests."""
-        # Initialize nugridse instance and methods
-        self.se = nugridse.se(DATA_PATH)
-        self.traj = nugridse.trajectory
-
-    @skip('This functionality is, at the moment, hopelessly broken.')
-    def test_trajectory(self):
-        """Test the trajectory write method."""
-        nugridse.set_data_path(DATA_PATH)
-        self.se_in = nugridse.se(mass=12, Z=0.006)
-        self.m_coor = 0.15
-        self.model_start = 235
-        self.r, self.rho, self.temp, self.time = nugridse.trajectory(
-                self.model_start, 1306, 10, self.mcoor, age_in_sec=True,
-                online=False)
