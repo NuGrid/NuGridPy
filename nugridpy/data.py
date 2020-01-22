@@ -1,5 +1,8 @@
 """
-Data handling
+Data
+====
+
+This module provides implementation for handling data.
 """
 
 from contextlib import suppress
@@ -9,7 +12,7 @@ import re
 
 import numpy as np
 
-from .plot import StarPlotsMixin
+from .plot import PlotMixin, StarPlotsMixin
 from .io import TextFile, Hdf5File
 
 logging.basicConfig(level=logging.INFO)
@@ -61,122 +64,15 @@ class DataFromTextMixin:
         return self._data_object[name]
 
 
-class MesaData(StarPlotsMixin):
-    """
-    For reading MESA data from a provided directory.
+class DataFromHDF5Mixin(PlotMixin):
+    """Class for data obtained from reading text files.
 
-    Attributes:
-        history_data (DataFromTextMixin): A DataFromTextMixin instance that contains the data from a
-            history.data file.
-        profiles_index (DataFromTextMixin): A DataFromTextMixin instance that contains the data from
-            a profiles.index file.
-        profiles_in_dir (tuple): A tuple containing string filenames for each MESA
-            profile found in filedir.
-        profiles (list): A list populated with one DataFromTextMixin object for each profile
-            that is read in.
-
-    Arguments:
-        filedir (str): Directory path to MESA data.
-        history_name (:obj:`str`, optional): Filename in the given directory for the
-            history data file. The default is history.data, or can be set by user.
-        index_name (:obj:`str`, optional): Filename in the given directory for the
-            mesa profiles index file. Default is profiles.index.
-        profile_prefix (:obj:`str`, optional): The filename prefix for profile data,
-            such as profile or log (e.g., profile32.data). The default is profile.
-        profile_suffix (:obj:`str`, optional): The filename suffix for profile data.
-            The default is .data.
-        all_profiles (:obj:`bool`, optional): Determines whether all profiles are read
-            in or not. Default is True.
-        history_only (:obj:`bool`, optional): Set to True if history.data is the only
-            thing you want to read in. False by default.
-        profiles_only (:obj:`bool`, optional): Set to True if profile data is the only
-            thing you want to read in. False by default.
+     Arguments:
+        filedir (str): Directory path to the data.
+        file_ext (str, optional): file extension
     """
 
-    def __init__(self, filedir, history_name='history.data', index_name='profiles.index',
-                 profile_prefix='profile', profile_suffix='.data', all_profiles=True,
-                 history_only=False, profiles_only=False):
-        """Constructs a MESA data instance."""
-        # Raise error if both history_only and profiles_only are True simultaneously
-        if history_only and profiles_only:
-            raise ValueError('At least one of history_only and profiles_only must be '
-                             'False.')
-
-        # history.data read-in
-        if not profiles_only:
-            # Try to read and alert user if file not present
-            try:
-                self.history_data = DataFromTextMixin(
-                    os.path.join(filedir, history_name), TextFile.MESA_DATA)
-            except IOError:
-                raise IOError('No file named {} could be found. Check filedir path or '
-                              'set history_name.'.format(history_name))
-
-        # profiles.index read-in
-        if not history_only:
-            # Try to read and alert user if file not present
-            try:
-                self.profiles_index = DataFromTextMixin(
-                    os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
-            except IOError:
-                raise IOError('No file named {} could be found. Check filedir or set '
-                              'index_name.'.format(index_name))
-
-            # Collect the profiles from filedir
-            files = os.listdir(filedir)
-            self.profiles_in_dir = tuple(prof for prof in files if re.match(
-                '{}[0-9]\d*{}'.format(profile_prefix, profile_suffix), prof))
-            prof_count = len(self.profiles_in_dir)
-
-            # Read in all profiles to a user-facing list attribute
-            if all_profiles:
-                print('Reading in {} profiles... set all_profiles to False to '
-                      'skip.'.format(prof_count))
-                self.profiles = [DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
-                                 for prof in self.profiles_in_dir]
-
-    @property
-    def cycles(self):
-        """List of cycles."""
-        return self.history_data.get('model_number')
-
-    def get_cycle_header(self, name, cycles=None):
-        """Return header data from specific cycles.
-
-        :param str name: Header name
-        :param int or list(int) cycles: cycle numbers. Default: all cycles
-        """
-        cycles = cycles or self.cycles
-        if isinstance(cycles, int):
-            return self.history_data.get(name)[cycles - 1]  # -1 because of arrays here, not dict
-        return np.array([self.history_data.get(name)[c - 1] for c in cycles])
-
-    def get_cycle_data(self, name, cycles):
-        """Return data from specific cycles.
-
-        :param str name: Data name
-        :param int or list(int) cycles: cycle numbers
-        """
-        if isinstance(cycles, int):
-            return self.profiles.get(name)[cycles - 1]
-        return [self.profiles.get(name)[c - 1] for c in cycles]
-
-
-class Trajectory(DataFromTextMixin):
-    """Read in a trajectory file and make a DataFromTextMixin instance."""
-
-    def __init__(self, filename):
-        super().__init__(filename, TextFile.TRAJECTORY)
-
-
-class NugridData(StarPlotsMixin):
-    """Class representing NuGrid data."""
-
-    # Names of the methods extracting header and cycle data
-    _get_data_from_headers_name = 'get_cycle_header'
-    _get_data_from_cycles_name = 'get_cycle_data'
-
-    def __init__(self, filedir, file_ext='.h5'):
+    def __init__(self, filedir, file_ext='.h5', **_kwargs):
 
         # List files in filedir and collect all hdf5 files with regex
         self.filedir = filedir
@@ -294,3 +190,133 @@ class NugridData(StarPlotsMixin):
         if isinstance(cycles, int):
             return self._get_cycle_data(name, cycles)
         return [self._get_cycle_data(name, c) for c in cycles]
+
+
+# This is not ideal but for the moment,
+# we keep two distinct classes for MESA data
+# because the data and the way to access it is different
+# between these obtained from logs and those from HDF5 files.
+class MesaDataText(StarPlotsMixin):
+    """
+    Class for MESA data obtained from reading text files.
+
+    Attributes:
+        history_data (DataFromTextMixin): A DataFromTextMixin instance that contains the data from a
+            history.data file.
+        profiles_index (DataFromTextMixin): A DataFromTextMixin instance that contains the data from
+            a profiles.index file.
+        profiles_in_dir (tuple): A tuple containing string filenames for each MESA
+            profile found in filedir.
+        profiles (list): A list populated with one DataFromTextMixin object for each profile
+            that is read in.
+
+    Arguments:
+        filedir (str): Directory path to MESA data.
+        history_name (:obj:`str`, optional): Filename in the given directory for the
+            history data file. The default is history.data, or can be set by user.
+        index_name (:obj:`str`, optional): Filename in the given directory for the
+            mesa profiles index file. Default is profiles.index.
+        profile_prefix (:obj:`str`, optional): The filename prefix for profile data,
+            such as profile or log (e.g., profile32.data). The default is profile.
+        profile_suffix (:obj:`str`, optional): The filename suffix for profile data.
+            The default is .data.
+        all_profiles (:obj:`bool`, optional): Determines whether all profiles are read
+            in or not. Default is True.
+        history_only (:obj:`bool`, optional): Set to True if history.data is the only
+            thing you want to read in. False by default.
+        profiles_only (:obj:`bool`, optional): Set to True if profile data is the only
+            thing you want to read in. False by default.
+    """
+
+    def __init__(self, filedir, history_name='history.data', index_name='profiles.index',
+                 profile_prefix='profile', profile_suffix='.data', all_profiles=True,
+                 history_only=False, profiles_only=False):
+        """Constructs a MESA data instance."""
+        # Raise error if both history_only and profiles_only are True simultaneously
+        if history_only and profiles_only:
+            raise ValueError('At least one of history_only and profiles_only must be '
+                             'False.')
+
+        # history.data read-in
+        if not profiles_only:
+            # Try to read and alert user if file not present
+            try:
+                self.history_data = DataFromTextMixin(
+                    os.path.join(filedir, history_name), TextFile.MESA_DATA)
+            except IOError:
+                raise IOError('No file named {} could be found. Check filedir path or '
+                              'set history_name.'.format(history_name))
+
+        # profiles.index read-in
+        if not history_only:
+            # Try to read and alert user if file not present
+            try:
+                self.profiles_index = DataFromTextMixin(
+                    os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
+            except IOError:
+                raise IOError('No file named {} could be found. Check filedir or set '
+                              'index_name.'.format(index_name))
+
+            # Collect the profiles from filedir
+            files = os.listdir(filedir)
+            self.profiles_in_dir = tuple(prof for prof in files if re.match(
+                '{}[0-9]\d*{}'.format(profile_prefix, profile_suffix), prof))
+            prof_count = len(self.profiles_in_dir)
+
+            # Read in all profiles to a user-facing list attribute
+            if all_profiles:
+                print('Reading in {} profiles... set all_profiles to False to '
+                      'skip.'.format(prof_count))
+                self.profiles = [DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
+                                 for prof in self.profiles_in_dir]
+
+    @property
+    def cycles(self):
+        """List of cycles."""
+        return self.history_data.get('model_number')
+
+    def get_cycle_header(self, name, cycles=None):
+        """Return header data from specific cycles.
+
+        :param str name: Header name
+        :param int or list(int) cycles: cycle numbers. Default: all cycles
+        """
+        cycles = cycles or self.cycles
+        if isinstance(cycles, int):
+            return self.history_data.get(name)[cycles - 1]  # -1 because of arrays here, not dict
+        return np.array([self.history_data.get(name)[c - 1] for c in cycles])
+
+    def get_cycle_data(self, name, cycles):
+        """Return data from specific cycles.
+
+        :param str name: Data name
+        :param int or list(int) cycles: cycle numbers
+        """
+        if isinstance(cycles, int):
+            return self.profiles.get(name)[cycles - 1]
+        return [self.profiles.get(name)[c - 1] for c in cycles]
+
+
+class MesaDataHDF5(DataFromHDF5Mixin, StarPlotsMixin):
+    """Class for MESA data obtained from reading HDF5 files.
+
+     Arguments:
+        filedir (str): Directory path to MESA data.
+        file_ext (str, optional): file extension
+    """
+
+
+class NugridData(DataFromHDF5Mixin):
+    """Class for NuGrid data.
+
+     Arguments:
+        filedir (str): Directory path to NuGrid data.
+        file_ext (str, optional): file extension
+    """
+
+
+class Trajectory(DataFromTextMixin):
+    """Read in a trajectory file and make a DataFromTextMixin instance."""
+
+    def __init__(self, filename):
+        super().__init__(filename, TextFile.TRAJECTORY)

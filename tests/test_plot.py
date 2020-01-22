@@ -25,16 +25,18 @@ class TestPlotMixinInit(TestCase):
 
 
 @patch('nugridpy.plot.plt')
+@patch('nugridpy.plot.np.where', return_value=...)
 class TestPlotMixin(TestCase):
     """Tests for the PlotMixin class functionalities."""
 
-    def check_plot_call(self, inst, m_get_data, m_plt, cycles=None,
+    def check_plot_call(self, inst, m_get_data, m_plt, m_where, cycles=None, x0=None,
                         num_profiles=1, xlabel=None, ylabel=None, legend=None):
         """Function checking calls for a given configuration."""
 
         # Reset mocks
         m_get_data.reset_mock()
         m_plt.reset_mock()
+        m_where.reset_mock()
 
         # Names of the profiles requested
         names = [random_string() for _ in range(num_profiles + 1)]  # +1 for x-axis
@@ -43,7 +45,8 @@ class TestPlotMixin(TestCase):
         return_value = random_array()
         m_get_data.return_value = return_value
 
-        inst.plot(names[0], names[1:], cycles=cycles, xlabel=xlabel, ylabel=ylabel, legend=legend)
+        inst.plot(names[0], names[1:], cycles=cycles, x0=x0,
+                  xlabel=xlabel, ylabel=ylabel, legend=legend)
 
         # Number of plot/get data calls
         # If there is no cycles or one cycle:
@@ -61,6 +64,8 @@ class TestPlotMixin(TestCase):
         expected_calls = [m_get_data.call_args_list[i][0][0]
                           for i in range(len(m_get_data.call_args_list))]
         self.assertEqual(expected_calls, names * num_cycles)
+        if x0:
+            self.assertTrue(m_where.called)
         if xlabel:
             m_plt.xlabel.assert_called_with(xlabel)
         if ylabel:
@@ -68,7 +73,7 @@ class TestPlotMixin(TestCase):
         if legend:
             m_plt.legend.assert_called_with(legend)
 
-    def check_plot_call_all_configs(self, get_data, m_plt, cycles=None):
+    def check_plot_call_all_configs(self, get_data, m_plt, m_where, cycles=None):
         """Function checking calls for all configurations."""
 
         with patch.object(PlotMixin, get_data) as m_get_data:
@@ -76,37 +81,42 @@ class TestPlotMixin(TestCase):
             inst = PlotMixin()
 
             # Minimal call
-            self.check_plot_call(inst, m_get_data, m_plt, cycles)
+            self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles)
 
             # With xlabel
-            self.check_plot_call(inst, m_get_data, m_plt, cycles, xlabel=random_string())
+            self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles, xlabel=random_string())
 
             # With ylabel
-            self.check_plot_call(inst, m_get_data, m_plt, cycles, ylabel=random_string())
+            self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles, ylabel=random_string())
 
             # With legend
-            self.check_plot_call(inst, m_get_data, m_plt, cycles, legend=(random_string(),))
+            self.check_plot_call(
+                inst, m_get_data, m_plt, m_where, cycles, legend=(random_string(),))
+
+            # With slicing the data
+            self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles, x0=random.randint(1, 10))
 
             # Several profiles
             self.check_plot_call(
-                inst, m_get_data, m_plt, cycles, num_profiles=random.randint(1, 10))
+                inst, m_get_data, m_plt, m_where, cycles, num_profiles=random.randint(1, 10))
 
-    def test_plot_header_data(self, m_plt):
+    def test_plot_header_data(self, m_where, m_plt):
         """Checks the plot method on header data."""
         # Header data accross cycles
-        self.check_plot_call_all_configs('get_cycle_header', m_plt)
+        self.check_plot_call_all_configs('get_cycle_header', m_plt, m_where)
 
-    def test_plot_cycle_data(self, m_plt):
+    def test_plot_cycle_data(self, m_where, m_plt):
         """Checks the plot method on cycle data."""
         # Cycle data
         # One cycle
-        self.check_plot_call_all_configs('get_cycle_data', m_plt, cycles=random.randint(1, 1000))
+        self.check_plot_call_all_configs(
+            'get_cycle_data', m_plt, m_where, cycles=random.randint(1, 1000))
 
         # Many cycles
-        self.check_plot_call_all_configs('get_cycle_data', m_plt, cycles=random_ints())
+        self.check_plot_call_all_configs('get_cycle_data', m_plt, m_where, cycles=random_ints())
 
     @patch.object(PlotMixin, 'get_cycle_header')
-    def test_plot_function_used(self, _m_get_data, m_plt):
+    def test_plot_function_used(self, _m_get_data, _m_where, m_plt):
         """Checks that the correct plot function is used."""
 
         inst = PlotMixin()
@@ -114,61 +124,21 @@ class TestPlotMixin(TestCase):
         # Linear plot
         inst.plot('x', 'y')
         self.assertEqual(m_plt.plot.call_count, 1)
-        m_plt.reset_mock()
 
         # Logx plot
         inst.plot('x', 'y', logx=True)
         self.assertEqual(m_plt.semilogx.call_count, 1)
-        m_plt.reset_mock()
 
         # Logy plot
         inst.plot('x', 'y', logy=True)
         self.assertEqual(m_plt.semilogy.call_count, 1)
-        m_plt.reset_mock()
 
         # Loglog plot
         inst.plot('x', 'y', logx=True, logy=True)
         self.assertEqual(m_plt.loglog.call_count, 1)
-        m_plt.reset_mock()
 
-
-class TestStarPlotsMixin(TestCase):
-    """Tests for the StarPlotsMixin class."""
-
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
-    @patch('nugridpy.plot.plt')
-    def test_hrd(self, m_plt, _m_get_data):
-        """Checks the HRD method."""
-
-        _ = StarPlotsMixin().hrd()
-        self.assertEqual(m_plt.plot.call_count, 1)
-
-    @patch.object(StarPlotsMixin, '_find_data_by_correct_name')
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
-    @patch('nugridpy.plot.plt')
-    def test_kippenhahn(self, m_plt, m_get_data, m_find_data):
-        """Checks the Kippnehahn diagramm."""
-
-        # All arrays returned must have the same size
-        r_array = random_array()
-        m_get_data.return_value = r_array
-
-        def side_effect(*args):
-            return random_string(), r_array
-        m_find_data.side_effect = side_effect
-
-        _ = StarPlotsMixin().kippenhahn(random_string())
-
-        # Number of calls given by the various class attributes
-        num_calls = len(StarPlotsMixin.CORE_NAMES) + \
-            len(StarPlotsMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
-
-        self.assertEqual(m_get_data.call_count, 1)  # x-data
-        self.assertEqual(m_find_data.call_count, num_calls)  # y-data
-        self.assertEqual(m_plt.plot.call_count, num_calls)
-
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
-    def test_find_data_by_correct_name(self, m_get_data):
+    @patch.object(PlotMixin, 'get_cycle_header')
+    def test_find_data_by_correct_name(self, m_get_data, _m_where, _m_plt):
         """Checks the function finding data by name."""
 
         field_name = 'my_field'
@@ -193,3 +163,70 @@ class TestStarPlotsMixin(TestCase):
         r = StarPlotsMixin()._find_data_by_correct_name(d)
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], field_name)
+
+        # Key present but we dont want the data
+        d += (field_name,)
+        r = StarPlotsMixin()._find_data_by_correct_name(d, return_data=False)
+        self.assertEqual(r, field_name)
+
+
+class TestStarPlotsMixin(TestCase):
+    """Tests for the StarPlotsMixin class."""
+
+    @patch.object(StarPlotsMixin, 'get_cycle_header')
+    @patch.object(StarPlotsMixin, 'plot')
+    def test_hrd(self, m_plt, m_get_data):
+        """Checks the HRD method."""
+
+        x = StarPlotsMixin()
+        x.hrd()
+        for arg in m_get_data.call_args_list:
+            self.assertIn(arg[0][0], x.LOG_TEFF_NAMES + x.LOG_L_NAMES)
+        self.assertEqual(m_plt.call_count, 1)
+
+    @patch.object(StarPlotsMixin, 'get_cycle_header')
+    @patch.object(StarPlotsMixin, 'plot')
+    def test_tcrhoc(self, m_plt, m_get_data):
+        """Checks the Tc/Rhoc method."""
+
+        x = StarPlotsMixin()
+        x.tcrhoc()
+        for arg in m_get_data.call_args_list:
+            self.assertIn(arg[0][0], x.LOG_RHOC_NAMES + x.LOG_TC_NAMES)
+        self.assertEqual(m_plt.call_count, 1)
+
+    @patch.object(StarPlotsMixin, '_find_data_by_correct_name')
+    @patch.object(StarPlotsMixin, 'get_cycle_header')
+    @patch('nugridpy.plot.plt')
+    def test_kippenhahn(self, m_plt, m_get_data, m_find_data):
+        """Checks the Kippnehahn diagramm."""
+
+        # All arrays returned must have the same size
+        r_array = random_array()
+        m_get_data.return_value = r_array
+
+        def side_effect(*_args):
+            return random_string(), r_array
+        m_find_data.side_effect = side_effect
+
+        _ = StarPlotsMixin().kippenhahn(random_string())
+
+        # Number of calls given by the various class attributes
+        num_calls = len(StarPlotsMixin.CORE_NAMES) + \
+            len(StarPlotsMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
+
+        self.assertEqual(m_get_data.call_count, 1)  # x-data
+        self.assertEqual(m_find_data.call_count, num_calls)  # y-data
+        self.assertEqual(m_plt.plot.call_count, num_calls)
+
+        # With C/O ration
+        m_get_data.reset_mock()
+        m_find_data.reset_mock()
+        m_plt.plot.reset_mock()
+
+        _ = StarPlotsMixin().kippenhahn(random_string(), CO_ratio=True)
+
+        self.assertEqual(m_get_data.call_count, 1)  # x-data
+        self.assertEqual(m_find_data.call_count, num_calls + 2)  # y-data
+        self.assertEqual(m_plt.plot.call_count, num_calls + 1)
+        self.assertEqual(m_plt.twinx.call_count, 1)  # second y-axis

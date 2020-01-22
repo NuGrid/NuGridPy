@@ -18,11 +18,6 @@ logging.basicConfig(level=logging.INFO)
 class PlotMixin:
     """Abstract class giving plotting functionalities."""
 
-    # These attributes allow us to proxy the actualy methods extracting header and cycle data.
-    # They should be defined in the inherited class
-    _get_data_from_headers_name = None
-    _get_data_from_cycles_name = None
-
     # Matplotlib functions to use for plotting (plot, semilogx, ...)
     # Key is a tuple (logx,logy)
     PLOT_FUNC_CHOICES = {
@@ -46,7 +41,24 @@ class PlotMixin:
         """
         raise NotImplementedError
 
-    def plot(self, x, ys, cycles=None, logx=False, logy=False,
+    def _find_data_by_correct_name(self, names, return_data=True):
+        """Utility function that finds the correct data name and extracts the data if requested."""
+
+        for name in names:
+            with suppress(KeyError, ValueError):
+                data = self.get_cycle_header(name)
+                return (name, data) if return_data else name
+        logging.warning(
+            'Cannot find data with any of the following names: %s', names)
+
+    @staticmethod
+    def _slice_array(x, x0=None):
+        """Returns indices for which x>x0 if x0, else an ellipsis."""
+        if x0:
+            return np.where(x > x0)
+        return ...
+
+    def plot(self, x, ys, cycles=None, x0=None, logx=False, logy=False,
              xlabel=None, ylabel=None, legend=None, show=True, **kwargs):
         """Generate a 2D plot.
 
@@ -55,6 +67,8 @@ class PlotMixin:
         :type ys: str or list(str)
         :param cycles: requested cycles
         :type cycles: int or list(int)
+        :param x0: if provided, only plots data for x > x0. Must be same unit as `x`.
+        :type x0: int or float
         :param bool logx: if True, use logarithmic x-axis
         :param bool logy: if True, use logarithmic y-axis
         :param str xlabel: label for the x-axis
@@ -76,15 +90,19 @@ class PlotMixin:
         #  * data for given cycles
         if not cycles:
             x_data = self.get_cycle_header(x)
+            indices = self._slice_array(x_data, x0)
+            x_data = x_data[indices]
             for y in ys:
-                y_data = self.get_cycle_header(y)
+                y_data = self.get_cycle_header(y)[indices]
                 getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(x_data, y_data, **kwargs)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
             for c in cycles:
                 x_data = self.get_cycle_data(x, c)
+                indices = self._slice_array(x_data, x0)
+                x_data = x_data[indices]
                 for y in ys:
-                    y_data = self.get_cycle_data(y, c)
+                    y_data = self.get_cycle_data(y, c)[indices]
                     getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(x_data, y_data, **kwargs)
 
         # Axes labels
@@ -113,9 +131,15 @@ class StarPlotsMixin(PlotMixin):
     # Instead, we classify these possible names in class attributes and use a utility function
     #
     # The keys is name representing the content of the data, values all the possible names to access it
+    STELLAR_MASS_NAMES = ('mass', 'star_mass', 'total_mass')
     LOG_TEFF_NAMES = ('logTeff', 'log_Teff')
     LOG_L_NAMES = ('logL', 'log_L')
-    STELLAR_MASS_NAMES = ('mass', 'star_mass', 'total_mass')
+    LOG_RHOC_NAMES = ('log_center_Rho',)
+    LOG_TC_NAMES = ('log_center_T',)
+
+    SURFACE_C12_NAMES = ('surface_c12',)
+    SURFACE_O16_NAMES = ('surface_o16',)
+
     HE_CORE_NAMES = ('h1_boundary_mass', 'he_core_mass')
     C_CORE_NAMES = ('he4_boundary_mass', 'c_core_mass')
     O_CORE_NAMES = ('c12_boundary_mass', 'o_core_mass')
@@ -143,30 +167,23 @@ class StarPlotsMixin(PlotMixin):
         'Mix2 Top': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': None},
     }
 
-    def _find_data_by_correct_name(self, names):
-        """Utility function that finds the correct data name and extracts the data."""
-
-        for name in names:
-            with suppress(KeyError, ValueError):
-                return name, self.get_cycle_header(name)
-        logging.warning(
-            'Cannot find data with any of the following names: %s', names)
-
     def hrd(self, show=True, **kwargs):
         """Hertzsprung-Russel diagramm.
+
         :param bool show: if True, display figure
         :returns: Figure
         :rtype: :py:class:`matplotlib.figure.Figure`
         """
 
-        _, x_data = self._find_data_by_correct_name(self.LOG_TEFF_NAMES)
-        _, y_data = self._find_data_by_correct_name(self.LOG_L_NAMES)
+        teff_name = self._find_data_by_correct_name(self.LOG_TEFF_NAMES, return_data=False)
+        l_name = self._find_data_by_correct_name(self.LOG_L_NAMES, return_data=False)
+        if (not teff_name) or (not l_name):
+            raise RuntimeError("Cannot access temperature or luminosity data.")
 
-        fig = plt.figure()
-        plt.plot(x_data, y_data, **kwargs)
-
-        plt.xlabel(r'$\log(T_{\mathrm{eff}}/T_\odot)$')
-        plt.ylabel(r'$\log(L/L_\odot)$')
+        fig = self.plot(teff_name, l_name,
+                        xlabel=r'$\log(T_{\mathrm{eff}}/T_\odot)$',
+                        ylabel=r'$\log(L/L_\odot)$',
+                        show=False, **kwargs)
 
         # Invert x-axis and return
         fig.gca().invert_xaxis()
@@ -174,16 +191,43 @@ class StarPlotsMixin(PlotMixin):
         # Show figure?
         if show:
             fig.show()
-
         return fig
 
-    def kippenhahn(self, x, x0=None, show=True):
+    def tcrhoc(self, show=True, **kwargs):
+        """Central temperature against central density plot.
+
+        :param bool show: if True, display figure
+        :returns: Figure
+        :rtype: :py:class:`matplotlib.figure.Figure`
+        """
+
+        rhoc_name = self._find_data_by_correct_name(self.LOG_RHOC_NAMES, return_data=False)
+        tc_name = self._find_data_by_correct_name(self.LOG_TC_NAMES, return_data=False)
+
+        if (not rhoc_name) or (not tc_name):
+            raise RuntimeError("Cannot access central temperature or density data.")
+
+        fig = self.plot(rhoc_name, tc_name,
+                        xlabel=r'$\log(\rho_c/\,[g.cm^{-3}])$',
+                        ylabel=r'$\log(T_c/[K])$',
+                        show=False, **kwargs)
+
+        # Invert x-axis and return
+        fig.gca().invert_xaxis()
+
+        # Show figure?
+        if show:
+            fig.show()
+        return fig
+
+    def kippenhahn(self, x, x0=None, CO_ratio=False, show=True):
         """Kippenhahn diagramm as a function of time or model.
 
         :param str x: name of the data for the x-axis. Should be either 'star_age' or 'model'.
         :param x0: zero point for the plot. Previous data is not shown. Must be same unit as `x`.
         :type x0: int or float
         :param tuple(str) legend: legend to be added
+        :param bool CO_ratio: if True, display C/O ratio
         :param bool show: if True, display figure
         :returns: Figure
         :rtype: :py:class:`matplotlib.figure.Figure`
@@ -219,6 +263,17 @@ class StarPlotsMixin(PlotMixin):
             x_data = x_data[indices] - x0
             y_data = {k: v[indices] for k, v in y_data.items()}
 
+        # C/O ratio
+        if CO_ratio:
+            c12 = self._find_data_by_correct_name(self.SURFACE_C12_NAMES)
+            o16 = self._find_data_by_correct_name(self.SURFACE_O16_NAMES)
+            if c12 and o16:
+                CO_ratio_data = c12[1] / o16[1]
+                if x0:
+                    CO_ratio_data = CO_ratio_data[indices]
+            else:
+                CO_ratio = False
+
         # Figure
         fig = plt.figure()
 
@@ -240,8 +295,14 @@ class StarPlotsMixin(PlotMixin):
         # Legend
         plt.legend()
 
+        # Add y-axis if C/O ratio is plotted
+        if CO_ratio:
+            plt.twinx()
+            plt.plot(x_data, CO_ratio_data, 'k--', lw=2, label='C/O ratio')
+            plt.ylabel('C/O ratio')
+            plt.legend()
+
         # Show figure?
         if show:
             fig.show()
-
         return fig

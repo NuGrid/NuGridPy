@@ -1,26 +1,21 @@
 
 import os
 import random
-import tempfile
-import unittest
-from unittest import TestCase, skip
+from unittest import TestCase
 
 import pkg_resources
 import numpy as np
 from matplotlib.figure import Figure
 
-from nugridpy.data import DataFromTextMixin, NugridData, MesaData
+from nugridpy.data import DataFromTextMixin, DataFromHDF5Mixin, MesaDataHDF5, MesaDataText
 from nugridpy.io import TextFile
 
 
-DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
+class TestDataFromTextMixin(TestCase):
+    """Testing the DataFromTextMixin class."""
 
-
-class TestAsciiData(unittest.TestCase):
-    """Testing data.py ASCII data-handling."""
-
-    def setUp(self):
-        """Setting up variables and other test structures."""
+    def test_data_from_text(self):
+        """Test the DataFromTextMixin class."""
         # Set the test data path
         self.data_path = 'tests/data/read-write/'
 
@@ -29,97 +24,23 @@ class TestAsciiData(unittest.TestCase):
             os.path.join(self.data_path,
                          'history.data'), TextFile.MESA_DATA)
 
-    def test_DataFromTextMixin(self):
-        """Test the DataFromTextMixin class."""
-
         # Check the datacol/header names attributes are populated
         self.assertIsInstance(self.test_data.header_names, tuple)
         self.assertGreaterEqual(len(self.test_data.header_names), 0)
         self.assertIsInstance(self.test_data.data_names, tuple)
         self.assertGreater(len(self.test_data.data_names), 0)
 
-    def test_MesaData(self):
-        """Test the MesaData class."""
-        # Check that MesaData works and reads in a custom filename
-        with tempfile.NamedTemporaryFile(prefix='star.log') as tmpf:
-            # Write history.data to tempfile
-            hd = open(os.path.join(self.data_path, 'history.data'))
-            tmpf.write(hd.read().encode())
-            hd.close()
 
-            # Read the tempfile as a MesaData instance
-            test_alias = MesaData(tempfile.tempdir, history_name=tmpf.name,
-                                  history_only=True)
+class TestDataFromHDF5Mixin(TestCase):
+    """Testing the DataFromHDF5Mixin class."""
 
-            # Ensure the instance was initialized properly
-            self.assertIsInstance(test_alias, MesaData)
-            self.assertIsInstance(test_alias.history_data, DataFromTextMixin)
+    def test_data_from_hdf5(self):
+        """Testing the DataFromHDF5Mixin class."""
 
-            # Ensure history_only worked properly, no profile data
-            with self.assertRaises(AttributeError):
-                _ = test_alias.profiles_index
-            with self.assertRaises(AttributeError):
-                _ = test_alias.profiles
-
-            # Assign data to variables
-            test_headers = test_alias.history_data.header_names
-            test_data = test_alias.history_data.data_names
-
-            # Ensure the history.data read worked
-            self.assertIsInstance(test_headers, tuple)
-            self.assertGreater(len(test_headers), 0)
-            self.assertIsInstance(test_data, tuple)
-            self.assertGreater(len(test_data), 0)
-
-
-class TestHdf5Data(unittest.TestCase):
-    """Testing data.py hdf5 handling."""
-
-    def setUp(self):
-        """Test setup."""
         # Create data object
-        self.test_data = NugridData(DATA_PATH)
-
-        # Define some expected values and names for functional tests
-        self.expected_num_cycles = 1000
-        self.expected_metadata = ['HDF5_version',
-                                  'SE_version',
-                                  'age_unit',
-                                  'codev',
-                                  'dcoeff_unit',
-                                  'mass_unit',
-                                  'mini',
-                                  'modname',
-                                  'numcodev',
-                                  'overini',
-                                  'radius_unit',
-                                  'rho_unit',
-                                  'rotini',
-                                  'temperature_unit',
-                                  'zini',
-                                  'zisnb']
-
-        self.expected_cycle_headers = ['age',
-                                       'deltat',
-                                       'model_number',
-                                       'shellnb']
-
-        self.expected_cycle_data = ['mass',
-                                    'radius',
-                                    'rho',
-                                    'temperature',
-                                    'dcoeff',
-                                    'iso_massf',
-                                    'elem_massf',
-                                    'elem_numf',
-                                    'iso_massf_decay',
-                                    'elem_massf_decay',
-                                    'elem_numf_decay']
-
-    def test_NugridData(self):
-        """Testing the NugridData class."""
-        # Test data object
-        self.assertIsInstance(self.test_data, NugridData)
+        path = pkg_resources.resource_filename(
+            'nugridpy', os.path.join('resources', 'mesa', 'HDF5'))
+        self.test_data = DataFromHDF5Mixin(path)
 
         # Declare the data object attribute lists
         test_cycles = self.test_data.cycles
@@ -129,7 +50,6 @@ class TestHdf5Data(unittest.TestCase):
         test_ages = self.test_data.ages
 
         # Ensure they are populated correctly
-        self.assertEqual(len(test_cycles), self.expected_num_cycles)
         self.assertEqual(len(test_cycles), len(self.test_data._data))
         self.assertEqual(len(test_cycles), len(self.test_data._headers))
         self.assertEqual(len(test_ages), len(self.test_data._headers))
@@ -147,23 +67,64 @@ class TestHdf5Data(unittest.TestCase):
         for key in test_metadata:
             _ = self.test_data.get_metadata(key)
             self.assertIsInstance(_, np.ndarray)
-            self.assertTrue(key in self.expected_metadata)
 
         for key in test_headers:
             _ = self.test_data.get_cycle_header(key, test_cyc)
-            self.assertTrue(key in self.expected_cycle_headers)
 
         for key in test_data_names:
             _ = self.test_data.get_cycle_data(key, test_cyc)
             self.assertIsInstance(_, np.ndarray)
-            self.assertTrue(key in self.expected_cycle_data)
 
 
-class TestMesaData(TestCase):
-    """Class for functional testing on the MesaData class."""
+class TestMesaDataText(TestCase):
+    """Class for testing on the MesaDataText class."""
 
     def setUp(self):
-        self.data = MesaData(DATA_PATH, history_only=True)
+        path = pkg_resources.resource_filename(
+            'nugridpy', os.path.join('resources', 'mesa', 'LOGS'))
+        self.data = MesaDataText(path, history_only=True)
+
+    def test_mesa_data_from_text(self):
+        """Test the MesaDataText class."""
+
+        # Ensure the instance was initialized properly
+        self.assertIsInstance(self.data, MesaDataText)
+        self.assertIsInstance(self.data.history_data, DataFromTextMixin)
+
+        # Ensure history_only worked properly, no profile data
+        with self.assertRaises(AttributeError):
+            _ = self.data.profiles_index
+        with self.assertRaises(AttributeError):
+            _ = self.data.profiles
+
+        # Assign data to variables
+        test_headers = self.data.history_data.header_names
+        test_data = self.data.history_data.data_names
+
+        # Ensure the history.data read worked
+        self.assertIsInstance(test_headers, tuple)
+        self.assertGreater(len(test_headers), 0)
+        self.assertIsInstance(test_data, tuple)
+        self.assertGreater(len(test_data), 0)
+
+    def test_functional_hrd(self):
+        """Checks that we can plot an HRD."""
+        fig = self.data.hrd(show=False)
+        self.assertIsInstance(fig, Figure)
+
+    def test_functional_kippenhahn(self):
+        """Checks that we can plot an Kippenhahn diagramm."""
+        fig = self.data.kippenhahn('star_age', show=False)
+        self.assertIsInstance(fig, Figure)
+
+
+class TestMesaDataHDF5(TestCase):
+    """Class for testing on the MesaDataHDF5 class."""
+
+    def setUp(self):
+        path = pkg_resources.resource_filename(
+            'nugridpy', os.path.join('resources', 'mesa', 'HDF5'))
+        self.data = MesaDataHDF5(path)
 
     def test_hdr(self):
         """Checks that we can plot an HRD."""
@@ -172,23 +133,5 @@ class TestMesaData(TestCase):
 
     def test_kippenhahn(self):
         """Checks that we can plot an Kippenhahn diagramm."""
-        fig = self.data.kippenhahn('star_age', show=False)
-        self.assertIsInstance(fig, Figure)
-
-
-@skip('bad data in tests folder')
-class TestNugridData(TestCase):
-    """Class for functional testing on the NugridData class."""
-
-    def setUp(self):
-        self.data = NugridData(DATA_PATH)
-
-    def test_hdr(self):
-        """Checks that we can plot an HRD."""
-        fig = self.data.hrd(show=False)
-        self.assertIsInstance(fig, Figure)
-
-    def test_kippenhahn(self):
-        """Checks that we can plot an Kippenhahn diagramm."""
-        fig = self.data.kippenhahn('star_age', show=False)
+        fig = self.data.kippenhahn('age', show=False)
         self.assertIsInstance(fig, Figure)
