@@ -14,6 +14,7 @@ import numpy as np
 
 from .plot import PlotMixin, StarPlotsMixin
 from .io import TextFile, Hdf5File
+from .isotopes import get_isotope_name, get_A_Z
 
 logging.basicConfig(level=logging.INFO)
 
@@ -72,7 +73,10 @@ class DataFromHDF5Mixin(PlotMixin):
         file_ext (str, optional): file extension
     """
 
-    def __init__(self, filedir, file_ext='.h5', **_kwargs):
+    # Name of the member containing the mass fractions
+    MASS_FRACTION_HDF5_MEMBER_NAME = 'iso_massf'
+
+    def __init__(self, filedir, file_ext='.h5'):
 
         # List files in filedir and collect all hdf5 files with regex
         self.filedir = filedir
@@ -81,6 +85,7 @@ class DataFromHDF5Mixin(PlotMixin):
 
         # List over all HDF5 files
         for ind, h5 in enumerate(self.files_in_dir):
+
             # Filename
             filename = os.path.join(filedir, h5)
 
@@ -95,7 +100,12 @@ class DataFromHDF5Mixin(PlotMixin):
                     self.A = datasets['A']
                     self.Z = datasets['Z']
                     self.isomeric_state = datasets['isomeric_state']
-                    logging.info('Attributes for A, Z, and isomeric_state have been created.')
+
+                    # Create isotopes
+                    self.isotopes = [
+                        get_isotope_name(int(a), int(z)) for a, z in zip(self.A, self.Z)]
+                    logging.info(
+                        'Attributes for A, Z, isomeric_state, and isotopes have been created.')
 
             else:  # only care about groups
                 _, groups_data, header_data, _ = Hdf5File.readfile(
@@ -170,6 +180,17 @@ class DataFromHDF5Mixin(PlotMixin):
         except KeyError:
             raise KeyError('Cannot find cycle {} in the data.'.format(cycle))
 
+    def _get_isotope_mass_fraction(self, name, cycle):
+        """Returns the mass fraction profile from a specific cycle."""
+        try:
+            a, z = get_A_Z(name)
+
+            # Extract data from the single index in A,Z with these values
+            index = int(np.where((self.A == a) * (self.Z == z))[0])
+            return self._get_cycle(cycle)[self.MASS_FRACTION_HDF5_MEMBER_NAME][..., index]
+        except (TypeError, KeyError):
+            raise KeyError('Cannot find isotope {} in cycle {}.'.format(name, cycle))
+
     def _get_cycle_data(self, name, cycle):
         """Return data from a specific cycle.
 
@@ -178,8 +199,12 @@ class DataFromHDF5Mixin(PlotMixin):
         """
         try:
             return self._get_cycle(cycle)[name]
-        except KeyError:
-            raise KeyError('Cannot find data {} in cycle {}.'.format(name, cycle))
+        except ValueError:
+
+            # It might be an element that can be accessed through iso_massf
+            if name in self.isotopes:
+                return self._get_isotope_mass_fraction(name, cycle)
+            raise KeyError('Cannot find data {} in cycle {}. '.format(name, cycle))
 
     def get_cycle_data(self, name, cycles):
         """Return data from specific cycles.
@@ -239,27 +264,21 @@ class MesaDataText(StarPlotsMixin):
 
         # history.data read-in
         if not profiles_only:
-            # Try to read and alert user if file not present
-            try:
-                self.history_data = DataFromTextMixin(
-                    os.path.join(filedir, history_name), TextFile.MESA_DATA)
-            except IOError:
-                raise IOError('No file named {} could be found. Check filedir path or '
-                              'set history_name.'.format(history_name))
+            self.history_data = DataFromTextMixin(
+                os.path.join(filedir, history_name), TextFile.MESA_DATA)
+
+            # We need to create a mapping between the cycles and the array indices
+            # since the cycle number is what the user provides
+            self._cycle_index_mapping = {c: i[0] for i, c in np.ndenumerate(self.cycles)}
 
         # profiles.index read-in
         if not history_only:
             # Try to read and alert user if file not present
-            try:
-                self.profiles_index = DataFromTextMixin(
-                    os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
-            except IOError:
-                raise IOError('No file named {} could be found. Check filedir or set '
-                              'index_name.'.format(index_name))
+            self.profiles_index = DataFromTextMixin(
+                os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
 
             # Collect the profiles from filedir
-            files = os.listdir(filedir)
-            self.profiles_in_dir = tuple(prof for prof in files if re.match(
+            self.profiles_in_dir = tuple(prof for prof in os.listdir(filedir) if re.match(
                 '{}[0-9]\d*{}'.format(profile_prefix, profile_suffix), prof))
             prof_count = len(self.profiles_in_dir)
 
@@ -267,8 +286,10 @@ class MesaDataText(StarPlotsMixin):
             if all_profiles:
                 print('Reading in {} profiles... set all_profiles to False to '
                       'skip.'.format(prof_count))
-                self.profiles = [DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
-                                 for prof in self.profiles_in_dir]
+                self.profiles = {}
+                for prof in self.profiles_in_dir:
+                    data = DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
+                self.profiles[data.get_header('model_number')] = data
 
     @property
     def cycles(self):
@@ -283,8 +304,8 @@ class MesaDataText(StarPlotsMixin):
         """
         cycles = cycles or self.cycles
         if isinstance(cycles, int):
-            return self.history_data.get(name)[cycles - 1]  # -1 because of arrays here, not dict
-        return np.array([self.history_data.get(name)[c - 1] for c in cycles])
+            return self.history_data.get(name)[self._cycle_index_mapping[cycles]]
+        return np.array([self.history_data.get(name)[self._cycle_index_mapping[c]] for c in cycles])
 
     def get_cycle_data(self, name, cycles):
         """Return data from specific cycles.
@@ -293,8 +314,8 @@ class MesaDataText(StarPlotsMixin):
         :param int or list(int) cycles: cycle numbers
         """
         if isinstance(cycles, int):
-            return self.profiles.get(name)[cycles - 1]
-        return [self.profiles.get(name)[c - 1] for c in cycles]
+            return self.profiles[cycles].get(name)
+        return [self.profiles[c].get(name) for c in cycles]
 
 
 class MesaDataHDF5(DataFromHDF5Mixin, StarPlotsMixin):
@@ -306,7 +327,7 @@ class MesaDataHDF5(DataFromHDF5Mixin, StarPlotsMixin):
     """
 
 
-class NugridData(DataFromHDF5Mixin):
+class NugridData(DataFromHDF5Mixin, StarPlotsMixin):
     """Class for NuGrid data.
 
      Arguments:

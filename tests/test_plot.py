@@ -30,7 +30,7 @@ class TestPlotMixin(TestCase):
     """Tests for the PlotMixin class functionalities."""
 
     def check_plot_call(self, inst, m_get_data, m_plt, m_where, cycles=None, x0=None,
-                        num_profiles=1, xlabel=None, ylabel=None, legend=None):
+                        num_profiles=1, xlabel=None, ylabel=None, legend=True):
         """Function checking calls for a given configuration."""
 
         # Reset mocks
@@ -56,7 +56,7 @@ class TestPlotMixin(TestCase):
         #   * plot is called num_profiles times*num_cycles
         #   * get_data is called (num_profiles times*num_cycles) + num_profiles times*num_cycles times
         num_cycles = 1
-        if cycles:
+        if cycles is not None:
             if not isinstance(cycles, int):
                 num_cycles = len(cycles)
         self.assertEqual(m_plt.plot.call_count, num_profiles * num_cycles)
@@ -71,7 +71,7 @@ class TestPlotMixin(TestCase):
         if ylabel:
             m_plt.ylabel.assert_called_with(ylabel)
         if legend:
-            m_plt.legend.assert_called_with(legend)
+            self.assertTrue(m_plt.legend.called)
 
     def check_plot_call_all_configs(self, get_data, m_plt, m_where, cycles=None):
         """Function checking calls for all configurations."""
@@ -89,9 +89,9 @@ class TestPlotMixin(TestCase):
             # With ylabel
             self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles, ylabel=random_string())
 
-            # With legend
+            # Without legend
             self.check_plot_call(
-                inst, m_get_data, m_plt, m_where, cycles, legend=(random_string(),))
+                inst, m_get_data, m_plt, m_where, cycles, legend=False)
 
             # With slicing the data
             self.check_plot_call(inst, m_get_data, m_plt, m_where, cycles, x0=random.randint(1, 10))

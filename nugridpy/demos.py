@@ -9,7 +9,7 @@ import os
 
 import pkg_resources
 
-from . import mesa_data
+from . import mesa_data, nugrid_data
 
 
 def _demo_mesa():
@@ -17,24 +17,32 @@ def _demo_mesa():
 
     # MESA data from logs
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'LOGS'))
-    m1 = mesa_data(path, data_type='text', history_only=True)
+    m1 = mesa_data(path, data_type='text')
     m1.hrd()
     m1.tcrhoc()
-    m1.kippenhahn('star_age', x0=1.15e10, CO_ratio=True)
+    m1.plot('logR', 'logRho', 2030)
+    m1.kippenhahn('star_age', x0=9.4e8, CO_ratio=True)
 
     # MESA data from HDF5
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'HDF5'))
     m2 = mesa_data(path, data_type='hdf5')
     m2.hrd()
-    # m2.tcrhoc()
+    m2.tcrhoc()
+    m2.plot('radius', 'rho', 2030,
+            ylabel=r'$\rho/\,[g.cm^{-3}]$', logx=True, logy=True, legend=False)
     m2.kippenhahn('age')
 
 
-def _demo_se():
+def _demo_nugrid():
     """Demo reading SE data and creating some plots."""
 
-    path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'se'))
-    _ = mesa_data(path, data_type='hdf5')
+    # out
+    path = pkg_resources.resource_filename(
+        'nugridpy', os.path.join('resources', 'nugrid', 'H5_out'))
+    n_out = nugrid_data(path)
+    n_out.plot('age', 'deltat')
+    n_out.plot('radius', 'dcoeff', 580)
+    n_out.plot('radius', ('H-1', 'He-4',), 300, logy=True)
 
 
 def demo(which=None):
@@ -42,7 +50,7 @@ def demo(which=None):
 
     DEMOS = {
         'mesa': _demo_mesa,
-        'se': _demo_se,
+        'nugrid': _demo_nugrid,
     }
 
     if which not in DEMOS:

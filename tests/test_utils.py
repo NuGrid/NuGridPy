@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from nugridpy import mesa_data
-from nugridpy.data import MesaDataText, MesaDataHDF5
+from nugridpy import mesa_data, nugrid_data
+from nugridpy.data import MesaDataText, MesaDataHDF5, NugridData
 
 from .fixtures import random_string
 
@@ -26,3 +26,11 @@ class TestUtils(TestCase):
         # Error
         with self.assertRaises(AssertionError):
             _ = mesa_data(random_string(), data_type='other-type')
+
+    @patch.object(NugridData, '__init__', return_value=None)
+    def test_nugrid_data(self, m_hdf5):
+        """Check the proxy function creating NuGrid data."""
+
+        # Text files
+        _ = nugrid_data(random_string(), data_type='text')
+        self.assertEqual(m_hdf5.call_count, 1)

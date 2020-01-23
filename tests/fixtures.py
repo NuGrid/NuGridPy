@@ -24,4 +24,4 @@ def random_ints(length=None):
     """Generate a random list of integers."""
 
     length = length or random.randint(5, 64)
-    return [random.randint(1, 1000) for _ in range(length)]
+    return np.array([random.randint(1, 1000) for _ in range(length)])

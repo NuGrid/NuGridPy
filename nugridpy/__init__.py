@@ -1,4 +1,4 @@
-from .data import MesaDataText, MesaDataHDF5
+from .data import MesaDataText, MesaDataHDF5, NugridData
 
 MESA_DATA_TYPES_CLS = {
     'text': MesaDataText,
@@ -17,3 +17,12 @@ def mesa_data(directory, data_type='text', **_kwargs):
         "MESA data type must be one of these: {}".format(MESA_DATA_TYPES_CLS.keys())
 
     return MESA_DATA_TYPES_CLS[data_type](directory, **_kwargs)
+
+
+def nugrid_data(directory, **_kwargs):
+    """Utility function acting as a proxy to create NuGrid data.
+
+    :param str directory: Directory path to NuGrid data.
+    """
+
+    return NugridData(directory, **_kwargs)

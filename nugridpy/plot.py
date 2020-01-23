@@ -59,7 +59,7 @@ class PlotMixin:
         return ...
 
     def plot(self, x, ys, cycles=None, x0=None, logx=False, logy=False,
-             xlabel=None, ylabel=None, legend=None, show=True, **kwargs):
+             xlabel=None, ylabel=None, legend=True, show=True, **kwargs):
         """Generate a 2D plot.
 
         :param str x: name of the data for the x-axis
@@ -73,11 +73,14 @@ class PlotMixin:
         :param bool logy: if True, use logarithmic y-axis
         :param str xlabel: label for the x-axis
         :param str ylabel: label for the y-axis
-        :param tuple(str) legend: legend to be added
+        :param bool legend: if True, display legend
         :param bool show: if True, display figure
         :returns: Figure
         :rtype: :py:class:`matplotlib.figure.Figure`
         """
+
+        # Default x label
+        xlabel = xlabel or x
 
         # Profiles names should be iterable
         ys = [ys] if isinstance(ys, str) else ys
@@ -88,13 +91,14 @@ class PlotMixin:
         # Distinguish between:
         #  * singleton header data accross cycles
         #  * data for given cycles
-        if not cycles:
+        if cycles is None:
             x_data = self.get_cycle_header(x)
             indices = self._slice_array(x_data, x0)
             x_data = x_data[indices]
             for y in ys:
                 y_data = self.get_cycle_header(y)[indices]
-                getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(x_data, y_data, **kwargs)
+                getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
+                    x_data, y_data, label=y, **kwargs)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
             for c in cycles:
@@ -103,17 +107,17 @@ class PlotMixin:
                 x_data = x_data[indices]
                 for y in ys:
                     y_data = self.get_cycle_data(y, c)[indices]
-                    getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(x_data, y_data, **kwargs)
+                    getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
+                        x_data, y_data, label=y, **kwargs)
 
         # Axes labels
-        if xlabel:
-            plt.xlabel(xlabel)
+        plt.xlabel(xlabel)
         if ylabel:
             plt.ylabel(ylabel)
 
         # Legend
         if legend:
-            plt.legend(legend)
+            plt.legend()
 
         # Show figure?
         if show:
@@ -158,7 +162,7 @@ class StarPlotsMixin(PlotMixin):
 
     # Plot kwargs for the different types of data.
     PLOT_KWARGS = {
-        'He core': {'c': 'k'},
+        'He core': {'c': 'r'},
         'C core': {'c': 'g', 'ls': '--'},
         'O core': {'c': 'c', 'ls': ':'},
         'Mix1 Bot': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': 'convection zones'},
@@ -183,7 +187,7 @@ class StarPlotsMixin(PlotMixin):
         fig = self.plot(teff_name, l_name,
                         xlabel=r'$\log(T_{\mathrm{eff}}/T_\odot)$',
                         ylabel=r'$\log(L/L_\odot)$',
-                        show=False, **kwargs)
+                        show=False, legend=False, **kwargs)
 
         # Invert x-axis and return
         fig.gca().invert_xaxis()
@@ -210,7 +214,7 @@ class StarPlotsMixin(PlotMixin):
         fig = self.plot(rhoc_name, tc_name,
                         xlabel=r'$\log(\rho_c/\,[g.cm^{-3}])$',
                         ylabel=r'$\log(T_c/[K])$',
-                        show=False, **kwargs)
+                        show=False, legend=False, **kwargs)
 
         # Invert x-axis and return
         fig.gca().invert_xaxis()
@@ -260,7 +264,7 @@ class StarPlotsMixin(PlotMixin):
         # Shift origin and keep only relevant data
         if x0:
             indices = np.where(x_data > x0)
-            x_data = x_data[indices] - x0
+            x_data = x_data[indices]
             y_data = {k: v[indices] for k, v in y_data.items()}
 
         # C/O ratio
@@ -306,3 +310,7 @@ class StarPlotsMixin(PlotMixin):
         if show:
             fig.show()
         return fig
+
+
+class NugridPlotMixin(PlotMixin):
+    """Class with additional plotting functionalities for NuGrid data."""
