@@ -1,5 +1,8 @@
 """
-I/O module
+Io
+==
+
+This module contains the logic for reading/writing data.
 """
 
 import logging

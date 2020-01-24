@@ -7,7 +7,9 @@ import pkg_resources
 import numpy as np
 from matplotlib.figure import Figure
 
-from nugridpy.data import DataFromTextMixin, DataFromHDF5Mixin, MesaDataHDF5, MesaDataText
+from nugridpy.data import DataFromTextMixin, DataFromHDF5Mixin, \
+    MesaDataHDF5, MesaDataText, \
+    NugridData
 from nugridpy.io import TextFile
 
 
@@ -134,4 +136,24 @@ class TestMesaDataHDF5(TestCase):
     def test_kippenhahn(self):
         """Checks that we can plot an Kippenhahn diagramm."""
         fig = self.data.kippenhahn('age', show=False)
+        self.assertIsInstance(fig, Figure)
+
+
+class TestNugridData(TestCase):
+    """Class for testing the NugridData class."""
+
+    def setUp(self):
+        path_out = pkg_resources.resource_filename(
+            'nugridpy', os.path.join('resources', 'nugrid', 'H5_out'))
+        self.data_out = NugridData(path_out)
+
+    def test_abu_profile(self):
+        """Checks the abu_profile method."""
+        fig = self.data_out.abu_profile(
+            500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'], show=False)
+        self.assertIsInstance(fig, Figure)
+
+    def test_iso_abund(self):
+        """Checks the iso_abund method."""
+        fig = self.data_out.iso_abund(500, show=False)
         self.assertIsInstance(fig, Figure)

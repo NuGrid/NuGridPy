@@ -26,6 +26,9 @@ def _demo_mesa():
     # MESA data from HDF5
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'HDF5'))
     m2 = mesa_data(path, data_type='hdf5')
+
+    print("Isotopes in the data are: \n", ' '.join(m2.isotopes))
+
     m2.hrd()
     m2.tcrhoc()
     m2.plot('radius', 'rho', 2030,
@@ -40,9 +43,14 @@ def _demo_nugrid():
     path = pkg_resources.resource_filename(
         'nugridpy', os.path.join('resources', 'nugrid', 'H5_out'))
     n_out = nugrid_data(path)
+
+    print("Isotopes in the data are: \n", ' '.join(n_out.isotopes))
+
     n_out.plot('age', 'deltat')
     n_out.plot('radius', 'dcoeff', 580)
     n_out.plot('radius', ('H-1', 'He-4',), 300, logy=True)
+    n_out.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'])
+    n_out.iso_abund(500)
 
 
 def demo(which=None):

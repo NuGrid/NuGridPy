@@ -6,7 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch
 import random
 
-from nugridpy.plot import PlotMixin, StarPlotsMixin
+from nugridpy.plot import PlotMixin, MESAPlotMixin, NugridPlotMixin
 
 from .fixtures import random_string, random_array, random_ints
 
@@ -152,51 +152,51 @@ class TestPlotMixin(TestCase):
 
         # Empty tuple
         d = ()
-        self.assertFalse(StarPlotsMixin()._find_data_by_correct_name(d))
+        self.assertFalse(MESAPlotMixin()._find_data_by_correct_name(d))
 
         # Key not present
         d = ('a', 'b', 'c', 'y', 'z')
-        self.assertFalse(StarPlotsMixin()._find_data_by_correct_name(d))
+        self.assertFalse(MESAPlotMixin()._find_data_by_correct_name(d))
 
         # Key present
         d += (field_name,)
-        r = StarPlotsMixin()._find_data_by_correct_name(d)
+        r = MESAPlotMixin()._find_data_by_correct_name(d)
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], field_name)
 
         # Key present but we dont want the data
         d += (field_name,)
-        r = StarPlotsMixin()._find_data_by_correct_name(d, return_data=False)
+        r = MESAPlotMixin()._find_data_by_correct_name(d, return_data=False)
         self.assertEqual(r, field_name)
 
 
-class TestStarPlotsMixin(TestCase):
-    """Tests for the StarPlotsMixin class."""
+class TestMESAPlotMixin(TestCase):
+    """Tests for the MESAPlotMixin class."""
 
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
-    @patch.object(StarPlotsMixin, 'plot')
+    @patch.object(MESAPlotMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, 'plot')
     def test_hrd(self, m_plt, m_get_data):
         """Checks the HRD method."""
 
-        x = StarPlotsMixin()
+        x = MESAPlotMixin()
         x.hrd()
         for arg in m_get_data.call_args_list:
             self.assertIn(arg[0][0], x.LOG_TEFF_NAMES + x.LOG_L_NAMES)
         self.assertEqual(m_plt.call_count, 1)
 
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
-    @patch.object(StarPlotsMixin, 'plot')
+    @patch.object(MESAPlotMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, 'plot')
     def test_tcrhoc(self, m_plt, m_get_data):
         """Checks the Tc/Rhoc method."""
 
-        x = StarPlotsMixin()
+        x = MESAPlotMixin()
         x.tcrhoc()
         for arg in m_get_data.call_args_list:
             self.assertIn(arg[0][0], x.LOG_RHOC_NAMES + x.LOG_TC_NAMES)
         self.assertEqual(m_plt.call_count, 1)
 
-    @patch.object(StarPlotsMixin, '_find_data_by_correct_name')
-    @patch.object(StarPlotsMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, '_find_data_by_correct_name')
+    @patch.object(MESAPlotMixin, 'get_cycle_header')
     @patch('nugridpy.plot.plt')
     def test_kippenhahn(self, m_plt, m_get_data, m_find_data):
         """Checks the Kippnehahn diagramm."""
@@ -209,11 +209,11 @@ class TestStarPlotsMixin(TestCase):
             return random_string(), r_array
         m_find_data.side_effect = side_effect
 
-        _ = StarPlotsMixin().kippenhahn(random_string())
+        _ = MESAPlotMixin().kippenhahn(random_string())
 
         # Number of calls given by the various class attributes
-        num_calls = len(StarPlotsMixin.CORE_NAMES) + \
-            len(StarPlotsMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
+        num_calls = len(MESAPlotMixin.CORE_NAMES) + \
+            len(MESAPlotMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
 
         self.assertEqual(m_get_data.call_count, 1)  # x-data
         self.assertEqual(m_find_data.call_count, num_calls)  # y-data
@@ -224,9 +224,80 @@ class TestStarPlotsMixin(TestCase):
         m_find_data.reset_mock()
         m_plt.plot.reset_mock()
 
-        _ = StarPlotsMixin().kippenhahn(random_string(), CO_ratio=True)
+        _ = MESAPlotMixin().kippenhahn(random_string(), CO_ratio=True)
 
         self.assertEqual(m_get_data.call_count, 1)  # x-data
         self.assertEqual(m_find_data.call_count, num_calls + 2)  # y-data
         self.assertEqual(m_plt.plot.call_count, num_calls + 1)
         self.assertEqual(m_plt.twinx.call_count, 1)  # second y-axis
+
+
+class TestNugridPlotMixin(TestCase):
+    """Tests for the NugridPlotMixin class."""
+
+    def setUp(self):
+
+        self.x = NugridPlotMixin()
+        self.cycle = random_ints(1)
+        self.isotopes = ['-'.join([random_string(), random_string()])
+                         for _ in range(random_ints(1))]
+
+    @patch.object(NugridPlotMixin, 'plot')
+    def test_abu_profile(self, m_plt):
+        """Checks the abu_profile method."""
+        self.x.abu_profile(self.cycle, isos=self.isotopes)
+
+        self.assertEqual(m_plt.call_count, 1)
+        self.assertEqual(m_plt.call_args_list[0][0], ('mass', self.isotopes))
+        self.assertEqual(m_plt.call_args_list[0][1]['cycles'], self.cycle)
+
+    @patch('nugridpy.plot.plt')
+    @patch('nugridpy.plot.get_A_Z')
+    @patch.object(NugridPlotMixin, 'get_cycle_data')
+    def test_iso_abund(self, m_get_data, m_get_A_Z, m_plt):
+        """Checks the iso_abund method."""
+
+        # Build isotopes to see if they are correctly excluded from the plot
+        self.x.isotopes = self.isotopes
+
+        isotopes_to_plot = set([
+            random.choice(self.isotopes)
+            for _ in range(random.randint(0, len(self.isotopes)))])
+
+        # Exclusion by mass number
+        bounds = random_ints(2)
+        a_min = min(bounds)
+        a_max = max(bounds)
+
+        def side_effect_A_Z(name):
+            # Mass number should be in the allowed range
+            if name in isotopes_to_plot:
+                a = random.randint(a_min, a_max)
+            else:  # Otherwishe outside the bounds
+                a = random.choice(
+                    [random.randint(0, a_min - 1),
+                     random.randint(a_max + 1, 1001)]
+                )
+            return a, random_ints(1), name
+
+        m_get_A_Z.side_effect = side_effect_A_Z
+        m_get_data.return_value = [1.0]
+
+        self.x.iso_abund(self.cycle, a_min=a_min, a_max=a_max)
+        self.assertEqual(m_plt.plot.call_count, len(isotopes_to_plot))
+
+        # Exclusion by threshold
+        m_plt.reset_mock()
+        low_val, threshold, high_val = tuple(sorted(random_array(3)))
+
+        def side_effect_get(name, _cycle):
+            # Mass number should be in the allowed range
+            if name in isotopes_to_plot:
+                return [high_val]
+            return [low_val]
+
+        m_get_A_Z.side_effect = lambda name: (a_min, random_ints(1), name)
+        m_get_data.side_effect = side_effect_get
+
+        self.x.iso_abund(self.cycle, a_min=a_min, a_max=a_max, threshold=threshold)
+        self.assertEqual(m_plt.plot.call_count, len(isotopes_to_plot))

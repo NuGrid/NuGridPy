@@ -11,6 +11,8 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .isotopes import get_A_Z
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -122,12 +124,11 @@ class PlotMixin:
         # Show figure?
         if show:
             fig.show()
-
         return fig
 
 
-class StarPlotsMixin(PlotMixin):
-    """Class with additional plotting functionalities for stellar data."""
+class MESAPlotMixin(PlotMixin):
+    """Class with additional plotting functionalities for MESA data."""
 
     # Data is accessed through different names depending on its type
     # We do not want to have several obscured if...else statements in the plot functions
@@ -314,3 +315,80 @@ class StarPlotsMixin(PlotMixin):
 
 class NugridPlotMixin(PlotMixin):
     """Class with additional plotting functionalities for NuGrid data."""
+
+    def abu_profile(self, cycle, isos=None, show=True, **kwargs):
+        """Abundances profiles vs mass coordinates.
+
+        :param int cycle: cycle for which to plot abundances
+        :param list(str) isos: list of isotopes to plot. Default: all isotopes
+        :param bool show: if True, display figure
+        :returns: Figure
+        :rtype: :py:class:`matplotlib.figure.Figure`
+        """
+
+        isos = isos or self.isotopes
+
+        return self.plot('mass', isos, cycles=cycle,
+                         xlabel=r'$m/M_\odot$',
+                         ylabel=r'$\log(X)$',
+                         show=show, legend=True, **kwargs)
+
+    def iso_abund(self, cycle, a_min=None, a_max=None, threshold=1e-14, show=True, **kwargs):
+        """Abundances of checmical species.
+
+        :param int cycle: cycle for which to plot abundances
+        :param int a_min: minimum mass number to consider
+        :param int a_max: maximum mass number to consider
+        :param int threshold: mass fraction threshold below which element is not plotted
+        :param bool show: if True, display figure
+        :returns: Figure
+        :rtype: :py:class:`matplotlib.figure.Figure`
+        """
+
+        a_min = a_min or min(self.A)
+        a_max = a_max or max(self.A)
+
+        # Data to plot is organized in a dictionary
+        # Key is the element name
+        # Value is a tuple (x,y) where x,y are list containing the data to be plotted
+        data_to_plot = {}
+
+        for iso in self.isotopes:
+            A, _, element = get_A_Z(iso)
+
+            # Filter those not wanted
+            if A < a_min or A > a_max:
+                continue
+
+            # Get mass fraction - we take the surface value for the moment
+            massf = self.get_cycle_data(iso, cycle)[0]
+            if massf < threshold:
+                continue
+            log_massf = np.log10(massf)
+
+            # Put in the dictrionary
+            if element not in data_to_plot:
+                data_to_plot[element] = ([A], [log_massf])
+            else:
+                data_to_plot[element][0].append(A)
+                data_to_plot[element][1].append(log_massf)
+
+        # Figure
+        fig = plt.figure()
+
+        for element in data_to_plot:
+            x = data_to_plot[element][0]
+            y = data_to_plot[element][1]
+            plt.plot(x, y, marker='s', **kwargs)
+
+            # Annotate at the largest mass fraction
+            x_max, y_max = sorted(zip(x, y), key=lambda e: e[1], reverse=True)[0]
+            plt.text(x_max, y_max + 0.1, element)
+
+        plt.xlabel('Mass Number ($A$)')
+        plt.ylabel('log(mass fraction)')
+
+        # Show figure?
+        if show:
+            fig.show()
+        return fig

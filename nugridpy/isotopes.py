@@ -4,6 +4,9 @@ Isotopes
 This module contains the data and utility functions for the isotopes.
 """
 
+from collections import namedtuple
+Isotope = namedtuple('Isotope', ['A', 'Z', 'Element'])
+
 
 # Key = Z, Value = name
 ISOTOPES = {
@@ -27,13 +30,13 @@ def get_isotope_name(A, Z):
     try:
         return '-'.join([ISOTOPES[Z], str(A)])
     except KeyError:
-        raise KeyError("Cannot find isotope with Z = %s, see %s." % (Z, __file__))
+        raise KeyError("Cannot find isotope with Z = %s." % Z)
 
 
 def get_A_Z(name):
-    """"Returns A and Z from the isotope name."""
+    """"Returns a namedtuple with A,Z, and the element name from the isotope name."""
     try:
         prefix, A = name.split('-')
-        return int(A), ISOTOPES_INV[prefix]
+        return Isotope(int(A), ISOTOPES_INV[prefix], prefix)
     except (ValueError, KeyError):
-        raise KeyError("Cannot find isotope with name = %s, see %s." % (name, __file__))
+        raise KeyError("Cannot find isotope with name = %s." % name)

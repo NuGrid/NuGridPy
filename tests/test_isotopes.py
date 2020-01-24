@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from nugridpy.isotopes import ISOTOPES, get_isotope_name, get_A_Z
+from nugridpy.isotopes import ISOTOPES, Isotope, \
+    get_isotope_name, get_A_Z
 
 
 class TestIsotopes(TestCase):
@@ -31,10 +32,19 @@ class TestIsotopes(TestCase):
     def test_get_A_Z(self):
         """Check the function computing A and Z from the name."""
 
-        self.assertEqual(get_A_Z('H-1'), (1, 1))
-        self.assertEqual(get_A_Z('H-2'), (2, 1))
-        self.assertEqual(get_A_Z('Bi-210'), (210, 83))
-        self.assertEqual(get_A_Z('Po-210'), (210, 84))
+        isotopes_list = [
+            ('H-1', 1, 1),
+            ('H-2', 2, 1),
+            ('Bi-210', 210, 83),
+            ('Po-210', 210, 84),
+        ]
+
+        for name, A, Z in isotopes_list:
+            iso = get_A_Z(name)
+            self.assertIsInstance(iso, Isotope)
+            self.assertEqual(iso.A, A)
+            self.assertEqual(iso.Z, Z)
+            self.assertIn(iso.Element, name)
 
         with self.assertRaises(KeyError):
             get_A_Z('Po210')

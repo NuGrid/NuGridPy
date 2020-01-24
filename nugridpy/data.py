@@ -12,7 +12,7 @@ import re
 
 import numpy as np
 
-from .plot import PlotMixin, StarPlotsMixin
+from .plot import PlotMixin, MESAPlotMixin, NugridPlotMixin
 from .io import TextFile, Hdf5File
 from .isotopes import get_isotope_name, get_A_Z
 
@@ -183,10 +183,10 @@ class DataFromHDF5Mixin(PlotMixin):
     def _get_isotope_mass_fraction(self, name, cycle):
         """Returns the mass fraction profile from a specific cycle."""
         try:
-            a, z = get_A_Z(name)
+            isotope = get_A_Z(name)
 
             # Extract data from the single index in A,Z with these values
-            index = int(np.where((self.A == a) * (self.Z == z))[0])
+            index = int(np.where((self.A == isotope.A) * (self.Z == isotope.Z))[0])
             return self._get_cycle(cycle)[self.MASS_FRACTION_HDF5_MEMBER_NAME][..., index]
         except (TypeError, KeyError):
             raise KeyError('Cannot find isotope {} in cycle {}.'.format(name, cycle))
@@ -221,7 +221,7 @@ class DataFromHDF5Mixin(PlotMixin):
 # we keep two distinct classes for MESA data
 # because the data and the way to access it is different
 # between these obtained from logs and those from HDF5 files.
-class MesaDataText(StarPlotsMixin):
+class MesaDataText(MESAPlotMixin):
     """
     Class for MESA data obtained from reading text files.
 
@@ -318,7 +318,7 @@ class MesaDataText(StarPlotsMixin):
         return [self.profiles[c].get(name) for c in cycles]
 
 
-class MesaDataHDF5(DataFromHDF5Mixin, StarPlotsMixin):
+class MesaDataHDF5(DataFromHDF5Mixin, MESAPlotMixin):
     """Class for MESA data obtained from reading HDF5 files.
 
      Arguments:
@@ -327,7 +327,7 @@ class MesaDataHDF5(DataFromHDF5Mixin, StarPlotsMixin):
     """
 
 
-class NugridData(DataFromHDF5Mixin, StarPlotsMixin):
+class NugridData(DataFromHDF5Mixin, NugridPlotMixin):
     """Class for NuGrid data.
 
      Arguments:
