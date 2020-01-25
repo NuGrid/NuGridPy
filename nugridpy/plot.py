@@ -29,15 +29,15 @@ class PlotMixin:
         (True, True): 'loglog',
     }
 
-    def get_cycle_header(self, name, cycles=None):
+    def get_cattr(self, name, cycles=None):
         """Return header data from specific cycles.
 
         ..note:: Must be implemented in the inherited class.
         """
         raise NotImplementedError
 
-    def get_cycle_data(self, name, cycles):
-        """Return data from specific cycles.
+    def get_dcol(self, name, cycles):
+        """Return column data from specific cycles.
 
         ..note:: Must be implemented in the inherited class.
         """
@@ -48,7 +48,7 @@ class PlotMixin:
 
         for name in names:
             with suppress(KeyError, ValueError):
-                data = self.get_cycle_header(name)
+                data = self.get_cattr(name)
                 return (name, data) if return_data else name
         logging.warning(
             'Cannot find data with any of the following names: %s', names)
@@ -94,21 +94,21 @@ class PlotMixin:
         #  * singleton header data accross cycles
         #  * data for given cycles
         if cycles is None:
-            x_data = self.get_cycle_header(x)
+            x_data = self.get_cattr(x)
             indices = self._slice_array(x_data, x0)
             x_data = x_data[indices]
             for y in ys:
-                y_data = self.get_cycle_header(y)[indices]
+                y_data = self.get_cattr(y)[indices]
                 getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
                     x_data, y_data, label=y, **kwargs)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
             for c in cycles:
-                x_data = self.get_cycle_data(x, c)
+                x_data = self.get_dcol(x, c)
                 indices = self._slice_array(x_data, x0)
                 x_data = x_data[indices]
                 for y in ys:
-                    y_data = self.get_cycle_data(y, c)[indices]
+                    y_data = self.get_dcol(y, c)[indices]
                     getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
                         x_data, y_data, label=y, **kwargs)
 
@@ -238,7 +238,7 @@ class MESAPlotMixin(PlotMixin):
         :rtype: :py:class:`matplotlib.figure.Figure`
         """
 
-        x_data = self.get_cycle_header(x)
+        x_data = self.get_cattr(x)
 
         # Data using the utility function
         # We should at least have the mass
@@ -361,7 +361,7 @@ class NugridPlotMixin(PlotMixin):
                 continue
 
             # Get mass fraction - we take the surface value for the moment
-            massf = self.get_cycle_data(iso, cycle)[0]
+            massf = self.get_dcol(iso, cycle)[0]
             if massf < threshold:
                 continue
             log_massf = np.log10(massf)

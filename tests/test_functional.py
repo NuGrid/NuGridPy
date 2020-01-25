@@ -46,9 +46,9 @@ class TestDataFromHDF5Mixin(TestCase):
 
         # Declare the data object attribute lists
         test_cycles = self.test_data.cycles
-        test_metadata = self.test_data.metadata_names
-        test_headers = self.test_data.cycle_headers
-        test_data_names = self.test_data.cycle_data
+        test_metadata = self.test_data.hattrs
+        test_headers = self.test_data.cattrs
+        test_data_names = self.test_data.dcols
         test_ages = self.test_data.ages
 
         # Ensure they are populated correctly
@@ -67,15 +67,13 @@ class TestDataFromHDF5Mixin(TestCase):
 
         # Make sure all data/header key values work to get data
         for key in test_metadata:
-            _ = self.test_data.get_metadata(key)
-            self.assertIsInstance(_, np.ndarray)
+            _ = self.test_data.get_hattr(key)
 
         for key in test_headers:
-            _ = self.test_data.get_cycle_header(key, test_cyc)
+            _ = self.test_data.get_cattr(key, test_cyc)
 
         for key in test_data_names:
-            _ = self.test_data.get_cycle_data(key, test_cyc)
-            self.assertIsInstance(_, np.ndarray)
+            _ = self.test_data.get_dcol(key, test_cyc)
 
 
 class TestMesaDataText(TestCase):

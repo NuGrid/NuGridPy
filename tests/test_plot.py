@@ -19,9 +19,9 @@ class TestPlotMixinInit(TestCase):
 
         x = PlotMixin()
         with self.assertRaises(NotImplementedError):
-            x.get_cycle_header('toto')
+            x.get_cattr('toto')
         with self.assertRaises(NotImplementedError):
-            x.get_cycle_data('toto', 1)
+            x.get_dcol('toto', 1)
 
 
 @patch('nugridpy.plot.plt')
@@ -103,19 +103,19 @@ class TestPlotMixin(TestCase):
     def test_plot_header_data(self, m_where, m_plt):
         """Checks the plot method on header data."""
         # Header data accross cycles
-        self.check_plot_call_all_configs('get_cycle_header', m_plt, m_where)
+        self.check_plot_call_all_configs('get_cattr', m_plt, m_where)
 
     def test_plot_cycle_data(self, m_where, m_plt):
         """Checks the plot method on cycle data."""
         # Cycle data
         # One cycle
         self.check_plot_call_all_configs(
-            'get_cycle_data', m_plt, m_where, cycles=random.randint(1, 1000))
+            'get_dcol', m_plt, m_where, cycles=random.randint(1, 1000))
 
         # Many cycles
-        self.check_plot_call_all_configs('get_cycle_data', m_plt, m_where, cycles=random_ints())
+        self.check_plot_call_all_configs('get_dcol', m_plt, m_where, cycles=random_ints())
 
-    @patch.object(PlotMixin, 'get_cycle_header')
+    @patch.object(PlotMixin, 'get_cattr')
     def test_plot_function_used(self, _m_get_data, _m_where, m_plt):
         """Checks that the correct plot function is used."""
 
@@ -137,7 +137,7 @@ class TestPlotMixin(TestCase):
         inst.plot('x', 'y', logx=True, logy=True)
         self.assertEqual(m_plt.loglog.call_count, 1)
 
-    @patch.object(PlotMixin, 'get_cycle_header')
+    @patch.object(PlotMixin, 'get_cattr')
     def test_find_data_by_correct_name(self, m_get_data, _m_where, _m_plt):
         """Checks the function finding data by name."""
 
@@ -173,7 +173,7 @@ class TestPlotMixin(TestCase):
 class TestMESAPlotMixin(TestCase):
     """Tests for the MESAPlotMixin class."""
 
-    @patch.object(MESAPlotMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, 'get_cattr')
     @patch.object(MESAPlotMixin, 'plot')
     def test_hrd(self, m_plt, m_get_data):
         """Checks the HRD method."""
@@ -184,7 +184,7 @@ class TestMESAPlotMixin(TestCase):
             self.assertIn(arg[0][0], x.LOG_TEFF_NAMES + x.LOG_L_NAMES)
         self.assertEqual(m_plt.call_count, 1)
 
-    @patch.object(MESAPlotMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, 'get_cattr')
     @patch.object(MESAPlotMixin, 'plot')
     def test_tcrhoc(self, m_plt, m_get_data):
         """Checks the Tc/Rhoc method."""
@@ -196,7 +196,7 @@ class TestMESAPlotMixin(TestCase):
         self.assertEqual(m_plt.call_count, 1)
 
     @patch.object(MESAPlotMixin, '_find_data_by_correct_name')
-    @patch.object(MESAPlotMixin, 'get_cycle_header')
+    @patch.object(MESAPlotMixin, 'get_cattr')
     @patch('nugridpy.plot.plt')
     def test_kippenhahn(self, m_plt, m_get_data, m_find_data):
         """Checks the Kippnehahn diagramm."""
@@ -253,7 +253,7 @@ class TestNugridPlotMixin(TestCase):
 
     @patch('nugridpy.plot.plt')
     @patch('nugridpy.plot.get_A_Z')
-    @patch.object(NugridPlotMixin, 'get_cycle_data')
+    @patch.object(NugridPlotMixin, 'get_dcol')
     def test_iso_abund(self, m_get_data, m_get_A_Z, m_plt):
         """Checks the iso_abund method."""
 

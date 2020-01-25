@@ -18,6 +18,12 @@ def _demo_mesa():
     # MESA data from logs
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'LOGS'))
     m1 = mesa_data(path, data_type='text')
+
+    # Extracting/plotting data
+    print("Header attributes are: \n", ' '.join(m1.hattrs))
+    print("Cycles attributes are: \n", ' '.join(m1.cattrs))
+    #print("Columns available are: \n", ' '.join(m1.dcols))
+
     m1.hrd()
     m1.tcrhoc()
     m1.plot('logR', 'logRho', 2030)
@@ -27,6 +33,10 @@ def _demo_mesa():
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'HDF5'))
     m2 = mesa_data(path, data_type='hdf5')
 
+    # Extracting/plotting data
+    print("Header attributes are: \n", ' '.join(m2.hattrs))
+    print("Cycles attributes are: \n", ' '.join(m2.cattrs))
+    print("Columns available are: \n", ' '.join(m2.dcols))
     print("Isotopes in the data are: \n", ' '.join(m2.isotopes))
 
     m2.hrd()
@@ -39,11 +49,15 @@ def _demo_mesa():
 def _demo_nugrid():
     """Demo reading SE data and creating some plots."""
 
-    # out
+    # OUT
     path = pkg_resources.resource_filename(
         'nugridpy', os.path.join('resources', 'nugrid', 'H5_out'))
     n_out = nugrid_data(path)
 
+    # Extracting/plotting data
+    print("Header attributes are: \n", ' '.join(n_out.hattrs))
+    print("Cycles attributes are: \n", ' '.join(n_out.cattrs))
+    print("Columns available are: \n", ' '.join(n_out.dcols))
     print("Isotopes in the data are: \n", ' '.join(n_out.isotopes))
 
     n_out.plot('age', 'deltat')

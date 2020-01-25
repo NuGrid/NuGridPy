@@ -12,7 +12,7 @@ import re
 
 import numpy as np
 
-from .plot import PlotMixin, MESAPlotMixin, NugridPlotMixin
+from .plot import MESAPlotMixin, NugridPlotMixin
 from .io import TextFile, Hdf5File
 from .isotopes import get_isotope_name, get_A_Z
 
@@ -65,7 +65,7 @@ class DataFromTextMixin:
         return self._data_object[name]
 
 
-class DataFromHDF5Mixin(PlotMixin):
+class DataFromHDF5Mixin:
     """Class for data obtained from reading text files.
 
      Arguments:
@@ -120,36 +120,36 @@ class DataFromHDF5Mixin(PlotMixin):
 
     @property
     def cycles(self):
-        """List of cycles."""
-        return tuple(self._data.keys())
+        """List of cycles present in the data."""
+        return sorted(self._data.keys())
 
     @property
-    def metadata_names(self):
-        """List of metadata names."""
-        return tuple(self._metadata.keys())
+    def hattrs(self):
+        """List of header attributes."""
+        return sorted(self._metadata.keys())
 
     @property
-    def cycle_headers(self):
+    def cattrs(self):
         """List of cycles headers."""
-        return tuple(self._headers[self.cycles[0]].keys())
+        return sorted(self._headers[self.cycles[0]].keys())
 
     @property
-    def cycle_data(self):
-        """List of cycles data."""
-        return tuple(self._data[self.cycles[0]].dtype.names)
+    def dcols(self):
+        """List of columns available in a cycle."""
+        return sorted(self._data[self.cycles[0]].dtype.names)
 
-    def get_metadata(self, name):
-        """Return metadata value(s).
+    def get_hattr(self, name):
+        """Return header attribute value(s).
 
         :param str name: Metadata name.
         """
         try:
-            return self._metadata[name]
+            return self._metadata[name].item()
         except KeyError:
             raise KeyError('Cannot find attribute {} in metadata.'.format(name))
 
-    def _get_cycle_header(self, name, cycle):
-        """Return data from a specific cycle header.
+    def _get_cattr(self, name, cycle):
+        """Return header data from a specific cycle.
 
         :param str name: Header name
         :param int cycle: cycle number
@@ -159,7 +159,7 @@ class DataFromHDF5Mixin(PlotMixin):
         except KeyError:
             raise KeyError('Cannot find header {} in cycle {}.'.format(name, cycle))
 
-    def get_cycle_header(self, name, cycles=None):
+    def get_cattr(self, name, cycles=None):
         """Return header data from specific cycles.
 
         :param str name: Header name
@@ -167,8 +167,8 @@ class DataFromHDF5Mixin(PlotMixin):
         """
         cycles = cycles or self.cycles
         if isinstance(cycles, int):
-            return self._get_cycle_header(name, cycles)
-        return np.array([self._get_cycle_header(name, c) for c in cycles])
+            return self._get_cattr(name, cycles)
+        return np.array([self._get_cattr(name, c) for c in cycles])
 
     def _get_cycle(self, cycle):
         """Return cycle dataset object.
@@ -191,10 +191,10 @@ class DataFromHDF5Mixin(PlotMixin):
         except (TypeError, KeyError):
             raise KeyError('Cannot find isotope {} in cycle {}.'.format(name, cycle))
 
-    def _get_cycle_data(self, name, cycle):
-        """Return data from a specific cycle.
+    def _get_dcol(self, name, cycle):
+        """Return column data from a specific cycle.
 
-        :param str name: Data name
+        :param str name: Column name
         :param int or list(int) cycle: cycle number
         """
         try:
@@ -206,21 +206,17 @@ class DataFromHDF5Mixin(PlotMixin):
                 return self._get_isotope_mass_fraction(name, cycle)
             raise KeyError('Cannot find data {} in cycle {}. '.format(name, cycle))
 
-    def get_cycle_data(self, name, cycles):
-        """Return data from specific cycles.
+    def get_dcol(self, name, cycles):
+        """Return column data from specific cycles.
 
         :param str name: Data name
         :param int or list(int) cycles: cycle numbers
         """
         if isinstance(cycles, int):
-            return self._get_cycle_data(name, cycles)
-        return [self._get_cycle_data(name, c) for c in cycles]
+            return self._get_dcol(name, cycles)
+        return [self._get_dcol(name, c) for c in cycles]
 
 
-# This is not ideal but for the moment,
-# we keep two distinct classes for MESA data
-# because the data and the way to access it is different
-# between these obtained from logs and those from HDF5 files.
 class MesaDataText(MESAPlotMixin):
     """
     Class for MESA data obtained from reading text files.
@@ -294,21 +290,39 @@ class MesaDataText(MESAPlotMixin):
     @property
     def cycles(self):
         """List of cycles."""
-        return self.history_data.get('model_number')
+        return sorted(self.history_data.get('model_number'))
 
-    def get_cycle_header(self, name, cycles=None):
+    @property
+    def hattrs(self):
+        """List of header attributes."""
+        return sorted(self.history_data.header_names)
+
+    @property
+    def cattrs(self):
+        """List of cycles headers."""
+        return sorted(self.history_data.data_names)
+
+    @property
+    def dcols(self):
+        """List of columns available in a cycle."""
+        return sorted(self.profiles[0].data_names)
+
+    def get_hattr(self, name):
+        """Return header attribute value(s).
+
+        :param str name: Metadata name.
+        """
+        return self.history_data.get_header(name)
+
+    def get_cattr(self, name):
         """Return header data from specific cycles.
 
         :param str name: Header name
-        :param int or list(int) cycles: cycle numbers. Default: all cycles
         """
-        cycles = cycles or self.cycles
-        if isinstance(cycles, int):
-            return self.history_data.get(name)[self._cycle_index_mapping[cycles]]
-        return np.array([self.history_data.get(name)[self._cycle_index_mapping[c]] for c in cycles])
+        return self.history_data.get(name)
 
-    def get_cycle_data(self, name, cycles):
-        """Return data from specific cycles.
+    def get_dcol(self, name, cycles):
+        """Return column data from specific cycles.
 
         :param str name: Data name
         :param int or list(int) cycles: cycle numbers
@@ -325,6 +339,33 @@ class MesaDataHDF5(DataFromHDF5Mixin, MESAPlotMixin):
         filedir (str): Directory path to MESA data.
         file_ext (str, optional): file extension
     """
+
+
+class MesaData:
+    """Class for MESA data.
+
+    :param str data_type: type of the MESA data ('text' or 'hdf5')
+
+    .. note:: Acts like a proxy
+    """
+
+    def __init__(self, data_type, *args, **kwargs):
+
+        if data_type == 'text':
+            self._proxied_obj = MesaDataText(*args, **kwargs)
+        elif data_type == 'hdf5':
+            self._proxied_obj = MesaDataHDF5(*args, **kwargs)
+        else:
+            raise RuntimeError(
+                "Wrong type of MESA data requested, must be 'text' or 'hdf5'")
+
+    # Delegate calls to the proxied object:
+    def __getattr__(self, name):
+        return getattr(self._proxied_obj, name)
+
+    # For tab completion
+    def __dir__(self):
+        return self._proxied_obj.__dir__() + ['_proxied_obj']
 
 
 class NugridData(DataFromHDF5Mixin, NugridPlotMixin):
