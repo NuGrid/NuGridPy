@@ -10,8 +10,10 @@ Welcome to NuGridPy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   pages/demos
    pages/astro-const
-   pages/data-handling
+   pages/data
+   pages/plot
 
 NuGridPy is a set of Python tools for the NuGrid community that allows
 for interactive analysis, visualization, computation, reading/writing, and other
@@ -42,7 +44,7 @@ with a username and password through HTTPS.
 Requirements
 ------------
 
-All requirements can be found in the requirements.txt file in the source directory. 
+All requirements can be found in the requirements.txt file in the source directory.
 NuGridPy users can install dependencies with the following command:
 
 .. code::
@@ -52,7 +54,7 @@ NuGridPy users can install dependencies with the following command:
 Tests
 -----
 
-Testing for NuGridPy is being developed in the :code:`tests/` directory of the source
+Testing for NuGridPy is being developed in the :code:`tests` directory of the source
 repository. They can be run with the python :code:`unittest` library manually or
 with the help of CI (e.g., Bamboo or Travis). Running either of the following:
 
@@ -62,10 +64,10 @@ with the help of CI (e.g., Bamboo or Travis). Running either of the following:
 
 .. code::
 
-   nosetests --with-xunit -v tests/
+   nosetests --with-xunit -v tests
 
-in the source directory will initiate testing. In the second case, an XML report is 
-generated. You may require the :code:`nose` package if you haven't installed the 
+in the source directory will initiate testing. In the second case, an XML report is
+generated. You may require the :code:`nose` package if you haven't installed the
 requirements as outlined above.
 
 Documentation
@@ -75,7 +77,7 @@ The Sphinx documentation can be built easily:
 
 .. code::
 
-   cd doc/
+   cd doc
    make html
 
 Authors
@@ -92,11 +94,6 @@ Copyright
 ~~~~~~~~~
 
 \(c\) 2019, NuGrid Collaboration
-
-Version
-~~~~~~~
-
-The current stable release of NuGridPy is |version|.
 
 Indices and tables
 ~~~~~~~~~~~~~~~~~~

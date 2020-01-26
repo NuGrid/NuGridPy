@@ -5,13 +5,11 @@ Io
 This module contains the logic for reading/writing data.
 """
 
-import logging
 import numpy as np
 
 import h5py
 
-
-logging.basicConfig(level=logging.INFO)
+from .config import logger
 
 
 def parse_history(filename):
@@ -142,7 +140,7 @@ class Hdf5File:
         Reads in HDF5 files.
         Returns metadata, data objects from file, and more?
         """
-        logging.info('Reading %s...', filename)
+        logger.info('Reading %s...', filename)
         file_object = h5py.File(filename, 'r')
 
         # Metadata

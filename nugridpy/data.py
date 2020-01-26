@@ -6,17 +6,15 @@ This module provides implementation for handling data.
 """
 
 from contextlib import suppress
-import logging
 import os
-import re
+from functools import lru_cache
 
 import numpy as np
 
-from .plot import MESAPlotMixin, NugridPlotMixin
+from .plot import MesaPlotMixin, NugridPlotMixin
 from .io import TextFile, Hdf5File
 from .isotopes import get_isotope_name, get_A_Z
-
-logging.basicConfig(level=logging.INFO)
+from .config import logger, CACHE_MAX_SIZE
 
 
 class DataFromTextMixin:
@@ -76,7 +74,7 @@ class DataFromHDF5Mixin:
     # Name of the member containing the mass fractions
     MASS_FRACTION_HDF5_MEMBER_NAME = 'iso_massf'
 
-    def __init__(self, filedir, file_ext='.h5'):
+    def __init__(self, filedir, file_ext='.h5', **_kwargs):
 
         # List files in filedir and collect all hdf5 files with regex
         self.filedir = filedir
@@ -104,7 +102,7 @@ class DataFromHDF5Mixin:
                     # Create isotopes
                     self.isotopes = [
                         get_isotope_name(int(a), int(z)) for a, z in zip(self.A, self.Z)]
-                    logging.info(
+                    logger.info(
                         'Attributes for A, Z, isomeric_state, and isotopes have been created.')
 
             else:  # only care about groups
@@ -217,19 +215,9 @@ class DataFromHDF5Mixin:
         return [self._get_dcol(name, c) for c in cycles]
 
 
-class MesaDataText(MESAPlotMixin):
+class MesaDataText(MesaPlotMixin):
     """
     Class for MESA data obtained from reading text files.
-
-    Attributes:
-        history_data (DataFromTextMixin): A DataFromTextMixin instance that contains the data from a
-            history.data file.
-        profiles_index (DataFromTextMixin): A DataFromTextMixin instance that contains the data from
-            a profiles.index file.
-        profiles_in_dir (tuple): A tuple containing string filenames for each MESA
-            profile found in filedir.
-        profiles (list): A list populated with one DataFromTextMixin object for each profile
-            that is read in.
 
     Arguments:
         filedir (str): Directory path to MESA data.
@@ -241,51 +229,52 @@ class MesaDataText(MESAPlotMixin):
             such as profile or log (e.g., profile32.data). The default is profile.
         profile_suffix (:obj:`str`, optional): The filename suffix for profile data.
             The default is .data.
-        all_profiles (:obj:`bool`, optional): Determines whether all profiles are read
-            in or not. Default is True.
-        history_only (:obj:`bool`, optional): Set to True if history.data is the only
-            thing you want to read in. False by default.
-        profiles_only (:obj:`bool`, optional): Set to True if profile data is the only
-            thing you want to read in. False by default.
     """
 
-    def __init__(self, filedir, history_name='history.data', index_name='profiles.index',
-                 profile_prefix='profile', profile_suffix='.data', all_profiles=True,
-                 history_only=False, profiles_only=False):
-        """Constructs a MESA data instance."""
-        # Raise error if both history_only and profiles_only are True simultaneously
-        if history_only and profiles_only:
-            raise ValueError('At least one of history_only and profiles_only must be '
-                             'False.')
+    def __init__(self, directory,
+                 history_name='history.data',
+                 profile_index_name='profiles.index',
+                 profile_prefix='profile', profile_suffix='.data'):
+
+        self._directory = directory
+        self._profile_prefix = profile_prefix
+        self._profile_suffix = profile_suffix
 
         # history.data read-in
-        if not profiles_only:
-            self.history_data = DataFromTextMixin(
-                os.path.join(filedir, history_name), TextFile.MESA_DATA)
+        self.history_data = DataFromTextMixin(
+            os.path.join(self._directory, history_name), TextFile.MESA_DATA)
 
-            # We need to create a mapping between the cycles and the array indices
-            # since the cycle number is what the user provides
-            self._cycle_index_mapping = {c: i[0] for i, c in np.ndenumerate(self.cycles)}
+        # We need to create a mapping between the cycles and the array indices
+        # since the cycle number is what the user provides
+        self._cycle_index_mapping = {c: i[0] for i, c in np.ndenumerate(self.cycles)}
 
-        # profiles.index read-in
-        if not history_only:
-            # Try to read and alert user if file not present
+        # Try to read profiles.index
+        try:
             self.profiles_index = DataFromTextMixin(
-                os.path.join(filedir, index_name), TextFile.PROFILES_INDEX)
+                os.path.join(self._directory, profile_index_name), TextFile.PROFILES_INDEX)
 
-            # Collect the profiles from filedir
-            self.profiles_in_dir = tuple(prof for prof in os.listdir(filedir) if re.match(
-                '{}[0-9]\d*{}'.format(profile_prefix, profile_suffix), prof))
-            prof_count = len(self.profiles_in_dir)
+            # Mapping between the cycle number and lof file number
+            self._cycle_log_file_number_mapping = dict(
+                zip(self.profiles_index.get('model_number'),
+                    self.profiles_index.get('log_file_number'))
+            )
 
-            # Read in all profiles to a user-facing list attribute
-            if all_profiles:
-                print('Reading in {} profiles... set all_profiles to False to '
-                      'skip.'.format(prof_count))
-                self.profiles = {}
-                for prof in self.profiles_in_dir:
-                    data = DataFromTextMixin(os.path.join(filedir, prof), TextFile.MESA_DATA)
-                self.profiles[data.get_header('model_number')] = data
+            # If the profile file is not found, remove the cycle from the mapping.
+            cycles_in_profile_index = sorted(self._cycle_log_file_number_mapping.keys())
+            for cycle in cycles_in_profile_index:
+                if not os.path.isfile(self._get_cycle_data_filepath(cycle)):
+                    _ = self._cycle_log_file_number_mapping.pop(cycle)
+
+            self.cycles_with_data = sorted(self._cycle_log_file_number_mapping.keys())
+
+            # Read one profile to extract column names
+            # Take the smallest cycle
+            if self.cycles_with_data:
+                self.dcols = self._get_cycle(min(self.cycles_with_data)).data_names
+
+        except OSError:
+            logger.warning('Cannot extract profiles from directory %s. No profile data availabe.',
+                           self._directory)
 
     @property
     def cycles(self):
@@ -302,11 +291,6 @@ class MesaDataText(MESAPlotMixin):
         """List of cycles headers."""
         return sorted(self.history_data.data_names)
 
-    @property
-    def dcols(self):
-        """List of columns available in a cycle."""
-        return sorted(self.profiles[0].data_names)
-
     def get_hattr(self, name):
         """Return header attribute value(s).
 
@@ -321,6 +305,36 @@ class MesaDataText(MESAPlotMixin):
         """
         return self.history_data.get(name)
 
+    def _get_cycle_data_filepath(self, cycle):
+        """Returns theoretical path to the file containing the cycle data."""
+        file_number = self._cycle_log_file_number_mapping[cycle]
+        filename = ''.join([self._profile_prefix, str(file_number), self._profile_suffix])
+        return os.path.join(self._directory, filename)
+
+    def clear_cache(self):
+        """Clear cached data, namely profiles."""
+        self._get_cycle.cache_clear()
+
+    @lru_cache(maxsize=CACHE_MAX_SIZE)
+    def _get_cycle(self, cycle):
+        """Returns cycle data.
+
+        ..note:: this function uses caching.
+        """
+        filepath = self._get_cycle_data_filepath(cycle)
+
+        logger.info('Reading data for cycle %s from file %s', cycle, filepath)
+        return DataFromTextMixin(filepath, TextFile.MESA_DATA)
+
+    def get_cycle(self, cycle):
+        """Extract cycle data from the corresponding text file, checking if the latter exists."""
+
+        if cycle not in self.cycles_with_data:
+            raise RuntimeError(
+                'No profile data available for cycle {}, must be one of these: {}'.format(
+                    cycle, self.cycles_with_data))
+        return self._get_cycle(cycle)
+
     def get_dcol(self, name, cycles):
         """Return column data from specific cycles.
 
@@ -328,11 +342,11 @@ class MesaDataText(MESAPlotMixin):
         :param int or list(int) cycles: cycle numbers
         """
         if isinstance(cycles, int):
-            return self.profiles[cycles].get(name)
-        return [self.profiles[c].get(name) for c in cycles]
+            return self.get_cycle(cycles).get(name)
+        return [self.get_cycle(c).get(name) for c in cycles]
 
 
-class MesaDataHDF5(DataFromHDF5Mixin, MESAPlotMixin):
+class MesaDataHDF5(DataFromHDF5Mixin, MesaPlotMixin):
     """Class for MESA data obtained from reading HDF5 files.
 
      Arguments:

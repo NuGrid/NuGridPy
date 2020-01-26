@@ -6,15 +6,12 @@ Module providing the plotting capabilities.
 """
 
 from contextlib import suppress
-import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from .isotopes import get_A_Z
-
-
-logging.basicConfig(level=logging.INFO)
+from .config import logger
 
 
 class PlotMixin:
@@ -50,7 +47,7 @@ class PlotMixin:
             with suppress(KeyError, ValueError):
                 data = self.get_cattr(name)
                 return (name, data) if return_data else name
-        logging.warning(
+        logger.warning(
             'Cannot find data with any of the following names: %s', names)
 
     @staticmethod
@@ -103,14 +100,19 @@ class PlotMixin:
                     x_data, y_data, label=y, **kwargs)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
+            # We report the cycle number in the legend if more than one is plotted
+            add_cycle_in_legend = len(cycles) > 1
             for c in cycles:
                 x_data = self.get_dcol(x, c)
                 indices = self._slice_array(x_data, x0)
                 x_data = x_data[indices]
                 for y in ys:
                     y_data = self.get_dcol(y, c)[indices]
+                    label = y
+                    if add_cycle_in_legend:
+                        label += ', cycle {}'.format(c)
                     getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
-                        x_data, y_data, label=y, **kwargs)
+                        x_data, y_data, label=label, **kwargs)
 
         # Axes labels
         plt.xlabel(xlabel)
@@ -127,7 +129,7 @@ class PlotMixin:
         return fig
 
 
-class MESAPlotMixin(PlotMixin):
+class MesaPlotMixin(PlotMixin):
     """Class with additional plotting functionalities for MESA data."""
 
     # Data is accessed through different names depending on its type
@@ -290,7 +292,7 @@ class MESAPlotMixin(PlotMixin):
                 else:
                     plt.plot(x_data, v, **self.PLOT_KWARGS[k], label=k, lw=2)
             except KeyError:
-                logging.debug('Cannot find specific plotting kwargs for %s', k)
+                logger.debug('Cannot find specific plotting kwargs for %s', k)
                 plt.plot(x_data, v, label=k, lw=2)
 
         # Labels
@@ -334,7 +336,7 @@ class NugridPlotMixin(PlotMixin):
                          show=show, legend=True, **kwargs)
 
     def iso_abund(self, cycle, a_min=None, a_max=None, threshold=1e-14, show=True, **kwargs):
-        """Abundances of checmical species.
+        """Isotopes abundances plot.
 
         :param int cycle: cycle for which to plot abundances
         :param int a_min: minimum mass number to consider

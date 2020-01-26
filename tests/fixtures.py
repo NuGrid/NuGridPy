@@ -13,11 +13,10 @@ def random_string(length=None):
         for _ in range(length))
 
 
-def random_array(dim1=None, *args):
+def random_array(*args):
     """Generate a random array of data."""
-
-    dim1 = dim1 or random.randint(1, 64)
-    return np.random.rand(dim1, *args)
+    args = args or (random.randint(1, 64),)
+    return np.random.rand(*args)
 
 
 def random_ints(length=None):

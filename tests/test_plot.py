@@ -6,7 +6,7 @@ from unittest import TestCase
 from unittest.mock import patch
 import random
 
-from nugridpy.plot import PlotMixin, MESAPlotMixin, NugridPlotMixin
+from nugridpy.plot import PlotMixin, MesaPlotMixin, NugridPlotMixin
 
 from .fixtures import random_string, random_array, random_ints
 
@@ -152,51 +152,51 @@ class TestPlotMixin(TestCase):
 
         # Empty tuple
         d = ()
-        self.assertFalse(MESAPlotMixin()._find_data_by_correct_name(d))
+        self.assertFalse(MesaPlotMixin()._find_data_by_correct_name(d))
 
         # Key not present
         d = ('a', 'b', 'c', 'y', 'z')
-        self.assertFalse(MESAPlotMixin()._find_data_by_correct_name(d))
+        self.assertFalse(MesaPlotMixin()._find_data_by_correct_name(d))
 
         # Key present
         d += (field_name,)
-        r = MESAPlotMixin()._find_data_by_correct_name(d)
+        r = MesaPlotMixin()._find_data_by_correct_name(d)
         self.assertEqual(len(r), 2)
         self.assertEqual(r[0], field_name)
 
         # Key present but we dont want the data
         d += (field_name,)
-        r = MESAPlotMixin()._find_data_by_correct_name(d, return_data=False)
+        r = MesaPlotMixin()._find_data_by_correct_name(d, return_data=False)
         self.assertEqual(r, field_name)
 
 
-class TestMESAPlotMixin(TestCase):
-    """Tests for the MESAPlotMixin class."""
+class TestMesaPlotMixin(TestCase):
+    """Tests for the MesaPlotMixin class."""
 
-    @patch.object(MESAPlotMixin, 'get_cattr')
-    @patch.object(MESAPlotMixin, 'plot')
+    @patch.object(MesaPlotMixin, 'get_cattr')
+    @patch.object(MesaPlotMixin, 'plot')
     def test_hrd(self, m_plt, m_get_data):
         """Checks the HRD method."""
 
-        x = MESAPlotMixin()
+        x = MesaPlotMixin()
         x.hrd()
         for arg in m_get_data.call_args_list:
             self.assertIn(arg[0][0], x.LOG_TEFF_NAMES + x.LOG_L_NAMES)
         self.assertEqual(m_plt.call_count, 1)
 
-    @patch.object(MESAPlotMixin, 'get_cattr')
-    @patch.object(MESAPlotMixin, 'plot')
+    @patch.object(MesaPlotMixin, 'get_cattr')
+    @patch.object(MesaPlotMixin, 'plot')
     def test_tcrhoc(self, m_plt, m_get_data):
         """Checks the Tc/Rhoc method."""
 
-        x = MESAPlotMixin()
+        x = MesaPlotMixin()
         x.tcrhoc()
         for arg in m_get_data.call_args_list:
             self.assertIn(arg[0][0], x.LOG_RHOC_NAMES + x.LOG_TC_NAMES)
         self.assertEqual(m_plt.call_count, 1)
 
-    @patch.object(MESAPlotMixin, '_find_data_by_correct_name')
-    @patch.object(MESAPlotMixin, 'get_cattr')
+    @patch.object(MesaPlotMixin, '_find_data_by_correct_name')
+    @patch.object(MesaPlotMixin, 'get_cattr')
     @patch('nugridpy.plot.plt')
     def test_kippenhahn(self, m_plt, m_get_data, m_find_data):
         """Checks the Kippnehahn diagramm."""
@@ -209,11 +209,11 @@ class TestMESAPlotMixin(TestCase):
             return random_string(), r_array
         m_find_data.side_effect = side_effect
 
-        _ = MESAPlotMixin().kippenhahn(random_string())
+        _ = MesaPlotMixin().kippenhahn(random_string())
 
         # Number of calls given by the various class attributes
-        num_calls = len(MESAPlotMixin.CORE_NAMES) + \
-            len(MESAPlotMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
+        num_calls = len(MesaPlotMixin.CORE_NAMES) + \
+            len(MesaPlotMixin.MIXING_BOUNDARIES_NAMES) + 1  # +1 for mass
 
         self.assertEqual(m_get_data.call_count, 1)  # x-data
         self.assertEqual(m_find_data.call_count, num_calls)  # y-data
@@ -224,7 +224,7 @@ class TestMESAPlotMixin(TestCase):
         m_find_data.reset_mock()
         m_plt.plot.reset_mock()
 
-        _ = MESAPlotMixin().kippenhahn(random_string(), CO_ratio=True)
+        _ = MesaPlotMixin().kippenhahn(random_string(), CO_ratio=True)
 
         self.assertEqual(m_get_data.call_count, 1)  # x-data
         self.assertEqual(m_find_data.call_count, num_calls + 2)  # y-data

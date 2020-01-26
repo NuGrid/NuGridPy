@@ -82,7 +82,7 @@ class TestMesaDataText(TestCase):
     def setUp(self):
         path = pkg_resources.resource_filename(
             'nugridpy', os.path.join('resources', 'mesa', 'LOGS'))
-        self.data = MesaDataText(path, history_only=True)
+        self.data = MesaDataText(path)
 
     def test_mesa_data_from_text(self):
         """Test the MesaDataText class."""
@@ -90,12 +90,6 @@ class TestMesaDataText(TestCase):
         # Ensure the instance was initialized properly
         self.assertIsInstance(self.data, MesaDataText)
         self.assertIsInstance(self.data.history_data, DataFromTextMixin)
-
-        # Ensure history_only worked properly, no profile data
-        with self.assertRaises(AttributeError):
-            _ = self.data.profiles_index
-        with self.assertRaises(AttributeError):
-            _ = self.data.profiles
 
         # Assign data to variables
         test_headers = self.data.history_data.header_names
