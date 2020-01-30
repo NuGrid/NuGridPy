@@ -66,7 +66,27 @@ def _demo_nugrid_out():
     n_out.plot('radius', 'dcoeff', 580)
     n_out.plot('radius', ('H-1', 'He-4',), 300, logy=True)
     n_out.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'])
-    n_out.iso_abund(500, a_max=100)
+    n_out.iso_abu(500, a_max=100)
+    n_out.abu_chart(500, n_max=30, z_max=30)
+
+
+def _demo_nugrid_surf():
+    """Demo reading SE data and creating some plots."""
+
+    # OUT
+    path = pkg_resources.resource_filename(
+        'nugridpy', os.path.join('resources', 'nugrid', 'H5_surf'))
+    n_surf = nugrid_data(path)
+
+    # Extracting/plotting data
+    print("Header attributes are: \n\t", ' '.join(n_surf.hattrs), '\n')
+    print("Cycles attributes are: \n\t", ' '.join(n_surf.cattrs), '\n')
+    print("Columns available are: \n\t", ' '.join(n_surf.dcols), '\n')
+    print("Isotopes in the data are: \n\t", ' '.join(n_surf.isotopes), '\n')
+
+    n_surf.plot('age', 'deltat')
+    n_surf.iso_abu(500, a_max=100)
+    n_surf.abu_chart(500, n_max=30, z_max=30)
 
 
 def demo(which=None):
@@ -76,6 +96,7 @@ def demo(which=None):
         'mesa_logs': _demo_mesa_logs,
         'mesa_hdf5': _demo_mesa_hdf5,
         'nugrid_out': _demo_nugrid_out,
+        'nugrid_surf': _demo_nugrid_surf,
     }
 
     if which not in DEMOS:

@@ -254,8 +254,8 @@ class TestNugridPlotMixin(TestCase):
     @patch('nugridpy.plot.plt')
     @patch('nugridpy.plot.get_A_Z')
     @patch.object(NugridPlotMixin, 'get_dcol')
-    def test_iso_abund(self, m_get_data, m_get_A_Z, m_plt):
-        """Checks the iso_abund method."""
+    def test_iso_abun(self, m_get_data, m_get_A_Z, m_plt):
+        """Checks the iso_abu method."""
 
         # Build isotopes to see if they are correctly excluded from the plot
         self.x.isotopes = self.isotopes
@@ -283,7 +283,7 @@ class TestNugridPlotMixin(TestCase):
         m_get_A_Z.side_effect = side_effect_A_Z
         m_get_data.return_value = [1.0]
 
-        self.x.iso_abund(self.cycle, a_min=a_min, a_max=a_max)
+        self.x.iso_abu(self.cycle, a_min=a_min, a_max=a_max)
         self.assertEqual(m_plt.plot.call_count, len(isotopes_to_plot))
 
         # Exclusion by threshold
@@ -299,5 +299,50 @@ class TestNugridPlotMixin(TestCase):
         m_get_A_Z.side_effect = lambda name: (a_min, random_ints(1), name)
         m_get_data.side_effect = side_effect_get
 
-        self.x.iso_abund(self.cycle, a_min=a_min, a_max=a_max, threshold=threshold)
+        self.x.iso_abu(self.cycle, a_min=a_min, a_max=a_max, threshold=threshold)
         self.assertEqual(m_plt.plot.call_count, len(isotopes_to_plot))
+
+    @patch('matplotlib.axes.Axes.add_patch')
+    @patch('nugridpy.plot.get_A_Z')
+    @patch.object(NugridPlotMixin, 'get_dcol')
+    def test_abu_chart(self, m_get_data, m_get_A_Z, m_patch):
+        """Checks the abu_chart method."""
+
+        # Build isotopes to see if they are correctly excluded from the plot
+        self.x.isotopes = self.isotopes
+
+        isotopes_to_plot = set([
+            random.choice(self.isotopes)
+            for _ in range(random.randint(0, len(self.isotopes)))])
+
+        # Exclusion by neutron number
+        bounds = random_ints(2)
+        n_min = min(bounds)
+        n_max = max(bounds)
+
+        # Exclusion by atomic number
+        bounds = random_ints(2)
+        z_min = min(bounds)
+        z_max = max(bounds)
+
+        def side_effect_A_Z(name):
+            # Mass number should be in the allowed range
+            if name in isotopes_to_plot:
+                n = random.randint(n_min, n_max)
+                z = random.randint(z_min, z_max)
+            else:  # Otherwishe outside the bounds
+                n = random.choice(
+                    [random.randint(0, n_min - 1),
+                     random.randint(n_max + 1, 1001)]
+                )
+                z = random.choice(
+                    [random.randint(0, z_min - 1),
+                     random.randint(z_max + 1, 1001)]
+                )
+            return z + n, z, name
+
+        m_get_A_Z.side_effect = side_effect_A_Z
+        m_get_data.return_value = [1.0]
+
+        self.x.abu_chart(self.cycle, n_min=n_min, n_max=n_max, z_min=z_min, z_max=z_max, show=False)
+        self.assertEqual(m_patch.call_count, len(isotopes_to_plot))

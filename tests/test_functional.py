@@ -145,7 +145,12 @@ class TestNugridData(TestCase):
             500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'], show=False)
         self.assertIsInstance(fig, Figure)
 
-    def test_iso_abund(self):
-        """Checks the iso_abund method."""
-        fig = self.data_out.iso_abund(500, show=False)
+    def test_iso_abun(self):
+        """Checks the iso_abun method."""
+        fig = self.data_out.iso_abu(500, show=False)
+        self.assertIsInstance(fig, Figure)
+
+    def test_abun_chart(self):
+        """Checks the abund_chart method."""
+        fig = self.data_out.abu_chart(500, show=False)
         self.assertIsInstance(fig, Figure)

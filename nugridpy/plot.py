@@ -7,7 +7,9 @@ Module providing the plotting capabilities.
 
 from contextlib import suppress
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import numpy as np
 
 from .isotopes import get_A_Z
@@ -335,13 +337,13 @@ class NugridPlotMixin(PlotMixin):
                          ylabel=r'$\log(X)$',
                          show=show, legend=True, **kwargs)
 
-    def iso_abund(self, cycle, a_min=None, a_max=None, threshold=1e-14, show=True, **kwargs):
+    def iso_abu(self, cycle, a_min=None, a_max=None, threshold=1e-12, show=True, **kwargs):
         """Isotopes abundances plot.
 
         :param int cycle: cycle for which to plot abundances
         :param int a_min: minimum mass number to consider
         :param int a_max: maximum mass number to consider
-        :param int threshold: mass fraction threshold below which element is not plotted
+        :param float threshold: mass fraction threshold below which element is not plotted
         :param bool show: if True, display figure
         :returns: Figure
         :rtype: :py:class:`matplotlib.figure.Figure`
@@ -352,7 +354,7 @@ class NugridPlotMixin(PlotMixin):
 
         # Data to plot is organized in a dictionary
         # Key is the element name
-        # Value is a tuple (x,y) where x,y are list containing the data to be plotted
+        # Value is a tuple of lists ([A1, A2,...], [logmassf1, logmassf2...])
         data_to_plot = {}
 
         for iso in self.isotopes:
@@ -389,6 +391,98 @@ class NugridPlotMixin(PlotMixin):
 
         plt.xlabel('Mass Number ($A$)')
         plt.ylabel('log(mass fraction)')
+
+        # Show figure?
+        if show:
+            fig.show()
+        return fig
+
+    def abu_chart(self, cycle, n_min=None, n_max=None, z_min=None, z_max=None,
+                  threshold=1e-12, show=True):
+        """Isotopic abundances chart.
+
+        :param int cycle: cycle for which to plot abundances
+        :param int n_min: minimum neutron number to consider
+        :param int n_max: maximum neutron number to consider
+        :param int z_min: minimum atomic number to consider
+        :param int z_max: maximum atomic number to consider
+        :param float threshold: mass fraction threshold below which element is not plotted
+        :param bool show: if True, display figure
+        :returns: Figure
+        :rtype: :py:class:`matplotlib.figure.Figure`
+        """
+
+        n_min = n_min or min(self.A - self.Z)
+        n_max = n_max or max(self.A - self.Z)
+        z_min = z_min or min(self.Z)
+        z_max = z_max or max(self.Z)
+
+        # Data to plot is organized in a dictionary
+        # Key is the element name
+        # Value is a list of tuples, where each tuple has the form ((N, Z), log_massf)
+        data_to_plot = {}
+
+        for iso in self.isotopes:
+            A, Z, element = get_A_Z(iso)
+            N = A - Z
+
+            # Filter those not wanted
+            if N < n_min or N > n_max or Z < z_min or Z > z_max:
+                continue
+
+            # Get mass fraction - we take the surface value for the moment
+            massf = self.get_dcol(iso, cycle)[0]
+            if massf < threshold:
+                log_massf = None
+            else:
+                log_massf = np.log10(massf)
+
+            # Put in the dictrionary
+            coordinates = (N, Z)
+            if element not in data_to_plot:
+                data_to_plot[element] = [(coordinates, log_massf)]
+            else:
+                data_to_plot[element].append((coordinates, log_massf))
+
+        # Figure
+        fig = plt.figure()
+
+        # Axes
+        # -/+1 for the isotpe name and squares to appear properly
+        fig.gca().set_xlim(n_min - 1, n_max + 1)
+        fig.gca().set_ylim(z_min - 1, z_max + 1)
+        plt.xlabel('Neutron number ($A-Z$)')
+        plt.ylabel('Atomic number ($Z$)')
+        plt.axis('equal')
+
+        # Colormap
+        cmap = plt.get_cmap('jet')
+        norm = mpl.colors.Normalize(vmin=np.log10(threshold), vmax=0)
+        sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+        sm.set_array([])
+        cbar = plt.colorbar(sm)
+        cbar.ax.set_ylabel(r'$\log_{10}(X)$')
+
+        # Plot data
+        for element, isos in data_to_plot.items():
+            for iso in isos:
+                (N, Z), log_massf = iso
+
+                # Draw square and annotate A
+                color = cmap(norm(log_massf)) if log_massf else 'none'
+                rect = patches.Rectangle(
+                    (N - 0.5, Z - 0.5), 1, 1, linewidth=2, edgecolor='k', facecolor=color)
+                fig.gca().add_patch(rect)
+                plt.annotate(
+                    N + Z, (N, Z), horizontalalignment='center', verticalalignment='center')
+
+            # Add isotope name
+            N_min_element = min([iso[0][0] for iso in isos])
+            plt.annotate(element, (N_min_element - 1, Z),
+                         horizontalalignment='center', verticalalignment='center')
+
+        # Title
+        plt.title('Isotropic chart for cycle {}'.format(cycle))
 
         # Show figure?
         if show:

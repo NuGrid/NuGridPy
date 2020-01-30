@@ -109,7 +109,7 @@ With NuGrid data, one can plot the abundances of some species vs mass coordinate
     print(n.isotopes)
 
     # Abundance profiles
-    n_out.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'])
+    n.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'])
 
 .. figure::  ../images/abu_profile.png
    :align:   center
@@ -119,19 +119,31 @@ With NuGrid data, one can plot the abundances of some species vs mass coordinate
 Isotopes abundances
 -------------------
 
-One can plot the different isotopes abundances using the :py:func:`~nugridpy.plot.PlotMixin.iso_abund` method:
+One can plot the different isotopes abundances using the :py:func:`~nugridpy.plot.PlotMixin.iso_abu` method:
 
 .. code:: python
 
-    path2 = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'nugrid', 'H5_out'))
-    n = nugrid_data(path2)
-
     # Isotope abundances
-    n.iso_abund(500, a_max=100)
+    n.iso_abu(500, a_max=100)
 
 .. figure::  ../images/iso_abund.png
    :align:   center
    :scale: 40%
+
+
+Abundances chart
+----------------
+
+user the :py:func:`~nugridpy.plot.PlotMixin.abu_chart` method to plot an abundance chart:
+
+.. code:: python
+
+    # Abundances chart
+    n.abu_chart(500, n_max=30, z_max=30)
+
+.. figure::  ../images/abu_chart.png
+   :align:   center
+   :scale: 60%
 
 
 References
