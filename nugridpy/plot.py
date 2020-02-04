@@ -6,6 +6,7 @@ Module providing the plotting capabilities.
 """
 
 from contextlib import suppress
+import itertools
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -14,6 +15,64 @@ import numpy as np
 
 from .isotopes import get_A_Z
 from .config import logger
+
+
+# Some constants for producing plots
+LINESTYLES = ('-', '--', '-.', ':')
+COLORS = ('b', 'g', 'r', 'c', 'm', 'k')
+MARKERS = ('^', 's', '*', 'h', '+', 'x', 'o', 'v', 'p', 'd', '<')
+MARKEVERY = (7, 19, 11, 17, 13)  # prime numbers to define where to put markers
+
+
+def color_scheme_generator():
+    """
+    Function for creating unique combinations of style, color, and mark
+    that is suitable for color-blind people.
+
+    :returns: Generator of tuples (style, color, marker, markevery)
+    :rtype: generator
+    """
+
+    # First take combinations for markers and linsetyles
+    # which are the important elements for color-blind people
+    combinations = np.array([_ for _ in itertools.product(MARKERS, LINESTYLES)])
+
+    # This dictionary contains the following:
+    #   - key: combination
+    #   - value: penalty given the combinations that have already been used
+    #
+    # E.g, we do not want to use '^' if it has already been used twice and 's' only once
+    # High penalty means we don't want to use this combination
+    # The penalty is calculated the following way:
+    #   - +1 for each time the marker has already been used
+    #   - +1 for each time the linestyle has already been used
+    penalties = {tuple(k): 0 for k in combinations}
+
+    sorted_combinations = []
+    while penalties:
+
+        # Get combination with minimum penalty and save it
+        min_c = min(penalties.keys(), key=lambda k: penalties[k])
+        sorted_combinations.append(min_c)
+
+        # Remove it and update penalties for the remaining combinations
+        penalties.pop(min_c)
+        for c in penalties:
+            if c[0] == min_c[0]:
+                penalties[c] += 1
+            if c[1] == min_c[1]:
+                penalties[c] += 1
+
+    # Add colors, cycling through them
+    combinations = ((c, combi[0], combi[1])
+                    for c, combi in zip(itertools.cycle(COLORS), sorted_combinations))
+
+    # Add markevery element to make sure markers do not overlap
+    combinations = ((m,) + combi
+                    for m, combi in zip(itertools.cycle(MARKEVERY), combinations))
+
+    # Return a cycle in case we exhaust all combinations - e.g. abundance plot
+    return itertools.cycle(combinations)
 
 
 class PlotMixin:
@@ -60,7 +119,7 @@ class PlotMixin:
         return ...
 
     def plot(self, x, ys, cycles=None, x0=None, logx=False, logy=False,
-             xlabel=None, ylabel=None, legend=True, show=True, **kwargs):
+             xlabel=None, ylabel=None, legend=True, show=True):
         """Generate a 2D plot.
 
         :param str x: name of the data for the x-axis
@@ -80,6 +139,9 @@ class PlotMixin:
         :rtype: :py:class:`matplotlib.figure.Figure`
         """
 
+        # Style generator
+        style_gen = color_scheme_generator()
+
         # Default x label
         xlabel = xlabel or x
 
@@ -98,8 +160,9 @@ class PlotMixin:
             x_data = x_data[indices]
             for y in ys:
                 y_data = self.get_cattr(y)[indices]
+                step, color, marker, ls = next(style_gen)
                 getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
-                    x_data, y_data, label=y, **kwargs)
+                    x_data, y_data, color + ls + marker, markevery=step, label=y)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
             # We report the cycle number in the legend if more than one is plotted
@@ -110,11 +173,12 @@ class PlotMixin:
                 x_data = x_data[indices]
                 for y in ys:
                     y_data = self.get_dcol(y, c)[indices]
+                    step, color, marker, ls = next(style_gen)
                     label = y
                     if add_cycle_in_legend:
                         label += ', cycle {}'.format(c)
                     getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
-                        x_data, y_data, label=label, **kwargs)
+                        x_data, y_data, color + ls + marker, markevery=step, label=label)
 
         # Axes labels
         plt.xlabel(xlabel)
@@ -166,17 +230,14 @@ class MesaPlotMixin(PlotMixin):
     }
 
     # Plot kwargs for the different types of data.
-    PLOT_KWARGS = {
-        'He core': {'c': 'r'},
-        'C core': {'c': 'g', 'ls': '--'},
-        'O core': {'c': 'c', 'ls': ':'},
+    KIPPENHAHN_PLOT_KWARGS = {
         'Mix1 Bot': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': 'convection zones'},
         'Mix1 Top': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': None},
         'Mix2 Bot': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': None},
         'Mix2 Top': {'c': 'b', 'marker': 'o', 'ls': 'None', 'alpha': 0.3, 'label': None},
     }
 
-    def hrd(self, show=True, **kwargs):
+    def hrd(self, show=True):
         """Hertzsprung-Russel diagramm.
 
         :param bool show: if True, display figure
@@ -192,7 +253,7 @@ class MesaPlotMixin(PlotMixin):
         fig = self.plot(teff_name, l_name,
                         xlabel=r'$\log(T_{\mathrm{eff}}/T_\odot)$',
                         ylabel=r'$\log(L/L_\odot)$',
-                        show=False, legend=False, **kwargs)
+                        show=False, legend=False)
 
         # Invert x-axis and return
         fig.gca().invert_xaxis()
@@ -202,7 +263,7 @@ class MesaPlotMixin(PlotMixin):
             fig.show()
         return fig
 
-    def tcrhoc(self, show=True, **kwargs):
+    def tcrhoc(self, show=True):
         """Central temperature against central density plot.
 
         :param bool show: if True, display figure
@@ -219,7 +280,7 @@ class MesaPlotMixin(PlotMixin):
         fig = self.plot(rhoc_name, tc_name,
                         xlabel=r'$\log(\rho_c/\,[g.cm^{-3}])$',
                         ylabel=r'$\log(T_c/[K])$',
-                        show=False, legend=False, **kwargs)
+                        show=False, legend=False)
 
         # Invert x-axis and return
         fig.gca().invert_xaxis()
@@ -243,6 +304,9 @@ class MesaPlotMixin(PlotMixin):
         """
 
         x_data = self.get_cattr(x)
+
+        # Style generator
+        style_gen = color_scheme_generator()
 
         # Data using the utility function
         # We should at least have the mass
@@ -288,14 +352,14 @@ class MesaPlotMixin(PlotMixin):
 
         # Plot
         for k, v in y_data.items():
-            try:
-                if 'label' in self.PLOT_KWARGS[k]:
-                    plt.plot(x_data, v, **self.PLOT_KWARGS[k], lw=2)
+            if k in self.KIPPENHAHN_PLOT_KWARGS:
+                if 'label' in self.KIPPENHAHN_PLOT_KWARGS[k]:
+                    plt.plot(x_data, v, **self.KIPPENHAHN_PLOT_KWARGS[k], lw=2)
                 else:
-                    plt.plot(x_data, v, **self.PLOT_KWARGS[k], label=k, lw=2)
-            except KeyError:
-                logger.debug('Cannot find specific plotting kwargs for %s', k)
-                plt.plot(x_data, v, label=k, lw=2)
+                    plt.plot(x_data, v, **self.KIPPENHAHN_PLOT_KWARGS[k], label=k, lw=2)
+            else:
+                step, color, marker, ls = next(style_gen)
+                plt.plot(x_data, v, color + ls + marker, markevery=step, label=k, lw=2)
 
         # Labels
         plt.xlabel(x)
@@ -307,7 +371,9 @@ class MesaPlotMixin(PlotMixin):
         # Add y-axis if C/O ratio is plotted
         if CO_ratio:
             plt.twinx()
-            plt.plot(x_data, CO_ratio_data, 'k--', lw=2, label='C/O ratio')
+            step, color, marker, ls = next(style_gen)
+            plt.plot(x_data, CO_ratio_data, color + ls + marker,
+                     markevery=step, lw=2, label='C/O ratio')
             plt.ylabel('C/O ratio')
             plt.legend()
 
@@ -320,7 +386,7 @@ class MesaPlotMixin(PlotMixin):
 class NugridPlotMixin(PlotMixin):
     """Class with additional plotting functionalities for NuGrid data."""
 
-    def abu_profile(self, cycle, isos=None, show=True, **kwargs):
+    def abu_profile(self, cycle, isos=None, logx=False, logy=False, show=True):
         """Abundances profiles vs mass coordinates.
 
         :param int cycle: cycle for which to plot abundances
@@ -335,9 +401,10 @@ class NugridPlotMixin(PlotMixin):
         return self.plot('mass', isos, cycles=cycle,
                          xlabel=r'$m/M_\odot$',
                          ylabel=r'$\log(X)$',
-                         show=show, legend=True, **kwargs)
+                         logx=logx, logy=logy,
+                         show=show, legend=True)
 
-    def iso_abu(self, cycle, a_min=None, a_max=None, threshold=1e-12, show=True, **kwargs):
+    def iso_abu(self, cycle, a_min=None, a_max=None, threshold=1e-12, show=True):
         """Isotopes abundances plot.
 
         :param int cycle: cycle for which to plot abundances
@@ -351,6 +418,9 @@ class NugridPlotMixin(PlotMixin):
 
         a_min = a_min or min(self.A)
         a_max = a_max or max(self.A)
+
+        # Style generator
+        style_gen = color_scheme_generator()
 
         # Data to plot is organized in a dictionary
         # Key is the element name
@@ -383,7 +453,9 @@ class NugridPlotMixin(PlotMixin):
         for element in data_to_plot:
             x = data_to_plot[element][0]
             y = data_to_plot[element][1]
-            plt.plot(x, y, marker='s', **kwargs)
+
+            _, color, marker, ls = next(style_gen)
+            plt.plot(x, y, color + ls + marker)
 
             # Annotate at the largest mass fraction
             x_max, y_max = sorted(zip(x, y), key=lambda e: e[1], reverse=True)[0]

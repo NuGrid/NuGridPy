@@ -22,6 +22,8 @@ First, we need to load data. We can use the data availabel in the :code:`resourc
 
 .. code:: python
 
+    import os
+    import pkg_resources
     from nugridpy import mesa_data, nugrid_data
 
     path = pkg_resources.resource_filename('nugridpy', os.path.join('resources', 'mesa', 'LOGS'))
@@ -47,11 +49,13 @@ will produce two plots:
 .. |logRvslogRho| image::  ../images/logRvslogRho.png
    :width: 45%
 
+Specific plots
+--------------
 
 Hertzsprung-Russel diagramm
----------------------------
+***************************
 
-You can produce Hertzsprung-Russel diagramm using the :py:func:`~nugridpy.plot.PlotMixin.hrd` method:
+You can produce Hertzsprung-Russel diagramm using the :py:func:`~nugridpy.plot.MesaPlotMixin.hrd` method:
 
 .. code:: python
 
@@ -64,9 +68,9 @@ You can produce Hertzsprung-Russel diagramm using the :py:func:`~nugridpy.plot.P
 
 
 T\ :sub:`c`\-Rho\ :sub:`c`\  diagramm
--------------------------------------
+*************************************
 
-The :py:func:`~nugridpy.plot.PlotMixin.tcrhoc` method plots the central density vs. the central temperature:
+The :py:func:`~nugridpy.plot.MesaPlotMixin.tcrhoc` method plots the central density vs. the central temperature:
 
 
 .. code:: python
@@ -80,9 +84,9 @@ The :py:func:`~nugridpy.plot.PlotMixin.tcrhoc` method plots the central density 
 
 
 Kippenhahn diagramm
--------------------
+*******************
 
-One can also make a Kippenhahn diagramm with the :py:func:`~nugridpy.plot.PlotMixin.kippenhahn` method:
+One can also make a Kippenhahn diagramm with the :py:func:`~nugridpy.plot.MesaPlotMixin.kippenhahn` method:
 
 .. code:: python
 
@@ -91,13 +95,14 @@ One can also make a Kippenhahn diagramm with the :py:func:`~nugridpy.plot.PlotMi
 
 .. figure::  ../images/kippenhahn.png
    :align:   center
-   :scale: 60%
+   :scale: 40%
 
 
 Abundances profiles
--------------------
+*******************
 
-With NuGrid data, one can plot the abundances of some species vs mass coordinates:
+With NuGrid data, one can plot the abundances of some species vs mass coordinates
+using the method :py:func:`~nugridpy.plot.NugridPlotMixin.abu_profile`:
 
 
 .. code:: python
@@ -109,7 +114,7 @@ With NuGrid data, one can plot the abundances of some species vs mass coordinate
     print(n.isotopes)
 
     # Abundance profiles
-    n.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'])
+    n.abu_profile(500, isos=['H-1', 'He-4', 'C-12', 'C-13', 'N-14', 'O-16'], logy=True)
 
 .. figure::  ../images/abu_profile.png
    :align:   center
@@ -117,9 +122,9 @@ With NuGrid data, one can plot the abundances of some species vs mass coordinate
 
 
 Isotopes abundances
--------------------
+*******************
 
-One can plot the different isotopes abundances using the :py:func:`~nugridpy.plot.PlotMixin.iso_abu` method:
+One can plot the different isotopes abundances using the :py:func:`~nugridpy.plot.NugridPlotMixin.iso_abu` method:
 
 .. code:: python
 
@@ -132,9 +137,9 @@ One can plot the different isotopes abundances using the :py:func:`~nugridpy.plo
 
 
 Abundances chart
-----------------
+****************
 
-user the :py:func:`~nugridpy.plot.PlotMixin.abu_chart` method to plot an abundance chart:
+User the :py:func:`~nugridpy.plot.NugridPlotMixin.abu_chart` method to plot an abundance chart:
 
 .. code:: python
 
@@ -142,6 +147,45 @@ user the :py:func:`~nugridpy.plot.PlotMixin.abu_chart` method to plot an abundan
     n.abu_chart(500, n_max=30, z_max=30)
 
 .. figure::  ../images/abu_chart.png
+   :align:   center
+   :scale: 50%
+
+
+
+Plot customization
+------------------
+
+Plotting is performed using the well-known `Matplotlib <https://matplotlib.org/>`_ package.
+It provides a thorough and complex API allowing plot modifications.
+In order to keep the NuGridPy API simple, it is impossible for the user to interface directly with the
+`Matplotlib <https://matplotlib.org/>`_ API using the different plotting functions.
+
+However, each of these functions returns a :code:`Matplotlib Figure` which can be interacted with.
+For instance:
+
+
+.. code:: python
+
+    fig = m.plot('logR', ['h1', 'he4'], cycles=2030)
+    ax = fig.gca()
+
+    # Change linestyles
+    ax.lines[0].set_linestyle('--')
+    ax.lines[0].set_color('r')
+    ax.lines[0].set_label('Hydrogen')
+
+    # Regenerate legend
+    ax.legend()
+
+    # Change baackground
+    ax.set_facecolor('grey')
+
+    # Update plot
+    fig.canvas.draw()
+
+will produce the following plot:
+
+.. figure::  ../images/updated_plot.png
    :align:   center
    :scale: 60%
 

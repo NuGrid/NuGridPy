@@ -133,7 +133,7 @@ between the classes :py:class:`~nugridpy.data.MesaDataText` and
 
 These classes can be used to instantiate data objects.
 However, we recommend to use the simpler functions
-:py:class:`~nugridpy.mesa_data` and :py:class:`~nugridpy.nugrid_data`.
+:py:func:`~nugridpy.__init__.mesa_data` and :py:func:`~nugridpy.__init__.nugrid_data`.
 For instance:
 
 .. code:: python
@@ -142,7 +142,8 @@ For instance:
 
     m1 = mesa_data('/path/to/LOGS', data_type='text')
     m2 = mesa_data('/path/to/HDF5', data_type='hdf5')
-    nu = mesa_data('/path/to/H5_out')
+    nu1 = nugrid_data('/path/to/H5_out')
+    nu2 = nugrid_data('/path/to/H5_surf')
 
 
 Data can be extracted easily:
@@ -153,7 +154,7 @@ Data can be extracted easily:
     header_attributes = m1.hattrs
     cycle_attributes = m1.cattrs
     isotopes = m2.isotopes
-    data_columns = nu.dcols
+    data_columns = nu1.dcols
 
     # Header attributes
     z = m1.get_hattr('initial_z')
@@ -162,11 +163,19 @@ Data can be extracted easily:
     age = m2.get_cattr('age')
 
     # Data columns for one or two cycles
-    r = nu.get_dcol('radius', 100)
-    rho = nu.get_dcol('rho', [500, 800])
+    r = nu1.get_dcol('radius', 100)
+    rho = nu1.get_dcol('rho', [500, 800])
+
+    # Decay data
+    decay = nu2.get_dcol('elem_massf_decay', 500)
 
 References
 ----------
+
+.. automodule:: nugridpy.__init__
+   :members:
+   :member-order: bysource
+   :exclude-members: __weakref__
 
 .. automodule:: nugridpy.data
    :members:

@@ -26,6 +26,7 @@ def _demo_mesa_logs():
     m1.hrd()
     m1.tcrhoc()
     m1.plot('logR', 'logRho', [2030, 2210])
+    m1.plot('mass', ['H-1', 'He3', 'c12'], 2030, x0=0.315, logy=True)
     m1.kippenhahn('star_age', x0=9.4e8, CO_ratio=True)
 
 
@@ -45,6 +46,8 @@ def _demo_mesa_hdf5():
     m2.tcrhoc()
     m2.plot('radius', 'rho', 2030, ylabel=r'$\rho/\,[g.cm^{-3}]$',
             logx=True, logy=True, legend=False)
+    m2.plot('age', ['he_core_mass', 'c_core_mass', 'o_core_mass',
+                    'log_g', 'logL', 'logTeff', 'log_R', ])
     m2.kippenhahn('age')
 
 

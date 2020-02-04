@@ -5,8 +5,12 @@ Tests for the plot module.
 from unittest import TestCase
 from unittest.mock import patch
 import random
+import itertools
 
-from nugridpy.plot import PlotMixin, MesaPlotMixin, NugridPlotMixin
+from nugridpy.plot import \
+    PlotMixin, MesaPlotMixin, NugridPlotMixin, \
+    color_scheme_generator, \
+    LINESTYLES, COLORS, MARKERS, MARKEVERY
 
 from .fixtures import random_string, random_array, random_ints
 
@@ -168,6 +172,20 @@ class TestPlotMixin(TestCase):
         d += (field_name,)
         r = MesaPlotMixin()._find_data_by_correct_name(d, return_data=False)
         self.assertEqual(r, field_name)
+
+    def test_color_scheme_generator(self, _m_where, _m_plt):
+        """Checks the function generating styles to used for plotting."""
+
+        gen = color_scheme_generator()
+        self.assertIsInstance(gen, itertools.cycle)
+
+        # Generator will produce values indefenitely
+        for _ in range(10000):
+            step, color, marker, ls = next(gen)
+            self.assertIn(step, MARKEVERY)
+            self.assertIn(color, COLORS)
+            self.assertIn(marker, MARKERS)
+            self.assertIn(ls, LINESTYLES)
 
 
 class TestMesaPlotMixin(TestCase):

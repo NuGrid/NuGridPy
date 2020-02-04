@@ -44,6 +44,18 @@ class DataFromTextMixin:
         self._header_object, self._data_object = TextFile.readfile(
             filename, filetype)
 
+    def _find_similar_name(self, name):
+        """Function trying to find in the data a matching name for a given field.
+
+        ..note:: trying to match names such as o16, O16, or O-16.
+        """
+        # Remove hyphen and put everything lower case
+        for col in self.data_names:
+            if name.replace('-', '').lower() == col.replace('-', '').lower():
+                logger.warning(
+                    'Matching requested field \'%s\' with available field \'%s\'', name, col)
+                return col
+
     @property
     def header_names(self):
         """List of header names."""
@@ -60,7 +72,14 @@ class DataFromTextMixin:
 
     def get(self, name):
         """Get method for data object."""
-        return self._data_object[name]
+        try:
+            return self._data_object[name]
+        except ValueError:
+            # See if we can find element with a similar name
+            matching_name = self._find_similar_name(name)
+            if matching_name:
+                return self._data_object[matching_name]
+            raise
 
 
 class DataFromHDF5Mixin:
@@ -100,10 +119,10 @@ class DataFromHDF5Mixin:
                     self.isomeric_state = datasets['isomeric_state']
 
                     # Create isotopes
+                    logger.info(
+                        'A, Z, and isomeric_state datasets read. Creating isotopes attribute.')
                     self.isotopes = [
                         get_isotope_name(int(a), int(z)) for a, z in zip(self.A, self.Z)]
-                    logger.info(
-                        'Attributes for A, Z, isomeric_state, and isotopes have been created.')
 
             else:  # only care about groups
                 _, groups_data, header_data, _ = Hdf5File.readfile(

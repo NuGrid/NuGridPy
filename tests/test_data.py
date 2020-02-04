@@ -6,10 +6,66 @@ import random
 
 import numpy as np
 
+from nugridpy.io import TextFile
 from nugridpy.data import \
     DataFromTextMixin, DataFromHDF5Mixin, \
     MesaDataText, MesaDataHDF5, MesaData
 from .fixtures import random_string, random_ints, random_array
+
+
+# , return_value=(np.array('toto', random_array()), np.array('toto', random_array())))
+@patch.object(TextFile, 'readfile',
+              return_value=np.array([('toto', random_array()), ('toto', random_array())]))
+class TestDataFromTextMixin(TestCase):
+    """Class for testing the DataFromTextMixin class."""
+
+    @patch.object(DataFromTextMixin, 'data_names', new_callable=PropertyMock)
+    def test_find_similar_name(self, m_dn, m_read):
+        """Check the _find_similar_name method."""
+
+        m_read.return_value = random_array(), random_array()
+        x = DataFromTextMixin(random_string(), random_string())
+        _ = x._find_similar_name('titi')
+        self.assertEqual(m_dn.call_count, 1)
+
+        # No match
+        m_dn.return_value = ['o16', 'ne22', 'logT']
+        no_match = x._find_similar_name('titi')
+        self.assertEqual(m_dn.call_count, 2)
+        self.assertIsNone(no_match)
+
+        # Match found
+        match = x._find_similar_name('O-16')
+        self.assertEqual(m_dn.call_count, 3)
+        self.assertEqual(match, 'o16')
+
+    @patch.object(DataFromTextMixin, '_find_similar_name')
+    def test_get(self, m_find, m_read):
+        """Check the _find_similar_name method."""
+
+        # Here we need to return a structured array for the data
+        struct_array = np.array(
+            [(1, 2.0), (3, -17.1)], dtype=[('toto', 'i4'), ('titi', 'f4')])
+        m_read.return_value = random_array(), struct_array
+
+        x = DataFromTextMixin(random_string(), random_string())
+
+        # Correct field
+        field = 'toto'
+        vals = x.get(field)
+        np.testing.assert_array_equal(vals, struct_array[field])
+
+        # Bad field, no matching
+        field = 'tutu'
+        m_find.return_value = None
+        with self.assertRaises(ValueError):
+            x.get(field)
+
+        # Bad field with matching
+        matching_name = 'titi'
+        m_find.return_value = matching_name
+        vals = x.get(field)
+        np.testing.assert_array_equal(vals, struct_array[matching_name])
 
 
 @patch.object(DataFromTextMixin, 'get', return_value=random_ints())

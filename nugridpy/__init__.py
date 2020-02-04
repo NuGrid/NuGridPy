@@ -1,7 +1,8 @@
 from .data import MesaData, NugridData
 
 
-def mesa_data(directory, data_type, history_name='history.data',
+def mesa_data(directory, data_type,
+              history_name='history.data',
               profile_index_name='profiles.index',
               profile_prefix='profile',
               profile_suffix='.data'):
