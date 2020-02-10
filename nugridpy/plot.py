@@ -139,6 +139,9 @@ class PlotMixin:
         :rtype: :py:class:`matplotlib.figure.Figure`
         """
 
+        # Plot function lookup
+        plot_function = getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])
+
         # Style generator
         style_gen = color_scheme_generator()
 
@@ -161,8 +164,7 @@ class PlotMixin:
             for y in ys:
                 y_data = self.get_cattr(y)[indices]
                 step, color, marker, ls = next(style_gen)
-                getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
-                    x_data, y_data, color + ls + marker, markevery=step, label=y)
+                plot_function(x_data, y_data, color + ls + marker, markevery=step, label=y)
         else:
             cycles = [cycles] if isinstance(cycles, int) else cycles
             # We report the cycle number in the legend if more than one is plotted
@@ -177,8 +179,7 @@ class PlotMixin:
                     label = y
                     if add_cycle_in_legend:
                         label += ', cycle {}'.format(c)
-                    getattr(plt, self.PLOT_FUNC_CHOICES[(logx, logy)])(
-                        x_data, y_data, color + ls + marker, markevery=step, label=label)
+                    plot_function(x_data, y_data, color + ls + marker, markevery=step, label=label)
 
         # Axes labels
         plt.xlabel(xlabel)
