@@ -1,17 +1,20 @@
-Doing Astrophysics With NuGridPy
-================================
+Doing Astrophysics
+==================
+
+.. contents::
+    :local:
+    :depth: 1
 
 On this page, the astronomy and constants modules are documented. Together,
 these modules comprise the basic astronomical and physical calculations
 and constants necessary for doing astrophysics with NuGridPy.
 
-
 Constants
 ---------
 
-In the ``constants`` module, the :py:class:`Constant<nugridpy.constants.Constant>` 
-class and its instances are defined. A variety of physical and astronomical 
-constants are instantiated (e.g., Planck's constant) with a value, description, 
+In the ``constants`` module, the :py:class:`Constant<nugridpy.constants.Constant>`
+class and its instances are defined. A variety of physical and astronomical
+constants are instantiated (e.g., Planck's constant) with a value, description,
 and the constant's cgs units. The module can be imported with a standard import:
 
 .. code:: python
@@ -46,9 +49,9 @@ from nugridpy with a standard import:
 
    from nugridpy import astronomy
 
-Each function in the module takes in a set of parameters and returns a data 
-structure, usually simply a float value. The functions may contain constants 
-imported from the constants module, which can be read out in a tuple as 
+Each function in the module takes in a set of parameters and returns a data
+structure, usually simply a float value. The functions may contain constants
+imported from the constants module, which can be read out in a tuple as
 follows:
 
 .. code:: python
@@ -103,7 +106,7 @@ Registering your own function
 You only need to use the :py:func:`attach_constants<nugridpy.astronomy.attach_constants>` decorator
 to register your astronomy function. Otherwise, it is the same as building any other python function.
 
-For instance, let us assume that we want to register a function that calculates the circumference of a 
+For instance, let us assume that we want to register a function that calculates the circumference of a
 circle. First, we define a constant for pi in the constants module:
 
 .. code::

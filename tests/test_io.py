@@ -9,12 +9,13 @@ import unittest
 
 import h5py
 
-from nugridpy import data, io
+from nugridpy import io
 from .fixtures import random_string
 
 
 DATA_PATH = pkg_resources.resource_filename('tests', 'data/read-write')
 HDF5_FILE = pkg_resources.resource_filename('tests', 'data/read-write/M2.00Z0.020.0000001.surf.h5')
+
 
 class TestAscii(unittest.TestCase):
     """Test ascii i/o capabilities."""
@@ -40,7 +41,7 @@ class TestAscii(unittest.TestCase):
             'parser': None,
             'skip_header': 0,
             'names': None
-            }
+        }
 
     def test_TextFile(self):
         """Test the io.TextFile class."""
@@ -56,7 +57,7 @@ class TestAscii(unittest.TestCase):
         """Test the io.TextFile.readfile class method."""
         # Read a working test file with io.TextFile.readfile
         self.test_read = io.TextFile.readfile(os.path.join(self.data_path, 'history.data'),
-            io.TextFile.MESA_DATA)
+                                              io.TextFile.MESA_DATA)
 
         # Ensure proper OSError when filename can't be found
         for ftype in self.ftypes:
@@ -81,9 +82,9 @@ class TestAscii(unittest.TestCase):
             self.assertIsInstance(temp_data, numpy.ndarray)
 
             # Ensure the dimensions are correct (minus 1 for column names)
-            self.assertEqual(temp_headers.size, 0) # No headers in TEST_DATA
-            self.assertEqual(temp_data.size, self.col_height - 1) # Data column minus name
-            self.assertEqual(len(temp_data.dtype), self.row_width) # Column names
+            self.assertEqual(temp_headers.size, 0)  # No headers in TEST_DATA
+            self.assertEqual(temp_data.size, self.col_height - 1)  # Data column minus name
+            self.assertEqual(len(temp_data.dtype), self.row_width)  # Column names
 
         # Populate a tempfile with column inconsistencies (break write-in)
         with tempfile.NamedTemporaryFile(mode='r+') as test_badf:
@@ -91,7 +92,7 @@ class TestAscii(unittest.TestCase):
             for row in range(self.col_height):
                 for col in range(self.row_width):
                     # Break before writing final data column
-                    if row > 0 and col == self.row_width-1:
+                    if row > 0 and col == self.row_width - 1:
                         break
                     # Otherwise write random string
                     test_badf.write(random_string())

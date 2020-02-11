@@ -3,3 +3,8 @@ __pycache__
 *~
 doc/build
 .idea
+nosetests*
+.noseids
+h5Preproc.txt
+history.datasa
+_build
