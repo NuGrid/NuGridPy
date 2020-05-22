@@ -1,0 +1,12 @@
+default:
+  image: adampaul/nugrid-ci:latest
+
+before_script:
+  - pip install -r requirements.txt
+
+nugridpy-tests:
+  tags:
+    - 'nugrid-ci'
+  stage: test
+  script:
+    - nosetests tests/
