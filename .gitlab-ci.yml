@@ -2,6 +2,7 @@ default:
   image: adampaul/nugrid-ci:latest
 
 before_script:
+  - python --version
   - pip install -r requirements.txt
 
 nugridpy-tests:
