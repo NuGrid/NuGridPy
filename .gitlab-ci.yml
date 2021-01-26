@@ -1,5 +1,5 @@
 default:
-  image: adampaul/nugrid-ci:latest
+  image: nugrid/nudome:18.0
 
 before_script:
   - python --version
