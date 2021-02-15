@@ -1090,10 +1090,14 @@ class history_data(DataPlot):
 
         """
         xl_old=pyl.gca().get_xlim()
-        if input_label == "":
-            my_label="M="+str(self.header_attr['initial_mass'])+", Z="+str(self.header_attr['initial_z'])
+        if 'initial_mass' in list(self.header_attr.keys()):
+            my_label = f"M={self.header_attr['initial_mass']:3.1f}" 
         else:
-            my_label="M="+str(self.header_attr['initial_mass'])+", Z="+str(self.header_attr['initial_z'])+"; "+str(input_label)
+            my_label = f"M={self.get('star_mass')[0]:3.1f}"
+        if 'initial_z' in list(self.header_attr.keys()):
+            my_label += f", Z={self.header_attr['initial_z']:3g}"     
+        if not input_label == "":
+            my_label += "; "+str(input_label)
 
         pyl.plot(self.data[skip:,self.cols['log_Teff']-1],self.data[skip:,self.cols['log_L']-1],label = my_label)
         pyl.legend(loc=0)
@@ -3737,7 +3741,10 @@ def _read_mesafile(filename,data_rows=0,only='all'):
     hlist = lines[1].split()
     header_attr = {}
     for a,b in zip(hlist,hval):
-        header_attr[a] = float(b)
+        try:
+            header_attr[a] = float(b)
+        except ValueError:
+            header_attr[a] = b
     if only is 'header_attr':
         return header_attr
 
