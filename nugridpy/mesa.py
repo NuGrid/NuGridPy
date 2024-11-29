@@ -3736,8 +3736,16 @@ def _read_mesafile(filename,data_rows=0,only='all'):
     hval  = lines[2].split()
     hlist = lines[1].split()
     header_attr = {}
-    for a,b in zip(hlist,hval):
-        header_attr[a] = float(b)
+#    for a,b in zip(hlist,hval):
+#        header_attr[a] = float(b)
+    for a, b in zip(hlist, hval):
+        # Check if b contains only digits and at most one '.'
+       if isinstance(b, str) and not b.replace('.', '', 1).isdigit():
+           header_attr[a] = b  # Keep it as a string
+       else:
+           header_attr[a] = float(b)  # Convert to float
+
+
     if only is 'header_attr':
         return header_attr
 
