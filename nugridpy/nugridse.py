@@ -317,7 +317,7 @@ class se(DataPlot, Utils):
         self.deltat=None
         self.sefiles=sefiles
         self._stable_names() # provides in addition to stable_el from
-                             # nuutils also just the stable element names
+                             # utils also just the stable element names
 
         self.se=h5T.Files(sedir,sefiles,rewrite=rewrite)
 
@@ -2075,7 +2075,7 @@ class se(DataPlot, Utils):
 
         """
 
-        import nuutils as u
+        import utils as u
 
         masses = []
         #    Check the inputs
@@ -2144,11 +2144,11 @@ class se(DataPlot, Utils):
 
         See Also
         --------
-        _read_iso_abund_marco(), nuutils.Utils._stable_species()
+        _read_iso_abund_marco(), utils.Utils._stable_species()
 
         """
 
-        import nuutils as u
+        import utils as u
 
         global decayed_multi_d
         decayed_multi_d=[]
@@ -3788,7 +3788,7 @@ class se(DataPlot, Utils):
         """
 
 
-        import nuutils as u
+        import utils as u
 
         if not stable and i_decay == 2:
             print('ERROR: choose i_decay = 1')
@@ -3851,7 +3851,7 @@ class se(DataPlot, Utils):
     def _get_elem_names(self):
         """ returns for one cycle an element name dictionary."""
 
-        import nuutils as u
+        import utils as u
 
         # provide library for Z versus element names, and Z for elements
         #element_name = self.se.elements
@@ -3872,7 +3872,7 @@ class se(DataPlot, Utils):
 
         """
 
-        import nuutils as u
+        import utils as u
 
         masses_for_this_cycle = self.se.get(cycle,'mass')
         self._read_iso_abund_marco([min(masses_for_this_cycle),max(masses_for_this_cycle)],cycle)
@@ -3930,7 +3930,7 @@ class se(DataPlot, Utils):
 
         """
 
-        import nuutils as u
+        import utils as u
 
         masses_for_this_cycle = self.se.get(cycle,'mass')
         self._read_iso_abund_marco([min(masses_for_this_cycle),max(masses_for_this_cycle)],cycle)
