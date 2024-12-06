@@ -3639,7 +3639,7 @@ class se(DataPlot, Utils):
 
     def windyields(self, ini, end, delta, **keyw):
         """
-        This function returns the wind yields and ejected masses.
+        This function returns the wind yields and ejected masses, with data extracted from the H5_surf file.
 
         X_i, E_i = data.windyields(ini, end, delta)
 
