@@ -3,7 +3,7 @@
 
 | **Attention ⚠️** |
 |----------|
-| The current version of NuGridPy is not maintained anymore at GitHub, but in the NuGrid [Gitlab](https://gitlab.ppmstar.org/NuGrid/NuGridPy). Please use the Gitlab version ☺️|
+| NuGridPy is now developed by the NuGrid collaboration on the NuGrid GitLab repository. The master branch will be updated here on GitHub from time to time. NuGrid developers: Please use the Gitlab repo. Others can do a pull request on the GitHub repo.
 
 
 # NuGridPy
