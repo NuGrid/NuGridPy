@@ -91,10 +91,10 @@ class data_fitting(object):
             (1, 1).
 
         '''
-        if func is 'linear':
+        if func == 'linear':
             print("Information: 'linear' fit needs coef list with 2 entries")
             print(" -> will use default: coef = "+str(coef))
-            if len(coef) is not 2:
+            if len(coef) != 2:
                 print("Warning: you want a linear fit but you have not")
                 print("         provided a guess for coef with the")
                 print("         right length (2).")
@@ -103,10 +103,10 @@ class data_fitting(object):
             def ff(coef,x):
                 return coef[0]*x + coef[1]
             self.__name__ = func
-        elif func is 'powerlaw':
+        elif func == 'powerlaw':
             print("Information: 'powerlaw' fit needs coef list with 3 entries")
             print(" -> will use default: coef = "+str(coef))
-            if len(coef) is not 3:
+            if len(coef) != 3:
                 print("Warning: you want a power law fit but you have")
                 print("         not provided a guess for coef with the")
                 print("         right length (3).")
@@ -161,7 +161,7 @@ class data_fitting(object):
         self.x = x
         self.y = y
 
-        if dcoef is not 'none':
+        if dcoef != 'none':
             coef = dcoef
         else:
             coef = self.coef
@@ -197,7 +197,7 @@ class data_fitting(object):
 
         pl.figure(ifig)
         pl.plot(self.x,self.y,data_shape,label=data_label)
-        if fit_label is 'fit':
+        if fit_label == 'fit':
             fit_label=self.__name__
         pl.plot(self.x,self.func(self.fcoef,self.x),fit_shape,label=fit_label)
         pl.legend()
@@ -907,13 +907,13 @@ def species_list(what_list):
         If what_list is "s-process", then s-process indicators.
 
     '''
-    if what_list is "CNONe":
+    if what_list == "CNONe":
         list_to_print = ['H-1','He-4','C-12','N-14','O-16','Ne-20']
-    elif what_list is "sprocess":
+    elif what_list == "sprocess":
         list_to_print = ['Fe-56','Ge-70','Zn-70','Se-76','Kr-80','Kr-82','Kr-86','Sr-88','Ba-138','Pb-208']
-    elif what_list is "burn_stages":
+    elif what_list == "burn_stages":
         list_to_print = ['H-1','He-4','C-12','O-16','Ne-20','Si-28']
-    elif what_list is "list_marco_1":
+    elif what_list == "list_marco_1":
         list_to_print = ['C-12','O-16','Ne-20','Ne-22','Na-23','Fe-54','Fe-56','Zn-70','Ge-70','Se-76','Kr-80','Kr-82','Sr-88','Y-89','Zr-96','Te-124','Xe-130','Xe-134','Ba-138']
 
     return list_to_print
@@ -948,8 +948,8 @@ def linestyle(i,a=5,b=3):
     lines=['-','--','-.',':']
     points=['v','^','<','>','1','2','3','4','s','p','*','h','H','+','x','D','d','o']
     colors=['b','g','r','c','m','k']
-    ls_string = colors[sc.mod(i,6)]+lines[sc.mod(i,4)]+points[sc.mod(i,18)]
-    mark_i    = a+sc.mod(i,b)
+    ls_string = colors[i % 6]+lines[i % 4]+points[i % 18]
+    mark_i    = a+i % b
     return ls_string,int(mark_i)
 
 def colourblind(i):
@@ -975,7 +975,7 @@ def colourblind(i):
     for r in rawRGBs:
         scaledRGBs.append((old_div(r[0],255.),old_div(r[1],255.),old_div(r[2],255.)))
 
-    idx = sc.mod(i,len(scaledRGBs))
+    idx = i % len(scaledRGBs)
     return scaledRGBs[idx]
 
 def colourblind2(i):
@@ -988,7 +988,7 @@ def colourblind2(i):
 
     hexcols = ['#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77',
                '#CC6677', '#882255', '#AA4499']
-    idx = sc.mod(i,len(hexcols))
+    idx = i % len(hexcols)
     return hexcols[idx]
 
 def linestylecb(i,a=5,b=3):
@@ -1021,9 +1021,9 @@ def linestylecb(i,a=5,b=3):
     points=['v','^','<','>','1','2','3','4','s','p','*','h','H','+','x','D','d','o']
     colors=['b','g','r','c','m','k']
     col=colourblind(i)
-    style=lines[sc.mod(i,4)]
-    point=points[sc.mod(i,18)]
-    mark_i    = a+sc.mod(i,b)
+    style=lines[i % 4]
+    point=points[i % 18]
+    mark_i    = a+i % b
     return style,point,col,mark_i
 
 
@@ -1038,17 +1038,17 @@ def symbol_list(what_list):
         "lines1" or "lines2".
 
     '''
-    if what_list is "list1":
+    if what_list == "list1":
         symbol=['ro','bo','ko','go','mo'\
                 ,'r-','b-','k-','g-','m-','r--','b--','k--'\
                 ,'g--','r1']
         #symbol=['r+','ro','r-']
-    elif what_list is "list2":
+    elif what_list == "list2":
         symbol=['r-','b--','g-.','k:','md','.','o','v','^','<','>','1','2',\
                 '3','4','s','p','*','h','H','+']
-    elif what_list is "lines1":
+    elif what_list == "lines1":
         symbol=['b--','k--','r--','c--','m--','g--','b-','k-','r-','c-','m-','g-','b.','b-.','k-.','r-.','c-.','m-.','g-.','b:','k:','r:','c:','m:','g:']
-    elif what_list is "lines2":
+    elif what_list == "lines2":
         symbol=['g:','r-.','k-','b--','k-.','b+','r:','b-','c--','m--','g--','r-','c-','m-','g-','k-.','c-.','m-.','g-.','k:','r:','c:','m:','b-.','b:']
     return symbol
 
@@ -1068,7 +1068,7 @@ def make_list(default_symbol_list, len_list_to_print):
 
     symbol_used = []
     for i in range(len_list_to_print):
-        symbol_used.append(default_symbol_list[sc.mod(i,len(default_symbol_list))])
+        symbol_used.append(default_symbol_list[i % len(default_symbol_list)])
 
     return symbol_used
 

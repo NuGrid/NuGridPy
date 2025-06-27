@@ -1,6 +1,11 @@
 [![Build Status](https://travis-ci.org/NuGrid/NuGridPy.svg?branch=master)](https://travis-ci.org/NuGrid/NuGridPy)
 [![PyPI version](https://badge.fury.io/py/NuGridpy.svg)](https://badge.fury.io/py/NuGridpy)
 
+| **Attention ⚠️** |
+|----------|
+| NuGridPy is now developed by the NuGrid collaboration on the NuGrid GitLab repository. The master branch will be updated here on GitHub from time to time. NuGrid developers: Please use the Gitlab repo. Others can do a pull request on the GitHub repo.
+
+
 # NuGridPy
 
 [NuGridPy](https://nugrid.github.io/NuGridPy) is the NuGrid Python package providing tools to access and analyse (e.g. plot) various output formats (including the [NuGrid hdf5-based se format](https://github.com/NuGrid/NuSE)) from NuGrid codes (mppnp and ppn) and from the MESA stellar evolution code using the [NuGrid mesa_h5 MESA extension](https://github.com/NuGrid/mesa_h5). In principle the NuGridPy package can be used on any stellar evolution code output if the [NuGrid se libraries](https://github.com/NuGrid/NuSE) are used for output.<br>
